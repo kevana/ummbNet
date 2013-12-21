@@ -1,0 +1,32 @@
+html,
+body {
+  background-color: #52020D;
+}
+
+.billboard {
+  margin-top: 60px;
+	color: #fff;
+}
+
+h1 {
+	font-size: 46pt;
+	margin-bottom: 40px;
+	font-family: "proxima nova", sans-serif;
+}
+
+p {
+	font-size: 20pt;
+	line-height: 26pt;
+	font-family: "proxima nova", sans-serif;
+	margin-bottom: 26pt;
+}
+
+a {
+  color: #b2e8ff;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #71d5ff;
+  text-decoration: underline;
+}
