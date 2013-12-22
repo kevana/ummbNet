@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_login import (LoginManager, login_required, login_user,
                          current_user, logout_user, UserMixin)
@@ -19,6 +19,7 @@ class User(db.Model):
   username = db.Column(db.String(80), unique=True)
   email = db.Column(db.String(120), unique=True)
   pw_hash = db.Column(db.String(60))
+  requests = db.relationship('Request', backref='User', lazy='dynamic')
   
   # Self functions
   def __init__(self, username, email, password):
@@ -48,10 +49,9 @@ class DbUser(object):
 
 class Request(db.Model):
   id = db.Column(db.Integer, primary_key=True)
+  poster = db.relationship('User', backref=db.backref('requests1', lazy='dynamic'))
   poster_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-  poster = db.relationship('User', backref=db.backref('requests', lazy='dynamic'))
-  sub_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-  sub = db.relationship('User', backref=db.backref('requests', lazy='dynamic'))
+  sub = db.relationship('User', backref=db.backref('requests2', lazy='dynamic'))
   
   def __init__(self, poster, sub=None):
     self.poster = poster
@@ -72,7 +72,7 @@ def load_user(user_id):
 @app.route('/', defaults={'dummy': ''})
 @app.route("/<path:dummy>")
 def catchAll(dummy):
-	return render_template('ummbNet.html')
+	return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
