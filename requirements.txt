@@ -1,4 +1,6 @@
 Flask==0.10.1
+Flask-Bcrypt==0.5.2
+Flask-Login==0.2.8
 Flask-SQLAlchemy==1.0
 Jinja2==2.7.1
 MarkupSafe==0.18
@@ -16,6 +18,7 @@ macholib==1.5
 matplotlib==1.1.1
 modulegraph==0.10.1
 numpy==1.6.2
+py-bcrypt==0.4
 py2app==0.7.1
 pyOpenSSL==0.13
 pyobjc-core==2.3.2a0

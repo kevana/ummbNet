@@ -2,6 +2,7 @@ from flask import Flask, render_template
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_login import (LoginManager, login_required, login_user,
                          current_user, logout_user, UserMixin)
+from flask.ext.bcrypt import Bcrypt
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
