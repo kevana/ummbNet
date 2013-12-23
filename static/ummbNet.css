@@ -1,11 +1,14 @@
 html,
+/*
 body {
   background-color: #52020D;
 }
+*/
 
 .billboard {
-  margin-top: 60px;
-	color: #fff;
+  /*margin-top: 60px;*/
+	/*color: #fff;*/
+  color: #000;
 }
 
 h1 {
