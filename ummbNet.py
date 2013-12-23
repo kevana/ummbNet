@@ -115,7 +115,11 @@ def users():
     password = request.form['password']
     if not username or not password or not email:
       error = 'Account creation failed: missing username, email, or password'
-    return 'Unimplemented' # url_for('users', username=username)
+    else:
+      add_user(username, email, password)
+      return redirect(url_for('users', username=username))
+  if request.args.get('new'):
+    return 'unimplemented' # render_template('newUser.html')
   return 'unimplemented' # render_template('users.html')
 
 # Route to particular user
@@ -128,6 +132,18 @@ def user(username):
 @app.route('/requests', methods=['GET', 'POST', 'PUT'])
 @login_required
 def requests():
+  error = None
+  if request.method == 'POST':
+    # Add a new request
+    username = request.form['username']
+    # TODO: Check other args
+    if not username: # or not ...other params...:
+      error = 'Request creation failed: missing information'
+    else:
+      add_request(username)
+      return redirect(url_for('requests'))
+  if request.args.get('new'):
+    return 'unimplemented' # render_template('newRequest.html')
   return 'unimplemented' # render_template('requests.html')
 
 # Route to a particular request
@@ -152,6 +168,19 @@ def add_user(username, email, password):
   except IntegrityError: 
     return False
   return True
+
+# Add a new request to the database
+def add_request(username):
+  user = User.query.filter_by(username=username).first()
+  if user:
+    req = Request(user)
+    try:
+      db.session.add(req)
+      db.session.commit()
+    except IntegrityError:
+      return False
+    return True # Not graceful logic
+  return False
 
 if __name__ == '__main__':
     app.run()
