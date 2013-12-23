@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for
+from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_login import (LoginManager, login_required, login_user,
                          current_user, logout_user, UserMixin)
@@ -6,6 +6,7 @@ from flask.ext.bcrypt import Bcrypt
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+app.config['SECRET_KEY'] = 'Shhhh, this is a secret'
 bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 login_manager = LoginManager()
@@ -20,12 +21,14 @@ class User(db.Model):
   email = db.Column(db.String(120), unique=True)
   pw_hash = db.Column(db.String(60))
   requests = db.relationship('Request', backref='User', lazy='dynamic')
+  enabled = db.Column(db.Boolean)
   
   # Self functions
   def __init__(self, username, email, password):
     self.username = username
     self.email = email
     self.pw_hash = bcrypt.generate_password_hash(password)
+    self.enabled = True
   
   def __repr__(self):
     return '<User %r>' % self.username
@@ -83,9 +86,11 @@ def login():
     password = request.form['password']
     
     if authenticate_user(username, password):
-      if login_user(DbUser()):
+      user = User.query.filter_by(username=username).first()
+      if login_user(DbUser(user)):
         flash("You have logged in")
-        return redirect(next or url_for('/', error=error))
+        session['logged_in'] = True
+        return redirect(next or url_for('catchAll', error=error))
     error = "Login failed"
   return render_template('login.html', login=True, next=next, error=error)
 
@@ -94,6 +99,7 @@ def login():
 def logout():
   logout_user()
   flash('You have logged out')
+  session['logged_in'] = False
   return(redirect(url_for('catchAll')))
 
 # Helper functions
