@@ -103,22 +103,32 @@ def logout():
   return(redirect(url_for('catchAll')))
 
 # Route to users collection
-@app.route('/users')
+@app.route('/users', methods=['GET', 'POST', 'PUT'])
 @login_required
 def users():
-  return 'unimplemented' # render_template('users.html')
-
-# Route to particular user
-@app.route('/users/<username>', methods=['GET', 'POST'])
-@login_required
-def user(username):
   error = None
   if request.method == 'POST':
     # Add a new user
     return 'Unimplemented'
+  return 'unimplemented' # render_template('users.html')
+
+# Route to particular user
+@app.route('/users/<username>')
+@login_required
+def user(username):
   return 'User: %s' % username # render_template('user.html', username=username)
 
 # Route to Requests Collection
+@app.route('/requests', methods=['GET', 'POST', 'PUT'])
+@login_required
+def requests():
+  return 'unimplemented' # render_template('requests.html')
+
+# Route to a particular request
+@app.route('/requests/<request>')
+@login_required
+def request(request):
+  return 'unimplemented' # render_template('request.html', request=request)
 
 # Helper functions
 def authenticate_user(username, password):
