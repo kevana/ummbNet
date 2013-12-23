@@ -131,9 +131,9 @@ def requests():
   return 'unimplemented' # render_template('requests.html')
 
 # Route to a particular request
-@app.route('/requests/<request>')
+@app.route('/requests/<req>')
 @login_required
-def request(request):
+def req(req):
   return 'unimplemented' # render_template('request.html', request=request)
 
 # Helper functions
