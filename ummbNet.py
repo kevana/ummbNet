@@ -102,6 +102,24 @@ def logout():
   session['logged_in'] = False
   return(redirect(url_for('catchAll')))
 
+# Route to users collection
+@app.route('/users')
+@login_required
+def users():
+  return 'unimplemented' # render_template('users.html')
+
+# Route to particular user
+@app.route('/users/<username>', methods=['GET', 'POST'])
+@login_required
+def user(username):
+  error = None
+  if request.method == 'POST':
+    # Add a new user
+    return 'Unimplemented'
+  return 'User: %s' % username # render_template('user.html', username=username)
+
+# Route to Requests Collection
+
 # Helper functions
 def authenticate_user(username, password):
   user = User.query.filter_by(username=username).first()
