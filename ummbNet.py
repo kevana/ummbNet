@@ -11,6 +11,7 @@ bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = 'login'
 
 app.debug = True
 
@@ -109,7 +110,12 @@ def users():
   error = None
   if request.method == 'POST':
     # Add a new user
-    return 'Unimplemented'
+    username = request.form['username']
+    email = request.form['email']
+    password = request.form['password']
+    if not username or not password or not email:
+      error = 'Account creation failed: missing username, email, or password'
+    return 'Unimplemented' # url_for('users', username=username)
   return 'unimplemented' # render_template('users.html')
 
 # Route to particular user
