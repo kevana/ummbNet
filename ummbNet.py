@@ -143,5 +143,15 @@ def authenticate_user(username, password):
     return bcrypt.check_password_hash(user.pw_hash, password)
   return False
 
+# Add a new user to the database
+def add_user(username, email, password):
+  user = User(username, email, password)
+  try:
+    db.session.add(user)
+    db.session.commit()
+  except IntegrityError: 
+    return False
+  return True
+
 if __name__ == '__main__':
     app.run()
