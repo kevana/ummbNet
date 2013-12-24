@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %} - Logout{% endblock %}
+{% block content %}
+  <h2>Logout</h2>
+  {% if error %}<p class=error><strong>Error:</strong></p>{{ error }}{% endif %}
+  <p>You have logged out</p>
+{% endblock %}
