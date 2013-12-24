@@ -8,6 +8,7 @@ from urllib import unquote
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 app.config['SECRET_KEY'] = 'Shhhh, this is a secret'
+# app.config['SERVER_NAME'] = '127.0.0.1:5000' Seems to break login/logout, maybe due to localhost?
 bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 login_manager = LoginManager()
@@ -82,7 +83,9 @@ def catchAll(dummy):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
   error = None
-  next = unquote(request.args.get('next'))
+  next = request.args.get('next')
+  if next:
+    next = unquote(next)
   if request.method == 'POST':
     username = request.form['username']
     password = request.form['password']
@@ -102,7 +105,7 @@ def logout():
   logout_user()
   flash('You have logged out')
   session['logged_in'] = False
-  return(redirect(url_for('catchAll')))
+  return 'unimplemented' # render_template('logout.html')
 
 # Route to users collection
 @app.route('/users', methods=['GET', 'POST', 'PUT'])
