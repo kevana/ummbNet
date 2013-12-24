@@ -3,6 +3,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask_login import (LoginManager, login_required, login_user,
                          current_user, logout_user, UserMixin)
 from flask.ext.bcrypt import Bcrypt
+from urllib import unquote
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
@@ -81,7 +82,7 @@ def catchAll(dummy):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
   error = None
-  next = request.args.get('next')
+  next = unquote(request.args.get('next'))
   if request.method == 'POST':
     username = request.form['username']
     password = request.form['password']
