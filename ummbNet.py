@@ -4,6 +4,7 @@ from flask_login import (LoginManager, login_required, login_user,
                          current_user, logout_user, UserMixin)
 from flask.ext.bcrypt import Bcrypt
 from urllib import unquote
+from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
@@ -105,12 +106,23 @@ def logout():
   logout_user()
   flash('You have logged out')
   session['logged_in'] = False
-  return 'unimplemented' # render_template('logout.html')
+  return render_template('logout.html')
 
 # Route to users collection
-@app.route('/users', methods=['GET', 'POST', 'PUT'])
+@app.route('/users', methods=['GET', 'POST'])
 @login_required
 def users():
+  return render_template('users.html')
+
+# Route to particular user
+@app.route('/users/<username>')
+@login_required
+def user(username):
+  return 'User: %s' % username # render_template('user.html', username=username)
+
+# Add a new user
+@app.route('/newuser', methods=['GET', 'POST'])
+def newuser():
   error = None
   if request.method == 'POST':
     # Add a new user
@@ -120,20 +132,14 @@ def users():
     if not username or not password or not email:
       error = 'Account creation failed: missing username, email, or password'
     else:
-      add_user(username, email, password)
-      return redirect(url_for('users', username=username))
-  if request.args.get('new'):
-    return 'unimplemented' # render_template('newUser.html')
-  return 'unimplemented' # render_template('users.html')
-
-# Route to particular user
-@app.route('/users/<username>')
-@login_required
-def user(username):
-  return 'User: %s' % username # render_template('user.html', username=username)
+      if not add_user(username, email, password):
+        error = 'Account creation failed: database errord'
+        return redirect(url_for('newuser', error=error))
+      return redirect(url_for('catchAll'))
+  return render_template('newuser.html')
 
 # Route to Requests Collection
-@app.route('/requests', methods=['GET', 'POST', 'PUT'])
+@app.route('/requests', methods=['GET', 'POST'])
 @login_required
 def requests():
   error = None
