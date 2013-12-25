@@ -85,8 +85,6 @@ def catchAll(dummy):
 def login():
   error = None
   next = request.args.get('next')
-  if next:
-    next = unquote(next)
   if request.method == 'POST':
     username = request.form['username']
     password = request.form['password']

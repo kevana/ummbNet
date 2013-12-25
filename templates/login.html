@@ -3,7 +3,7 @@
 {% block content %}
   <h2>Login</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-  <form action="{{ url_for('login') }}" method='POST'>
+  <form method='POST'>
     <dl>
       <dt>Username:</dt>
       <dd><input type="text" name="username"></dd>
