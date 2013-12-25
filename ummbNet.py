@@ -76,9 +76,8 @@ def load_user(user_id):
     return None
 
 # Route Requests
-@app.route('/', defaults={'dummy': ''})
-@app.route("/<path:dummy>")
-def catchAll(dummy):
+@app.route('/')
+def index():
 	return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -94,7 +93,7 @@ def login():
       if login_user(DbUser(user)):
         flash("You have logged in")
         session['logged_in'] = True
-        return redirect(next or url_for('catchAll', error=error))
+        return redirect(next or url_for('index', error=error))
     error = "Login failed"
   return render_template('login.html', login=True, next=next, error=error)
 
@@ -133,7 +132,7 @@ def newuser():
       if not add_user(username, email, password):
         error = 'Account creation failed: database errord'
         return redirect(url_for('newuser', error=error))
-      return redirect(url_for('catchAll'))
+      return redirect(url_for('index'))
   return render_template('newuser.html')
 
 # Route to Requests Collection
