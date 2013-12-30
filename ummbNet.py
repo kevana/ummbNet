@@ -7,7 +7,7 @@ from urllib import unquote
 from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://mplewis@localhost/ummbNet'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 app.config['SECRET_KEY'] = 'Shhhh, this is a secret'
 # app.config['SERVER_NAME'] = '127.0.0.1:5000' Seems to break login/logout, maybe due to localhost?
 bcrypt = Bcrypt(app)
