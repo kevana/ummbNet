@@ -106,13 +106,13 @@ def logout():
   return render_template('logout.html')
 
 # Route to users collection
-@app.route('/users', methods=['GET', 'POST'])
+@app.route('/users')
 @login_required
 def users():
   return render_template('users.html')
 
 # Route to particular user
-@app.route('/users/<username>')
+@app.route('/users/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
   return 'User: %s' % username # render_template('user.html', username=username)
@@ -136,7 +136,7 @@ def newuser():
   return render_template('newuser.html')
 
 # Route to Requests Collection
-@app.route('/requests', methods=['GET', 'POST'])
+@app.route('/requests')
 @login_required
 def requests():
   error = None

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %} - New Request{% endblock %}
+{% block content %}
+  <h2>Create a new request</h2>
+  {% if error %}<p class=error><strong>Error:</strong></p> {{ error }}{% endif %}
+  <form action="{{ url_for('newuser') }}" method='POST'>
+    <dl>
+      <dt>Username:</dt>
+      <dd><input type="text" name="username"></dd>
+      <dt>Email Address:</dt>
+      <dd><input type="text" name="email"></dd>
+      <dt>Password:</dt>
+      <dd><input type="password" name="password"></dd>
+      <dd><input type="submit" value="Create Account"></dd>
+    </dl>
+  </form>
+{% endblock %}
