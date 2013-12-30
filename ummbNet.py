@@ -56,15 +56,70 @@ class DbUser(object):
 
 class Request(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  poster = db.relationship('User', backref=db.backref('requests1', lazy='dynamic'))
+  poster = db.relationship('User', backref=db.backref('posted_requests', lazy='dynamic'))
   poster_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-  sub = db.relationship('User', backref=db.backref('requests2', lazy='dynamic'))
+  sub = db.relationship('User', backref=db.backref('filled_requests', lazy='dynamic'))
+  band_name = db.Column(db.String(80), db.ForeignKey('band.name'))
+  event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
+  instrument_name = db.Column(db.String(80), db.ForeignKey('instrument.name'))
+  part = db.Column(db.String(20))
   
   def __init__(self, poster, sub=None):
     self.poster = poster
   
   def __repr__(self):
     return '<Request Posted by:%r Filled by: %r>' % self.poster, self.sub
+
+class Band(db.Model):
+  name = db.Column(db.String(80), primary_key=True)
+  # members = db.relationship('User', backref='band', lazy='dynamic')
+  requests = db.relationship('Request', backref='band', lazy='dynamic')
+  
+  def __init__(self, name, members=None, requests=None):
+    self.name = name
+    if members:
+      self.members = members
+    if requests:
+      self.requests = requests
+  
+  def __repr__(self):
+    return '<Band Name: %r>' % self.name
+
+class Event(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  event_type_name = db.Column(db.String(80), db.ForeignKey('eventtype.name', schema='dbo'))
+  date = db.Column(db.DateTime)
+  requests = db.relationship('Request', backref='event', lazy='dynamic')
+  
+  def __init__(self, event_type, date):
+    self.event_type = event_type
+    self.date = date
+    
+  def __repr__(self):
+    return '<Event Type: %r Date: %r Time %r>' % self.event_type, self.date, self.time
+
+class EventType(db.Model):
+  __tablename__ = 'eventtype'
+  name = db.Column(db.String(80), primary_key=True)
+  events = db.relationship('Event', backref='eventtype', lazy='dynamic')
+  
+  def __init__(self, name, events=None):
+    self.name = name
+    if events:
+      self.events = events
+  
+  def __repr__(self):
+    return '<Event_Type Name: %r>' % self.name
+
+class Instrument(db.Model):
+  name = db.Column(db.String(80), primary_key=True)
+  requests = db.relationship('Request', backref='instrument', lazy='dynamic')
+  
+  def __init__(self, name):
+    self.name = name
+  
+  def __repr__(self):
+    return '<Instrument Name: %r>' % self.name
 
 # Define login_manager callback
 @login_manager.user_loader
