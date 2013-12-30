@@ -139,6 +139,17 @@ def newuser():
 @app.route('/requests')
 @login_required
 def requests():
+  return render_template('requests.html')
+
+# Route to a particular request
+@app.route('/requests/<req>', methods=['GET', 'POST'])
+@login_required
+def req(req):
+  return 'Request: %s' % req # render_template('request.html', request=req)
+
+# Add a new request
+@app.route('/newrequest', methods=['GET', 'POST'])
+def newrequest():
   error = None
   if request.method == 'POST':
     # Add a new request
@@ -149,15 +160,7 @@ def requests():
     else:
       add_request(username)
       return redirect(url_for('requests'))
-  if request.args.get('new'):
-    return 'unimplemented' # render_template('newRequest.html')
-  return 'unimplemented' # render_template('requests.html')
-
-# Route to a particular request
-@app.route('/requests/<req>')
-@login_required
-def req(req):
-  return 'unimplemented' # render_template('request.html', request=request)
+  return render_template('newRequest.html', error=error)
 
 # Helper functions
 def authenticate_user(username, password):
