@@ -91,7 +91,7 @@ class Request(db.Model):
         self.part = part
 
     def __repr__(self):
-        return ('<Request Event: %r Posted by: %r>' % 
+        return ('<Request Event: %r Posted by: %r>' %
                 Event.query.get(self.event_id), self.poster)
 
 
