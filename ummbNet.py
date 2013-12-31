@@ -21,9 +21,9 @@ app.debug = True
 # Define Database entities
 class User(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  username = db.Column(db.String(80), unique=True)
-  email = db.Column(db.String(120), unique=True)
-  pw_hash = db.Column(db.String(60))
+  username = db.Column(db.Text, unique=True)
+  email = db.Column(db.Text, unique=True)
+  pw_hash = db.Column(db.Text)
   requests = db.relationship('Request', backref='User', lazy='dynamic')
   enabled = db.Column(db.Boolean)
   
@@ -59,10 +59,10 @@ class Request(db.Model):
   poster = db.relationship('User', backref=db.backref('posted_requests', lazy='dynamic'))
   poster_id = db.Column(db.Integer, db.ForeignKey('user.id'))
   sub = db.relationship('User', backref=db.backref('filled_requests', lazy='dynamic'))
-  band_name = db.Column(db.String(80), db.ForeignKey('band.name'))
+  band_id = db.Column(db.Integer, db.ForeignKey('band.id'))
   event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
-  instrument_name = db.Column(db.String(80), db.ForeignKey('instrument.name'))
-  part = db.Column(db.String(20))
+  instrument_id = db.Column(db.Integer, db.ForeignKey('instrument.id'))
+  part = db.Column(db.Text)
   
   def __init__(self, poster, sub=None):
     self.poster = poster
@@ -71,7 +71,8 @@ class Request(db.Model):
     return '<Request Posted by:%r Filled by: %r>' % self.poster, self.sub
 
 class Band(db.Model):
-  name = db.Column(db.String(80), primary_key=True)
+  id = db.Column(db.Integer, primary_key=True)
+  name = db.Column(db.Text)
   # members = db.relationship('User', backref='band', lazy='dynamic')
   requests = db.relationship('Request', backref='band', lazy='dynamic')
   
@@ -87,7 +88,7 @@ class Band(db.Model):
 
 class Event(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  event_type_name = db.Column(db.String(80), db.ForeignKey('eventtype.name', schema='dbo'))
+  event_type_id = db.Column(db.Integer, db.ForeignKey('eventtype.id', schema='dbo'))
   date = db.Column(db.DateTime)
   requests = db.relationship('Request', backref='event', lazy='dynamic')
   
@@ -100,7 +101,8 @@ class Event(db.Model):
 
 class EventType(db.Model):
   __tablename__ = 'eventtype'
-  name = db.Column(db.String(80), primary_key=True)
+  id = db.Column(db.Integer, primary_key=True)
+  name = db.Column(db.Text)
   events = db.relationship('Event', backref='eventtype', lazy='dynamic')
   
   def __init__(self, name, events=None):
@@ -112,7 +114,8 @@ class EventType(db.Model):
     return '<Event_Type Name: %r>' % self.name
 
 class Instrument(db.Model):
-  name = db.Column(db.String(80), primary_key=True)
+  id = db.Column(db.Integer, primary_key=True)
+  name = db.Column(db.Text)
   requests = db.relationship('Request', backref='instrument', lazy='dynamic')
   
   def __init__(self, name):
