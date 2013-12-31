@@ -25,6 +25,7 @@ app.debug = True
 
 
 class User(db.Model):
+    '''Represents a user that can log into ummbNet.'''
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.Text, unique=True)
     email = db.Column(db.Text, unique=True)
@@ -47,7 +48,7 @@ class User(db.Model):
 
 class DbUser(object):
 
-    '''Wraps User object for Flask-login'''
+    '''Wraps User object for Flask-Login.'''
 
     def __init__(self, user):
         self._user = user
@@ -66,6 +67,7 @@ class DbUser(object):
 
 
 class Request(db.Model):
+    '''Represents a user's request for a substitute for a band event.'''
     id = db.Column(db.Integer, primary_key=True)
     poster = db.relationship(
         'User', backref=db.backref('posted_requests', lazy='dynamic'))
@@ -96,6 +98,7 @@ class Request(db.Model):
 
 
 class Band(db.Model):
+    '''Represents which band the request is for.'''
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
     requests = db.relationship('Request', backref='band', lazy='dynamic')
@@ -110,6 +113,7 @@ class Band(db.Model):
 
 
 class Event(db.Model):
+    '''Represents a specific band event.'''
     id = db.Column(db.Integer, primary_key=True)
     event_type_id = db.Column(
         db.Integer, db.ForeignKey('eventtype.id', schema='dbo'))
@@ -127,6 +131,7 @@ class Event(db.Model):
 
 
 class EventType(db.Model):
+    '''Represents the type of band event.'''
     __tablename__ = 'eventtype'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
@@ -170,11 +175,13 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
+    '''Return the ummbNet homepage.'''
     return render_template('index.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    '''Log in a user with their credentials.'''
     error = None
     next = request.args.get('next')
     if request.method == 'POST':
@@ -194,6 +201,7 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
+    '''Log out the currently logged-in user.'''
     logout_user()
     flash('You have logged out')
     session['logged_in'] = False
@@ -267,6 +275,7 @@ def newrequest():
 
 
 def authenticate_user(username, password):
+    '''Authenticate a user. Returns True if username and password are valid.'''
     user = User.query.filter_by(username=username).first()
     if user:
         return bcrypt.check_password_hash(user.pw_hash, password)
