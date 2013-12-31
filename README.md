@@ -26,6 +26,37 @@ Anyone who wants to help. I'll be upfront, I am receiving independent study cred
 Right now.
 
 ----
+##Getting Started
+
+Dependencies:
+
++ Python 2.7+
++ `pip`
++ Flask
+
+Run the following commands:
+
+    $ git clone https://github.com/aterlumen/ummbNet.git
+    $ cd ummbNet
+    $ pip install -r requirements.txt
+    $ python createDb.py
+    $ python ummbNet.py
+    
+If you follow those steps you should have a copy of ummbNet running at `http://localhost:5000/`. 
+
+To avoid extra configuration, the repo uses `sqlite` by default. If you'd like to use a different database system just change the line in `ummbNet.py` from:
+
+`app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'`
+
+to match your config.
+
+----
 ##REST?
 
 That's the plan. In case there's ever an urge to make iPhone and Android apps for this, the backend will be structured as a RESTful API. The web interface will add some quirks, but I plan to make sure they don't interfere with a clean RESTful interface.
+
+##License
+
+All source code is open source and released under the MIT License. All user content is owned by its respective creator.
+
+See `LICENSE` for more information.
