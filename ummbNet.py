@@ -1,7 +1,6 @@
 from flask import (Flask, flash, redirect, render_template,
                    request, session, url_for)
-from flask_login import (current_user, LoginManager, login_required,
-                         login_user, logout_user, UserMixin)
+from flask_login import (LoginManager, login_required, login_user, logout_user)
 from flask.ext.bcrypt import Bcrypt
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
