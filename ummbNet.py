@@ -28,11 +28,13 @@ class User(db.Model):
   enabled = db.Column(db.Boolean)
   
   # Self functions
-  def __init__(self, username, email, password):
+  def __init__(self, username, email, password, requests=None, enabled=True):
     self.username = username
     self.email = email
     self.pw_hash = bcrypt.generate_password_hash(password)
-    self.enabled = True
+    if requests:
+      self.requests = requests
+    self.enabled = enabled
   
   def __repr__(self):
     return '<User %r>' % self.username
@@ -64,22 +66,28 @@ class Request(db.Model):
   instrument_id = db.Column(db.Integer, db.ForeignKey('instrument.id'))
   part = db.Column(db.Text)
   
-  def __init__(self, poster, sub=None):
+  def __init__(self, poster, sub=None, band_id=None, event_id=None, instrument_id=None, part=""):
     self.poster = poster
+    if sub:
+      self.sub = sub
+    if band_id:
+      self.band_id = band_id
+    if event_id:
+      self.event_id = event_id
+    if instrument_id:
+      self.instrument_id = instrument_id
+    self.part = part
   
   def __repr__(self):
-    return '<Request Posted by:%r Filled by: %r>' % self.poster, self.sub
+    return '<Request Event: %r Posted by: %r>' % Event.query.get(self.event_id), self.poster
 
 class Band(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.Text)
-  # members = db.relationship('User', backref='band', lazy='dynamic')
   requests = db.relationship('Request', backref='band', lazy='dynamic')
   
   def __init__(self, name, members=None, requests=None):
     self.name = name
-    if members:
-      self.members = members
     if requests:
       self.requests = requests
   
@@ -92,9 +100,11 @@ class Event(db.Model):
   date = db.Column(db.DateTime)
   requests = db.relationship('Request', backref='event', lazy='dynamic')
   
-  def __init__(self, event_type, date):
-    self.event_type = event_type
+  def __init__(self, event_type_id, date, requests=None):
+    self.event_type_id = event_type_id
     self.date = date
+    if requests:
+      self.requests = requests
     
   def __repr__(self):
     return '<Event Type: %r Date: %r Time %r>' % self.event_type, self.date, self.time
@@ -118,8 +128,10 @@ class Instrument(db.Model):
   name = db.Column(db.Text)
   requests = db.relationship('Request', backref='instrument', lazy='dynamic')
   
-  def __init__(self, name):
+  def __init__(self, name, requests=None):
     self.name = name
+    if requests:
+      self.requests = requests
   
   def __repr__(self):
     return '<Instrument Name: %r>' % self.name
