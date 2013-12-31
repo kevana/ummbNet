@@ -1,15 +1,18 @@
-from flask import Flask, flash, redirect, render_template, request, session, url_for
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask_login import (LoginManager, login_required, login_user,
-                         current_user, logout_user, UserMixin)
+from flask import (Flask, flash, redirect, render_template,
+                   request, session, url_for)
+from flask_login import (current_user, LoginManager, login_required,
+                         login_user, logout_user, UserMixin)
 from flask.ext.bcrypt import Bcrypt
-from urllib import unquote
+from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 
+
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
-app.config['SECRET_KEY'] = 'Shhhh, this is a secret'
-# app.config['SERVER_NAME'] = '127.0.0.1:5000' Seems to break login/logout, maybe due to localhost?
+app.config.update(
+  SQLALCHEMY_DATABASE_URI='sqlite:////tmp/test.db',
+  SECRET_KEY='Shhhh, this is a secret'
+)
+
 bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 login_manager = LoginManager()
@@ -66,7 +69,8 @@ class Request(db.Model):
   instrument_id = db.Column(db.Integer, db.ForeignKey('instrument.id'))
   part = db.Column(db.Text)
   
-  def __init__(self, poster, sub=None, band_id=None, event_id=None, instrument_id=None, part=""):
+  def __init__(self, poster, sub=None, band_id=None, \
+               event_id=None, instrument_id=None, part=""):
     self.poster = poster
     if sub:
       self.sub = sub
