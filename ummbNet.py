@@ -5,7 +5,6 @@ from flask.ext.bcrypt import Bcrypt
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 
-
 app = Flask(__name__)
 app.config.update(
     SQLALCHEMY_DATABASE_URI='sqlite:////tmp/test.db',
@@ -20,9 +19,7 @@ login_manager.login_view = 'login'
 
 app.debug = True
 
-
 # Define Database entities
-
 
 class User(db.Model):
     '''Represents a user that can log into ummbNet.'''
@@ -45,9 +42,7 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
-
 class DbUser(object):
-
     '''Wraps User object for Flask-Login.'''
 
     def __init__(self, user):
@@ -64,7 +59,6 @@ class DbUser(object):
 
     def is_authenticated(self):
         return True
-
 
 class Request(db.Model):
     '''Represents a user's request for a substitute for a band event.'''
@@ -96,7 +90,6 @@ class Request(db.Model):
         return ('<Request Event: %r Posted by: %r>' %
                 Event.query.get(self.event_id), self.poster)
 
-
 class Band(db.Model):
     '''Represents which band the request is for.'''
     id = db.Column(db.Integer, primary_key=True)
@@ -110,7 +103,6 @@ class Band(db.Model):
 
     def __repr__(self):
         return '<Band Name: %r>' % self.name
-
 
 class Event(db.Model):
     '''Represents a specific band event.'''
@@ -129,7 +121,6 @@ class Event(db.Model):
     def __repr__(self):
         return '<Event Type: %r Date: %r Time %r>' % self.event_type, self.date, self.time
 
-
 class EventType(db.Model):
     '''Represents the type of band event.'''
     __tablename__ = 'eventtype'
@@ -145,8 +136,8 @@ class EventType(db.Model):
     def __repr__(self):
         return '<Event_Type Name: %r>' % self.name
 
-
 class Instrument(db.Model):
+    '''Represents the instrument the requester plays and needs a sub for.'''
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
     requests = db.relationship('Request', backref='instrument', lazy='dynamic')
@@ -161,7 +152,6 @@ class Instrument(db.Model):
 
 # Define login_manager callback
 
-
 @login_manager.user_loader
 def load_user(user_id):
     user = User.query.get(user_id)
@@ -172,12 +162,10 @@ def load_user(user_id):
 
 # Route Requests
 
-
 @app.route('/')
 def index():
     '''Return the ummbNet homepage.'''
     return render_template('index.html')
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -197,7 +185,6 @@ def login():
         error = "Login failed"
     return render_template('login.html', login=True, next=next, error=error)
 
-
 @app.route('/logout')
 @login_required
 def logout():
@@ -207,20 +194,17 @@ def logout():
     session['logged_in'] = False
     return render_template('logout.html')
 
-
 @app.route('/users')
 @login_required
 def users():
     '''Route to users collection'''
     return render_template('users.html')
 
-
 @app.route('/users/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
     '''Route to particular user'''
     return 'User: %s' % username
-
 
 @app.route('/newuser', methods=['GET', 'POST'])
 def newuser():
@@ -241,20 +225,17 @@ def newuser():
             return redirect(url_for('index'))
     return render_template('newuser.html')
 
-
 @app.route('/requests')
 @login_required
 def requests():
     '''Route to Requests Collection'''
     return render_template('requests.html')
 
-
 @app.route('/requests/<req>', methods=['GET', 'POST'])
 @login_required
 def req(req):
     '''Route to a particular request'''
     return 'Request: %s' % req  # render_template('request.html', request=req)
-
 
 @app.route('/newrequest', methods=['GET', 'POST'])
 def newrequest():
@@ -273,14 +254,12 @@ def newrequest():
 
 # Helper functions
 
-
 def authenticate_user(username, password):
     '''Authenticate a user. Returns True if username and password are valid.'''
     user = User.query.filter_by(username=username).first()
     if user:
         return bcrypt.check_password_hash(user.pw_hash, password)
     return False
-
 
 def add_user(username, email, password):
     '''Add a new user to the database'''
@@ -291,7 +270,6 @@ def add_user(username, email, password):
     except IntegrityError:
         return False
     return True
-
 
 def add_request(username):
     '''Add a new request to the database'''
