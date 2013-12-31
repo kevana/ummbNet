@@ -92,7 +92,8 @@ class Request(db.Model):
         self.part = part
 
     def __repr__(self):
-        return '<Request Event: %r Posted by: %r>' % Event.query.get(self.event_id), self.poster
+        return ('<Request Event: %r Posted by: %r>' % 
+                Event.query.get(self.event_id), self.poster)
 
 
 class Band(db.Model):
@@ -211,7 +212,7 @@ def users():
 @login_required
 def user(username):
     '''Route to particular user'''
-    return 'User: %s' % username  # render_template('user.html', username=username)
+    return 'User: %s' % username
 
 
 @app.route('/newuser', methods=['GET', 'POST'])
@@ -224,7 +225,8 @@ def newuser():
         email = request.form['email']
         password = request.form['password']
         if not username or not password or not email:
-            error = 'Account creation failed: missing username, email, or password'
+            error = ('Account creation failed: '
+                     'missing username, email, or password')
         else:
             if not add_user(username, email, password):
                 error = 'Account creation failed: database errord'
