@@ -8,9 +8,11 @@ from sqlalchemy.exc import IntegrityError
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
-app.config['SECRET_KEY'] = 'Shhhh, this is a secret'
-# app.config['SERVER_NAME'] = '127.0.0.1:5000' Seems to break login/logout, maybe due to localhost?
+app.config.update(
+  SQLALCHEMY_DATABASE_URI='sqlite:////tmp/test.db',
+  SECRET_KEY='Shhhh, this is a secret'
+)
+
 bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 login_manager = LoginManager()
