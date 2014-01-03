@@ -2,5 +2,23 @@
 {% block title %} - Requests{% endblock %}
 {% block content %}
   <h1>Requests</h1>
+  <table id="requests">
+    <tr>
+      <td>Poster</td>
+      <td>Band</td>
+      <td>Event</td>
+      <td>Instrument</td>
+      <td>Part</td>
+    </tr>
+    {% for req in requests %}
+      <tr>
+        <td>{{ req.poster.username }}</td>
+        <td>{{ req.band }}</td>
+        <td>{{ req.event }}</td>
+        <td>{{ req.instrument.name }}</td>
+        <td>{{ req.part }}</td>
+      </tr>
+    {% endfor %}
+  </table>
   <p><a href="{{ url_for('index') }}">home</a></p>
 {% endblock %}

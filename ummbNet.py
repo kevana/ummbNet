@@ -213,7 +213,8 @@ def newuser():
 @app.route('/requests')
 @login_required
 def requests():
-  return render_template('requests.html')
+  requests = Request.query.all()
+  return render_template('requests.html', requests=requests)
 
 # Route to a particular request
 @app.route('/requests/<req>', methods=['GET', 'POST'])
