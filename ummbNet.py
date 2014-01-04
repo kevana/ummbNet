@@ -36,9 +36,9 @@ class User(db.Model):
         self.email = email
         self.pw_hash = bcrypt.generate_password_hash(password)
         if requests:
-             self.requests = requests
+            self.requests = requests
         self.enabled = enabled
-  
+
     def __repr__(self):
         return '<User %r>' % self.username
 
@@ -49,7 +49,7 @@ class DbUser(object):
 
     def get_id(self):
         return unicode(self._user.id)
-  
+
     def is_active(self):
         return self._user.enabled
 
@@ -62,15 +62,17 @@ class DbUser(object):
 class Request(db.Model):
     '''Represents a user's request for a substitute for an event.'''
     id = db.Column(db.Integer, primary_key=True)
-    poster = db.relationship('User', backref=db.backref('posted_requests', lazy='dynamic'))
+    poster = db.relationship(
+        'User', backref=db.backref('posted_requests', lazy='dynamic'))
     poster_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    sub = db.relationship('User', backref=db.backref('filled_requests', lazy='dynamic'))
+    sub = db.relationship(
+        'User', backref=db.backref('filled_requests', lazy='dynamic'))
     band_id = db.Column(db.Integer, db.ForeignKey('band.id'))
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
     instrument_id = db.Column(db.Integer, db.ForeignKey('instrument.id'))
     part = db.Column(db.Text)
   
-    def __init__(self, poster, sub=None, band_id=None, \
+    def __init__(self, poster, sub=None, band_id=None,
                  event_id=None, instrument_id=None, part=""):
         self.poster = poster
         if sub:
@@ -82,12 +84,13 @@ class Request(db.Model):
         if instrument_id:
             self.instrument_id = instrument_id
         self.part = part
-  
+
     def __repr__(self):
-        return '<Request Event: %r Posted by: %r>' % Event.query.get(self.event_id), self.poster
+        return '<Request Event: %r Posted by: %r>' % 
+                Event.query.get(self.event_id), self.poster
 
 class Band(db.Model):
-    '''Represents a relatively static group.'''
+    '''Represents which band the request is for.'''
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
     requests = db.relationship('Request', backref='band', lazy='dynamic')
@@ -96,14 +99,15 @@ class Band(db.Model):
         self.name = name
         if requests:
             self.requests = requests
-  
+
     def __repr__(self):
         return '<Band Name: %r>' % self.name
 
 class Event(db.Model):
-    '''Represents a specific performance event.'''
+    '''Represents a specific band event.'''
     id = db.Column(db.Integer, primary_key=True)
-    event_type_id = db.Column(db.Integer, db.ForeignKey('eventtype.id', schema='dbo'))
+    event_type_id = db.Column(
+        db.Integer, db.ForeignKey('eventtype.id', schema='dbo'))
     date = db.Column(db.DateTime)
     requests = db.relationship('Request', backref='event', lazy='dynamic')
 
@@ -117,7 +121,7 @@ class Event(db.Model):
         return '<Event Type: %r Date: %r Time %r>' % self.event_type, self.date, self.time
 
 class EventType(db.Model):
-    '''Represents the type of performance event'''
+    '''Represents the type of band event.'''
     __tablename__ = 'eventtype'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
@@ -127,20 +131,21 @@ class EventType(db.Model):
         self.name = name
         if events:
             self.events = events
-  
+
     def __repr__(self):
         return '<Event_Type Name: %r>' % self.name
 
 class Instrument(db.Model):
+    '''Represents the instrument the requestor plays and needs a sub for.'''
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
     requests = db.relationship('Request', backref='instrument', lazy='dynamic')
-  
+
     def __init__(self, name, requests=None):
         self.name = name
         if requests:
             self.requests = requests
-  
+
     def __repr__(self):
         return '<Instrument Name: %r>' % self.name
 
@@ -154,18 +159,21 @@ def load_user(user_id):
         return None
 
 # Route Requests
+
 @app.route('/')
 def index():
+    '''Return the ummbNet homepage.'''
 	return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    '''Log in a user with their credentials.'''
     error = None
     next = request.args.get('next')
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
+
         if authenticate_user(username, password):
             user = User.query.filter_by(username=username).first()
             if login_user(DbUser(user)):
@@ -178,26 +186,27 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
+    '''Log out the currently logged-in user.'''
     logout_user()
     flash('You have logged out')
     session['logged_in'] = False
     return render_template('logout.html')
 
-# Route to users collection
 @app.route('/users')
 @login_required
 def users():
+    '''Route to users collection.'''
     return render_template('users.html')
 
-# Route to particular user
 @app.route('/users/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
+    '''Route to a particular user.'''
     return 'User: %s' % username # render_template('user.html', username=username)
 
-# Add a new user
 @app.route('/newuser', methods=['GET', 'POST'])
 def newuser():
+    '''Add a new user.'''
     error = None
     if request.method == 'POST':
         # Add a new user
@@ -205,7 +214,8 @@ def newuser():
         email = request.form['email']
         password = request.form['password']
         if not username or not password or not email:
-            error = 'Account creation failed: missing username, email, or password'
+            error = ('Account creation failed: '
+                     'missing username, email, or password')
         else:
             if not add_user(username, email, password):
                 error = 'Account creation failed: database errord'
@@ -213,28 +223,28 @@ def newuser():
             return redirect(url_for('index'))
     return render_template('newuser.html')
 
-# Route to Requests Collection
 @app.route('/requests')
 @login_required
 def requests():
+    '''Route to Requests Collection.'''
     requests = Request.query.all()
     return render_template('requests.html', requests=requests)
 
-# Route to a particular request
 @app.route('/requests/<req>', methods=['GET', 'POST'])
 @login_required
 def req(req):
+    '''Route to a particular request.'''
     return 'Request: %s' % req # render_template('request.html', request=req)
 
-# Add a new request
 @app.route('/newrequest', methods=['GET', 'POST'])
 def newrequest():
+    '''Add a new request.'''
     error = None
     if request.method == 'POST':
         # Add a new request
         username = request.form['username']
         # TODO: Check other args
-        if not username: # or not ...other params...:
+        if not username:  # or not ...other params...:
             error = 'Request creation failed: missing information'
         else:
             add_request(username)
@@ -242,24 +252,26 @@ def newrequest():
     return render_template('newRequest.html', error=error)
 
 # Helper functions
+
 def authenticate_user(username, password):
+    '''Authenticate a user. Return True if username and password are valid.'''
     user = User.query.filter_by(username=username).first()
     if user:
         return bcrypt.check_password_hash(user.pw_hash, password)
     return False
 
-# Add a new user to the database
 def add_user(username, email, password):
+    '''Add a new user to the database.'''
     user = User(username, email, password)
     try:
         db.session.add(user)
         db.session.commit()
-    except IntegrityError: 
+    except IntegrityError:
         return False
     return True
 
-# Add a new request to the database
 def add_request(username):
+    '''Add a new request to the database.'''
     user = User.query.filter_by(username=username).first()
     if user:
         req = Request(user)
@@ -272,4 +284,4 @@ def add_request(username):
     return False
 
 if __name__ == '__main__':
-        app.run()
+    app.run()
