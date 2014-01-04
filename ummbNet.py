@@ -22,7 +22,7 @@ app.debug = True
 # Define Database entities
 
 class User(db.Model):
-    '''Represents a user that can log into ummbNet.'''
+    '''Represent a user that can log into ummbNet.'''
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.Text, unique=True)
     email = db.Column(db.Text, unique=True)
@@ -43,7 +43,7 @@ class User(db.Model):
         return '<User %r>' % self.username
 
 class DbUser(object):
-    '''Wraps User object for Flask-Login.'''
+    '''Wrap User object for Flask-Login.'''
     def __init__(self, user):
         self._user = user
 
@@ -60,7 +60,7 @@ class DbUser(object):
         return True
 
 class Request(db.Model):
-    '''Represents a user's request for a substitute for an event.'''
+    '''Represent a user's request for a substitute for an event.'''
     id = db.Column(db.Integer, primary_key=True)
     poster = db.relationship(
         'User', backref=db.backref('posted_requests', lazy='dynamic'))
@@ -71,7 +71,7 @@ class Request(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
     instrument_id = db.Column(db.Integer, db.ForeignKey('instrument.id'))
     part = db.Column(db.Text)
-  
+
     def __init__(self, poster, sub=None, band_id=None,
                  event_id=None, instrument_id=None, part=""):
         self.poster = poster
@@ -90,7 +90,7 @@ class Request(db.Model):
                 Event.query.get(self.event_id), self.poster
 
 class Band(db.Model):
-    '''Represents which band the request is for.'''
+    '''Represent which band the request is for.'''
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
     requests = db.relationship('Request', backref='band', lazy='dynamic')
@@ -104,7 +104,7 @@ class Band(db.Model):
         return '<Band Name: %r>' % self.name
 
 class Event(db.Model):
-    '''Represents a specific band event.'''
+    '''Represent a specific band event.'''
     id = db.Column(db.Integer, primary_key=True)
     event_type_id = db.Column(
         db.Integer, db.ForeignKey('eventtype.id', schema='dbo'))
@@ -121,7 +121,7 @@ class Event(db.Model):
         return '<Event Type: %r Date: %r Time %r>' % self.event_type, self.date, self.time
 
 class EventType(db.Model):
-    '''Represents the type of band event.'''
+    '''Represent the type of band event.'''
     __tablename__ = 'eventtype'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
@@ -136,7 +136,7 @@ class EventType(db.Model):
         return '<Event_Type Name: %r>' % self.name
 
 class Instrument(db.Model):
-    '''Represents the instrument the requestor plays and needs a sub for.'''
+    '''Represent the instrument the requester plays and needs a sub for.'''
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
     requests = db.relationship('Request', backref='instrument', lazy='dynamic')
@@ -149,9 +149,10 @@ class Instrument(db.Model):
     def __repr__(self):
         return '<Instrument Name: %r>' % self.name
 
-# Define login_manager callback
+
 @login_manager.user_loader
 def load_user(user_id):
+    '''login_manager callback, Return user in DbUser wrapper.'''
     user = User.query.get(user_id)
     if user:
         return DbUser(user)
@@ -163,7 +164,7 @@ def load_user(user_id):
 @app.route('/')
 def index():
     '''Return the ummbNet homepage.'''
-	return render_template('index.html')
+    return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
