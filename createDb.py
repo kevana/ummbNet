@@ -1,5 +1,5 @@
 from ummbNet import *
- 
+
 db.drop_all()
 db.create_all()
 
@@ -31,7 +31,7 @@ alto_sax = Instrument('Alto Sax')
 tenor_sax = Instrument('Tenor Sax')
 trumpet = Instrument('Trumpet')
 mellophone = Instrument('Mellophone')
-trombone = Instrument('Trombone') 
+trombone = Instrument('Trombone')
 baritone = Instrument('Baritone')
 tuba = Instrument('Tuba')
 drumline = Instrument('Drumline')
