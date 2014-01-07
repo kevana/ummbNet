@@ -94,11 +94,14 @@ class Band(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
     requests = db.relationship('Request', backref='band', lazy='dynamic')
+    events = db.relationship('Event', backref='band', lazy='dynamic')
 
-    def __init__(self, name, members=None, requests=None):
+    def __init__(self, name, members=None, requests=None, events=None):
         self.name = name
         if requests:
             self.requests = requests
+        if events:
+            self.events = events
 
     def __repr__(self):
         return '<Band Name: %r>' % self.name
@@ -110,6 +113,7 @@ class Event(db.Model):
         db.Integer, db.ForeignKey('eventtype.id', schema='dbo'))
     date = db.Column(db.DateTime)
     requests = db.relationship('Request', backref='event', lazy='dynamic')
+    band_id = db.Column(db.Integer, db.ForeignKey('band.id'))
 
     def __init__(self, event_type_id, date, requests=None):
         self.event_type_id = event_type_id
