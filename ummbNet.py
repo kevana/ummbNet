@@ -87,7 +87,7 @@ class Request(db.Model):
 
     def __repr__(self):
         return '<Request Event: %r Posted by: %r>' % \
-                Event.query.get(self.event_id), self.poster
+            (self.event_id, self.poster)
 
 class Band(db.Model):
     '''Represent which band the request is for.'''
@@ -118,7 +118,8 @@ class Event(db.Model):
             self.requests = requests
 
     def __repr__(self):
-        return '<Event Type: %r Date: %r Time %r>' % self.event_type, self.date, self.time
+        return '<Event Type: %r Date: %r Time %r>' % \
+            (self.eventtype, self.date, self.time)
 
 class EventType(db.Model):
     '''Represent the type of band event.'''
