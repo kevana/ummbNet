@@ -22,7 +22,7 @@ app.debug = True
 # Define Database entities
 
 class User(db.Model):
-    '''Represents a user that can log into ummbNet.'''
+    '''Represent a user that can log into ummbNet.'''
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.Text, unique=True)
     email = db.Column(db.Text, unique=True)
@@ -43,8 +43,7 @@ class User(db.Model):
         return '<User %r>' % self.username
 
 class DbUser(object):
-    '''Wraps User object for Flask-Login.'''
-
+    '''Wrap User object for Flask-Login.'''
     def __init__(self, user):
         self._user = user
 
@@ -61,7 +60,7 @@ class DbUser(object):
         return True
 
 class Request(db.Model):
-    '''Represents a user's request for a substitute for a band event.'''
+    '''Represent a user's request for a substitute for an event.'''
     id = db.Column(db.Integer, primary_key=True)
     poster = db.relationship(
         'User', backref=db.backref('posted_requests', lazy='dynamic'))
@@ -74,7 +73,7 @@ class Request(db.Model):
     part = db.Column(db.Text)
 
     def __init__(self, poster, sub=None, band_id=None,
-                 event_id=None, instrument_id=None, part=""):
+                 event_id=None, instrument_id=None, part=''):
         self.poster = poster
         if sub:
             self.sub = sub
@@ -87,30 +86,34 @@ class Request(db.Model):
         self.part = part
 
     def __repr__(self):
-        return ('<Request Event: %r Posted by: %r>' %
-                Event.query.get(self.event_id), self.poster)
+        return '<Request Event: %r Posted by: %r>' % \
+            (self.event_id, self.poster)
 
 class Band(db.Model):
-    '''Represents which band the request is for.'''
+    '''Represent which band the request is for.'''
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
     requests = db.relationship('Request', backref='band', lazy='dynamic')
+    events = db.relationship('Event', backref='band', lazy='dynamic')
 
-    def __init__(self, name, members=None, requests=None):
+    def __init__(self, name, members=None, requests=None, events=None):
         self.name = name
         if requests:
             self.requests = requests
+        if events:
+            self.events = events
 
     def __repr__(self):
         return '<Band Name: %r>' % self.name
 
 class Event(db.Model):
-    '''Represents a specific band event.'''
+    '''Represent a specific band event.'''
     id = db.Column(db.Integer, primary_key=True)
     event_type_id = db.Column(
         db.Integer, db.ForeignKey('eventtype.id', schema='dbo'))
     date = db.Column(db.DateTime)
     requests = db.relationship('Request', backref='event', lazy='dynamic')
+    band_id = db.Column(db.Integer, db.ForeignKey('band.id'))
 
     def __init__(self, event_type_id, date, requests=None):
         self.event_type_id = event_type_id
@@ -119,10 +122,11 @@ class Event(db.Model):
             self.requests = requests
 
     def __repr__(self):
-        return '<Event Type: %r Date: %r Time %r>' % self.event_type, self.date, self.time
+        return '<Event Type: %r Date: %r Call: %r>' % \
+            (self.eventtype, self.date, self.date.time())
 
 class EventType(db.Model):
-    '''Represents the type of band event.'''
+    '''Represent the type of band event.'''
     __tablename__ = 'eventtype'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
@@ -137,7 +141,7 @@ class EventType(db.Model):
         return '<Event_Type Name: %r>' % self.name
 
 class Instrument(db.Model):
-    '''Represents the instrument the requester plays and needs a sub for.'''
+    '''Represent the instrument the requester plays and needs a sub for.'''
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
     requests = db.relationship('Request', backref='instrument', lazy='dynamic')
@@ -150,10 +154,10 @@ class Instrument(db.Model):
     def __repr__(self):
         return '<Instrument Name: %r>' % self.name
 
-# Define login_manager callback
 
 @login_manager.user_loader
 def load_user(user_id):
+    '''login_manager callback, Return user in DbUser wrapper.'''
     user = User.query.get(user_id)
     if user:
         return DbUser(user)
@@ -197,18 +201,18 @@ def logout():
 @app.route('/users')
 @login_required
 def users():
-    '''Route to users collection'''
+    '''Route to users collection.'''
     return render_template('users.html')
 
 @app.route('/users/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
-    '''Route to particular user'''
-    return 'User: %s' % username
+    '''Route to a particular user.'''
+    return 'User: %s' % username # render_template('user.html', username=username)
 
 @app.route('/newuser', methods=['GET', 'POST'])
 def newuser():
-    '''Add a new user'''
+    '''Add a new user.'''
     error = None
     if request.method == 'POST':
         # Add a new user
@@ -228,18 +232,19 @@ def newuser():
 @app.route('/requests')
 @login_required
 def requests():
-    '''Route to Requests Collection'''
-    return render_template('requests.html')
+    '''Route to Requests Collection.'''
+    requests = Request.query.all()
+    return render_template('requests.html', requests=requests)
 
 @app.route('/requests/<req>', methods=['GET', 'POST'])
 @login_required
 def req(req):
-    '''Route to a particular request'''
-    return 'Request: %s' % req  # render_template('request.html', request=req)
+    '''Route to a particular request.'''
+    return 'Request: %s' % req # render_template('request.html', request=req)
 
 @app.route('/newrequest', methods=['GET', 'POST'])
 def newrequest():
-    '''Add a new request'''
+    '''Add a new request.'''
     error = None
     if request.method == 'POST':
         # Add a new request
@@ -255,14 +260,14 @@ def newrequest():
 # Helper functions
 
 def authenticate_user(username, password):
-    '''Authenticate a user. Returns True if username and password are valid.'''
+    '''Authenticate a user. Return True if username and password are valid.'''
     user = User.query.filter_by(username=username).first()
     if user:
         return bcrypt.check_password_hash(user.pw_hash, password)
     return False
 
 def add_user(username, email, password):
-    '''Add a new user to the database'''
+    '''Add a new user to the database.'''
     user = User(username, email, password)
     try:
         db.session.add(user)
@@ -272,7 +277,7 @@ def add_user(username, email, password):
     return True
 
 def add_request(username):
-    '''Add a new request to the database'''
+    '''Add a new request to the database.'''
     user = User.query.filter_by(username=username).first()
     if user:
         req = Request(user)
@@ -281,7 +286,7 @@ def add_request(username):
             db.session.commit()
         except IntegrityError:
             return False
-        return True  # Not graceful logic
+        return True # Not graceful logic
     return False
 
 if __name__ == '__main__':

@@ -41,6 +41,11 @@ tuba = Instrument.query.filter_by(name='Tuba').first()
 drumline = Instrument.query.filter_by(name='Drumline').first()
 
 
+# Get bands
+gold_band = Band.query.filter_by(name='Gold Band').first()
+maroon_band = Band.query.filter_by(name='Maroon Band').first()
+gopher_band = Band.query.filter_by(name='Gopher Band').first()
+
 # Create Dates
 now = datetime.utcnow()
 year = now.year
@@ -85,16 +90,26 @@ db.session.commit()
 
 
 # Create Requests
-request_0 = Request(poster=user_5, instrument_id=drumline.id)
-request_1 = Request(poster=user_1, instrument_id=piccolo.id)
-request_2 = Request(poster=user_1, instrument_id=piccolo.id)
-request_3 = Request(poster=user_2, instrument_id=flute.id)
-request_4 = Request(poster=user_2, instrument_id=flute.id)
-request_5 = Request(poster=user_3, instrument_id=trumpet.id)
-request_6 = Request(poster=user_3, instrument_id=trumpet.id)
-request_7 = Request(poster=user_4, instrument_id=alto_sax.id)
-request_8 = Request(poster=user_4, instrument_id=alto_sax.id)
-request_9 = Request(poster=user_4, instrument_id=alto_sax.id)
+request_0 = Request(poster=user_5, band_id=gold_band.id, \
+                    event_id=event_1.id, instrument_id=drumline.id, part='Snare')
+request_1 = Request(poster=user_1, band_id=maroon_band.id, \
+                    event_id=event_2.id, instrument_id=piccolo.id, part='1')
+request_2 = Request(poster=user_1, band_id=gopher_band.id, \
+                    event_id=event_3.id, instrument_id=piccolo.id, part='2')
+request_3 = Request(poster=user_2, band_id=gold_band.id, \
+                    event_id=event_4.id, instrument_id=flute.id, part='1')
+request_4 = Request(poster=user_2, band_id=maroon_band.id, \
+                    event_id=event_5.id, instrument_id=flute.id, part='3')
+request_5 = Request(poster=user_3, band_id=gopher_band.id, \
+                    event_id=event_6.id, instrument_id=trumpet.id, part='3')
+request_6 = Request(poster=user_3, band_id=gold_band.id, \
+                    event_id=event_7.id, instrument_id=trumpet.id, part='2')
+request_7 = Request(poster=user_4, band_id=maroon_band.id, \
+                    event_id=event_8.id, instrument_id=alto_sax.id, part='1')
+request_8 = Request(poster=user_4, band_id=gopher_band.id, \
+                    event_id=event_9.id, instrument_id=alto_sax.id, part='2')
+request_9 = Request(poster=user_4, band_id=gold_band.id, \
+                    event_id=event_10.id, instrument_id=alto_sax.id, part='3')
 
 db.session.add_all([request_0, request_1, request_2, request_3, request_4, \
                     request_5, request_6, request_7, request_8, request_9])
