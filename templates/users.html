@@ -2,5 +2,26 @@
 {% block title %} - Users{% endblock %}
 {% block content %}
   <h1>Users</h1>
+  <table id="users">
+    <tr>
+      <td>Username</td>
+      <td>Email</td>
+      <td>First Name</td>
+      <td>Last Name</td>
+      <td>Nickname</td>
+      <td>Instrument</td>
+    </tr>
+    {% for user in users %}
+    <tr>
+      <td>{{ user.username }}</td>
+      <td>{{ user.email }}</td>
+      <td>{{ user.first_name }}</td>
+      <td>{{ user.last_name }}</td>
+      <td>{{ user.nickname }}</td>
+      <td>{{ user.instruments[0]|default('') }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  
   <p><a href="{{ url_for('index') }}">home</a></p>
 {% endblock %}

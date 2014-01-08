@@ -217,7 +217,8 @@ def logout():
 @login_required
 def users():
     '''Route to users collection.'''
-    return render_template('users.html')
+    users = User.query.all()
+    return render_template('users.html', users=users)
 
 @app.route('/users/<username>', methods=['GET', 'POST'])
 @login_required
