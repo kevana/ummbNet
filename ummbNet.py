@@ -73,7 +73,7 @@ class Request(db.Model):
     part = db.Column(db.Text)
 
     def __init__(self, poster, sub=None, band_id=None,
-                 event_id=None, instrument_id=None, part=""):
+                 event_id=None, instrument_id=None, part=''):
         self.poster = poster
         if sub:
             self.sub = sub
@@ -122,8 +122,8 @@ class Event(db.Model):
             self.requests = requests
 
     def __repr__(self):
-        return '<Event Type: %r Date: %r Time %r>' % \
-            (self.eventtype, self.date, self.time)
+        return '<Event Type: %r Date: %r Call: %r>' % \
+            (self.eventtype, self.date, self.date.time())
 
 class EventType(db.Model):
     '''Represent the type of band event.'''
