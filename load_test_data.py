@@ -3,16 +3,26 @@ from ummbNet import *
 
 
 # Create Users
-admin = User(username='admin', email='admin@example.com', password='password')
-user_1 = User(username='user_1', email='user_1@example.com', password='password')
-user_2 = User(username='user_2', email='user_2@example.com', password='password')
-user_3 = User(username='user_3', email='user_3@example.com', password='password')
-user_4 = User(username='user_4', email='user_4@example.com', password='password')
-user_5 = User(username='user_5', email='user_5@example.com', password='password')
-user_6 = User(username='user_6', email='user_6@example.com', password='password')
-user_7 = User(username='user_7', email='user_7@example.com', password='password')
-user_8 = User(username='user_8', email='user_8@example.com', password='password')
-user_9 = User(username='user_9', email='user_9@example.com', password='password')
+admin = User(username='admin', email='kevan@ummb.net', password='password', \
+            first_name='Kevan', last_name='Ahlquist', nickname='Krevan')
+user_1 = User(username='user_1', email='user_1@example.com', password='password', \
+            first_name='Mitch', last_name='Gulbransen', nickname='Gulbie')
+user_2 = User(username='user_2', email='user_2@example.com', password='password', \
+            first_name='Phillip', last_name='Homen', nickname='Phil')
+user_3 = User(username='user_3', email='user_3@example.com', password='password', \
+            first_name='Raoul', last_name='Shah', nickname='Batman')
+user_4 = User(username='user_4', email='user_4@example.com', password='password', \
+            first_name='Joe', last_name='Walsh', nickname='')
+user_5 = User(username='user_5', email='user_5@example.com', password='password', \
+            first_name='Colin', last_name='Campbell', nickname='')
+user_6 = User(username='user_6', email='user_6@example.com', password='password', \
+            first_name='Jeff', last_name='Korum', nickname='Twitch')
+user_7 = User(username='user_7', email='user_7@example.com', password='password', \
+            first_name='Tyler', last_name='Hoffman', nickname='Ty')
+user_8 = User(username='user_8', email='user_8@example.com', password='password', \
+            first_name='Brad', last_name='Billstein', nickname='Colin2')
+user_9 = User(username='user_9', email='user_9@example.com', password='password', \
+            first_name='Tomas', last_name='Icenogle', nickname='Iceman')
 
 db.session.add_all([admin, user_1, user_2, user_3, user_4, \
                     user_5, user_6, user_7, user_8, user_9])
