@@ -21,20 +21,35 @@ app.debug = True
 
 # Define Database entities
 
+users_instrs = db.Table('association', db.Model.metadata,
+    db.Column('left_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('right_id', db.Integer, db.ForeignKey('instrument.id')))
+
 class User(db.Model):
     '''Represent a user that can log into ummbNet.'''
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.Text, unique=True)
     email = db.Column(db.Text, unique=True)
     pw_hash = db.Column(db.Text)
-    requests = db.relationship('Request', backref='User', lazy='dynamic')
+    first_name = db.Column(db.Text)
+    last_name = db.Column(db.Text)
+    nickname = db.Column(db.Text)
+    instruments = db.relationship('Instrument', \
+                                secondary=users_instrs, backref='users')
+    requests = db.relationship('Request', backref='user', lazy='dynamic')
     enabled = db.Column(db.Boolean)
 
-    # Self functions
-    def __init__(self, username, email, password, requests=None, enabled=True):
+    def __init__(self, username, email, password, first_name=None, \
+                last_name=None, nickname=None, requests=None, enabled=True):
         self.username = username
         self.email = email
         self.pw_hash = bcrypt.generate_password_hash(password)
+        if first_name:
+            self.first_name = first_name
+        if last_name:
+            self.last_name = last_name
+        if nickname:
+            self.nickname = nickname
         if requests:
             self.requests = requests
         self.enabled = enabled
