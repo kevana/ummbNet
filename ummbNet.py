@@ -40,8 +40,7 @@ class User(db.Model):
     enabled = db.Column(db.Boolean)
 
     def __init__(self, username, email, password, first_name=None, \
-                last_name=None, nickname=None, requests=None, enabled=True, \
-                instruments=None):
+                last_name=None, nickname=None, requests=None, enabled=True):
         self.username = username
         self.email = email
         self.pw_hash = bcrypt.generate_password_hash(password)
@@ -53,8 +52,6 @@ class User(db.Model):
             self.nickname = nickname
         if requests:
             self.requests = requests
-        if instruments:
-            self.instruments = instruments
         self.enabled = enabled
 
     def __repr__(self):
@@ -227,11 +224,7 @@ def users():
 @login_required
 def user(username):
     '''Route to a particular user.'''
-    user = User.query.filter_by(username=username).first()
-    if user:
-        return render_template('user.html', user=user, \
-                            requests=user.requests, instruments=user.instruments)
-    return render_template('404.html')
+    return 'User: %s' % username # render_template('user.html', username=username)
 
 @app.route('/newuser', methods=['GET', 'POST'])
 def newuser():

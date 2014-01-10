@@ -2,6 +2,33 @@ from datetime import datetime, timedelta
 from ummbNet import *
 
 
+# Create Users
+admin = User(username='admin', email='kevan@ummb.net', password='password', \
+            first_name='Kevan', last_name='Ahlquist', nickname='Krevan')
+user_1 = User(username='user_1', email='user_1@example.com', password='password', \
+            first_name='Mitch', last_name='Gulbransen', nickname='Gulbie')
+user_2 = User(username='user_2', email='user_2@example.com', password='password', \
+            first_name='Phillip', last_name='Homen', nickname='Phil')
+user_3 = User(username='user_3', email='user_3@example.com', password='password', \
+            first_name='Raoul', last_name='Shah', nickname='Batman')
+user_4 = User(username='user_4', email='user_4@example.com', password='password', \
+            first_name='Joe', last_name='Walsh', nickname='')
+user_5 = User(username='user_5', email='user_5@example.com', password='password', \
+            first_name='Colin', last_name='Campbell', nickname='')
+user_6 = User(username='user_6', email='user_6@example.com', password='password', \
+            first_name='Jeff', last_name='Korum', nickname='Twitch')
+user_7 = User(username='user_7', email='user_7@example.com', password='password', \
+            first_name='Tyler', last_name='Hoffman', nickname='Ty')
+user_8 = User(username='user_8', email='user_8@example.com', password='password', \
+            first_name='Brad', last_name='Billstein', nickname='Colin2')
+user_9 = User(username='user_9', email='user_9@example.com', password='password', \
+            first_name='Tomas', last_name='Icenogle', nickname='Iceman')
+
+db.session.add_all([admin, user_1, user_2, user_3, user_4, \
+                    user_5, user_6, user_7, user_8, user_9])
+db.session.commit()
+
+
 # Get event_types
 mens_basketball = EventType.query.filter_by(name="Men's Basketball").first()
 womens_basketball = EventType.query.filter_by(name="Women's Basketball").first()
@@ -47,43 +74,6 @@ last_week = now - one_week
 next_week = now + one_week
 last_month = now - one_month
 next_month = now + one_month
-
-
-# Create Users
-admin = User(username='admin', email='kevan@ummb.net', password='password', \
-            first_name='Kevan', last_name='Ahlquist', nickname='Krevan', \
-            instruments=[trumpet, drumline])
-user_1 = User(username='user_1', email='user_1@example.com', password='password', \
-            first_name='Mitch', last_name='Gulbransen', nickname='Gulbie', \
-            instruments=[piccolo, flute])
-user_2 = User(username='user_2', email='user_2@example.com', password='password', \
-            first_name='Phillip', last_name='Homen', nickname='Phil', \
-            instruments=[clarinet])
-user_3 = User(username='user_3', email='user_3@example.com', password='password', \
-            first_name='Raoul', last_name='Shah', nickname='Batman', \
-            instruments=[alto_sax])
-user_4 = User(username='user_4', email='user_4@example.com', password='password', \
-            first_name='Joe', last_name='Walsh', nickname='', \
-            instruments=[mellophone])
-user_5 = User(username='user_5', email='user_5@example.com', password='password', \
-            first_name='Colin', last_name='Campbell', nickname='', \
-            instruments=[trombone])
-user_6 = User(username='user_6', email='user_6@example.com', password='password', \
-            first_name='Jeff', last_name='Korum', nickname='Twitch', \
-            instruments=[baritone])
-user_7 = User(username='user_7', email='user_7@example.com', password='password', \
-            first_name='Tyler', last_name='Hoffman', nickname='Ty', \
-            instruments=[tuba])
-user_8 = User(username='user_8', email='user_8@example.com', password='password', \
-            first_name='Brad', last_name='Billstein', nickname='Colin2', \
-            instruments=[drumline, flute])
-user_9 = User(username='user_9', email='user_9@example.com', password='password', \
-            first_name='Tomas', last_name='Icenogle', nickname='Iceman', \
-            instruments=[trumpet])
-
-db.session.add_all([admin, user_1, user_2, user_3, user_4, \
-                    user_5, user_6, user_7, user_8, user_9])
-db.session.commit()
 
 
 # Create Events
