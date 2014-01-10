@@ -133,11 +133,13 @@ class Event(db.Model):
     requests = db.relationship('Request', backref='event', lazy='dynamic')
     band_id = db.Column(db.Integer, db.ForeignKey('band.id'))
 
-    def __init__(self, event_type_id, date, requests=None):
+    def __init__(self, event_type_id, date, requests=None, band_id=None):
         self.event_type_id = event_type_id
         self.date = date
         if requests:
             self.requests = requests
+        if band_id:
+            self.band_id = band_id
 
     def __repr__(self):
         return '<Event Type: %r Date: %r Call: %r>' % \
