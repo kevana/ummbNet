@@ -40,7 +40,8 @@ class User(db.Model):
     enabled = db.Column(db.Boolean)
 
     def __init__(self, username, email, password, first_name=None, \
-                last_name=None, nickname=None, requests=None, enabled=True):
+                last_name=None, nickname=None, requests=None, enabled=True, \
+                instruments=None):
         self.username = username
         self.email = email
         self.pw_hash = bcrypt.generate_password_hash(password)
@@ -52,6 +53,8 @@ class User(db.Model):
             self.nickname = nickname
         if requests:
             self.requests = requests
+        if instruments:
+            self.instruments = instruments
         self.enabled = enabled
 
     def __repr__(self):
