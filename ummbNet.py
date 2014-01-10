@@ -227,7 +227,11 @@ def users():
 @login_required
 def user(username):
     '''Route to a particular user.'''
-    return 'User: %s' % username # render_template('user.html', username=username)
+    user = User.query.filter_by(username=username).first()
+    if user:
+        return render_template('user.html', user=user, \
+                            requests=user.requests, instruments=user.instruments)
+    return render_template('404.html')
 
 @app.route('/newuser', methods=['GET', 'POST'])
 def newuser():
