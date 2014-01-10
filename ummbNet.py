@@ -242,12 +242,19 @@ def newuser():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        nickname = request.form['nickname']
+        instruments = get_form_instr()
         if not username or not password or not email:
             error = ('Account creation failed: '
                      'missing username, email, or password')
         else:
-            if not add_user(username, email, password):
-                error = 'Account creation failed: database errord'
+            user = User(username=username, email=email, password=password, \
+                        first_name=first_name, last_name=last_name, \
+                        nickname=nickname, instruments=instruments)
+            if not add_user(user):
+                error = 'Account creation failed: database error'
                 return redirect(url_for('newuser', error=error))
             return redirect(url_for('index'))
     return render_template('newuser.html')
@@ -289,9 +296,8 @@ def authenticate_user(username, password):
         return bcrypt.check_password_hash(user.pw_hash, password)
     return False
 
-def add_user(username, email, password):
+def add_user(user):
     '''Add a new user to the database.'''
-    user = User(username, email, password)
     try:
         db.session.add(user)
         db.session.commit()
@@ -311,6 +317,32 @@ def add_request(username):
             return False
         return True # Not graceful logic
     return False
+
+def get_form_instr():
+    instr = []
+    if request.form.get('piccolo', None) == 'True':
+        instr.append(Instrument.query.filter_by(name='Piccolo').first())
+    if request.form.get('flute', None) == 'True':
+        instr.append(Instrument.query.filter_by(name='Flute').first())
+    if request.form.get('clarinet', None) == 'True':
+        instr.append(Instrument.query.filter_by(name='Clarinet').first())
+    if request.form.get('alto_sax') == 'True':
+        instr.append(Instrument.query.filter_by(name='Alto Sax').first())
+    if request.form.get('tenor_sax') == 'True':
+        instr.append(Instrument.query.filter_by(name='Tenor Sax').first())
+    if request.form.get('trumpet') == 'True':
+        instr.append(Instrument.query.filter_by(name='Trumpet').first())
+    if request.form.get('mellophone') == 'True':
+        instr.append(Instrument.query.filter_by(name='Mellophone').first())
+    if request.form.get('trombone') == 'True':
+        instr.append(Instrument.query.filter_by(name='Trombone').first())
+    if request.form.get('baritone') == 'True':
+        instr.append(Instrument.query.filter_by(name='Baritone').first())
+    if request.form.get('tuba') == 'True':
+        instr.append(Instrument.query.filter_by(name='Tuba').first())
+    if request.form.get('drumline') == 'True':
+        instr.append(Instrument.query.filter_by(name='Drumline').first())
+    return instr
 
 if __name__ == '__main__':
     app.run()
