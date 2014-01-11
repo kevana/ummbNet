@@ -297,14 +297,23 @@ def newrequest():
     error = None
     if request.method == 'POST':
         # Add a new request
-        username = request.form['username']
-        # TODO: Check other args
-        if not username:  # or not ...other params...:
+        band_id = request.form['band']
+        event_id = request.form['event']
+        instrument_id = request.form['instrument']
+        part = request.form['part']
+        if part == None:
+            part = ""
+        if not band_id or not event_id or not instrument_id:
             error = 'Request creation failed: missing information'
         else:
-            add_request(username)
+            add_request(band_id=band_id, event_id=event_id, \
+                        instrument_id=instrument_id, part=part)
             return redirect(url_for('requests'))
-    return render_template('newRequest.html', error=error)
+    bands = Band.query.all()
+    events = Event.query.all()
+    instruments = Instrument.query.all()
+    return render_template('newRequest.html', bands=bands, \
+                            events=events, instruments=instruments)
 
 @app.route('/confirm')
 @login_required
@@ -336,11 +345,12 @@ def add_user(user):
         return False
     return True
 
-def add_request(username):
+def add_request(band_id, event_id, instrument_id, part):
     '''Add a new request to the database.'''
-    user = User.query.filter_by(username=username).first()
+    user = current_user.get_user()
     if user:
-        req = Request(user)
+        req = Request(poster=user, band_id=band_id, event_id=event_id, \
+                      instrument_id=instrument_id, part=part)
         try:
             db.session.add(req)
             db.session.commit()
