@@ -43,7 +43,13 @@
         {% block navbar_right %}
         {% if session.logged_in %}
         <ul class="nav navbar-nav">
-            <li><a href="{{ url_for('requests') }}">Requests</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Requests<b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ url_for('requests') }}">View Requests</a></li>
+                <li><a href="{{ url_for('newrequest') }}">Add a New Request</a></li>
+              </ul>
+            </li>
             <li><a href="{{ url_for('user', username=user.username) }}">Profile</a></li>
         </ul>
         {% endif %}
