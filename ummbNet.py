@@ -1,6 +1,7 @@
 from flask import (Flask, flash, redirect, render_template,
                    request, session, url_for)
-from flask_login import (LoginManager, login_required, login_user, logout_user)
+from flask_login import (LoginManager, login_required, login_user, \
+                         logout_user, current_user)
 from flask.ext.bcrypt import Bcrypt
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
@@ -36,7 +37,6 @@ class User(db.Model):
     nickname = db.Column(db.Text)
     instruments = db.relationship('Instrument', \
                                 secondary=users_instrs, backref='users')
-    requests = db.relationship('Request', backref='user', lazy='dynamic')
     enabled = db.Column(db.Boolean)
 
     def __init__(self, username, email, password, first_name=None, \
@@ -76,15 +76,21 @@ class DbUser(object):
 
     def is_authenticated(self):
         return True
+    
+    def get_user(self):
+        return self._user
 
 class Request(db.Model):
     '''Represent a user's request for a substitute for an event.'''
     id = db.Column(db.Integer, primary_key=True)
-    poster = db.relationship(
-        'User', backref=db.backref('posted_requests', lazy='dynamic'))
     poster_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    sub = db.relationship(
-        'User', backref=db.backref('filled_requests', lazy='dynamic'))
+    poster = db.relationship('User', \
+                    backref=db.backref('posted_requests', lazy='dynamic'), \
+                    foreign_keys=[poster_id])
+    sub_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    sub = db.relationship('User', 
+                    backref=db.backref('filled_requests', lazy='dynamic'), \
+                    foreign_keys=[sub_id])
     band_id = db.Column(db.Integer, db.ForeignKey('band.id'))
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
     instrument_id = db.Column(db.Integer, db.ForeignKey('instrument.id'))
@@ -133,11 +139,13 @@ class Event(db.Model):
     requests = db.relationship('Request', backref='event', lazy='dynamic')
     band_id = db.Column(db.Integer, db.ForeignKey('band.id'))
 
-    def __init__(self, event_type_id, date, requests=None):
+    def __init__(self, event_type_id, date, requests=None, band_id=None):
         self.event_type_id = event_type_id
         self.date = date
         if requests:
             self.requests = requests
+        if band_id:
+            self.band_id = band_id
 
     def __repr__(self):
         return '<Event Type: %r Date: %r Call: %r>' % \
@@ -230,7 +238,7 @@ def user(username):
     user = User.query.filter_by(username=username).first()
     if user:
         return render_template('user.html', user=user, \
-                            requests=user.requests, instruments=user.instruments)
+                            requests=user.posted_requests, instruments=user.instruments)
     return render_template('404.html')
 
 @app.route('/newuser', methods=['GET', 'POST'])
@@ -263,29 +271,61 @@ def newuser():
 @login_required
 def requests():
     '''Route to Requests Collection.'''
-    requests = Request.query.all()
+    requests = Request.query.filter(Request.sub == None).all()
     return render_template('requests.html', requests=requests)
 
-@app.route('/requests/<req>', methods=['GET', 'POST'])
+@app.route('/requests/<request_id>', methods=['GET', 'POST'])
 @login_required
-def req(req):
+def req(request_id):
     '''Route to a particular request.'''
-    return 'Request: %s' % req # render_template('request.html', request=req)
-
+    if request.method == 'GET':
+        req = Request.query.get(request_id)
+        if req:
+            return render_template('request.html', req=req)
+        return render_template('404.html')
+    req = Request.query.filter_by(id=request_id).first()
+    if req:
+        req.sub = current_user.get_user()
+        db.session.commit()
+        return redirect(url_for('index', message='Success'))
+    return render_template('404.html')
+    
 @app.route('/newrequest', methods=['GET', 'POST'])
+@login_required
 def newrequest():
     '''Add a new request.'''
     error = None
     if request.method == 'POST':
         # Add a new request
-        username = request.form['username']
-        # TODO: Check other args
-        if not username:  # or not ...other params...:
+        band_id = request.form['band']
+        event_id = request.form['event']
+        instrument_id = request.form['instrument']
+        part = request.form['part']
+        if part == None:
+            part = ""
+        if not band_id or not event_id or not instrument_id:
             error = 'Request creation failed: missing information'
         else:
-            add_request(username)
+            add_request(band_id=band_id, event_id=event_id, \
+                        instrument_id=instrument_id, part=part)
             return redirect(url_for('requests'))
-    return render_template('newRequest.html', error=error)
+    bands = Band.query.all()
+    events = Event.query.all()
+    instruments = Instrument.query.all()
+    return render_template('newRequest.html', bands=bands, \
+                            events=events, instruments=instruments)
+
+@app.route('/confirm')
+@login_required
+def confirm():
+    if request.args.get('action') == 'pickup':
+        req_id = request.args['request_id']
+        req = Request.query.get(req_id)
+        if not req or req.sub:
+            return redirect(url_for('requests'))
+        return render_template('pickup-req-confirm.html', req=req)
+    error = 'Nothing to confirm'
+    return redirect(url_for('index', error=error))
 
 # Helper functions
 
@@ -305,11 +345,12 @@ def add_user(user):
         return False
     return True
 
-def add_request(username):
+def add_request(band_id, event_id, instrument_id, part):
     '''Add a new request to the database.'''
-    user = User.query.filter_by(username=username).first()
+    user = current_user.get_user()
     if user:
-        req = Request(user)
+        req = Request(poster=user, band_id=band_id, event_id=event_id, \
+                      instrument_id=instrument_id, part=part)
         try:
             db.session.add(req)
             db.session.commit()
