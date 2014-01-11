@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %} - Confirm Pickup{% endblock %}
 {% block content %}
+<div class="container">
   <h1>Are you sure?</h1>
   <p>Please review the details below and confirm that you want to pick up this event</p>
   <p>Band: {{ req.event.band.name }}</p>
@@ -20,4 +21,5 @@
   </form>
 
   <p><a href="{{ url_for('index') }}">home</a></p>
+</div>
 {% endblock %}

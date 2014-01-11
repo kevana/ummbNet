@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %} - Login{% endblock %}
 {% block content %}
+<div class="container">
   <h2>Login</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
   <form method='POST'>
@@ -13,4 +14,5 @@
       <dd><a href="{{ url_for('newuser') }}">Sign up</a></dd>
     </dl>
   </form>
+</div>
 {% endblock %}

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %} - New Request{% endblock %}
 {% block content %}
+<div class="container">
   <h2>Create a new request</h2>
   {% if error %}<p class=error><strong>Error:</strong></p> {{ error }}{% endif %}
   <form action="{{ url_for('newrequest') }}" method='POST'>
@@ -34,4 +35,5 @@
       <dd><input type="submit" value="Create Request"></dd>
     </dl>
   </form>
+</div>
 {% endblock %}
