@@ -36,7 +36,6 @@ class User(db.Model):
     nickname = db.Column(db.Text)
     instruments = db.relationship('Instrument', \
                                 secondary=users_instrs, backref='users')
-    requests = db.relationship('Request', backref='user', lazy='dynamic')
     enabled = db.Column(db.Boolean)
 
     def __init__(self, username, email, password, first_name=None, \
@@ -80,11 +79,14 @@ class DbUser(object):
 class Request(db.Model):
     '''Represent a user's request for a substitute for an event.'''
     id = db.Column(db.Integer, primary_key=True)
-    poster = db.relationship(
-        'User', backref=db.backref('posted_requests', lazy='dynamic'))
     poster_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    sub = db.relationship(
-        'User', backref=db.backref('filled_requests', lazy='dynamic'))
+    poster = db.relationship('User', \
+                    backref=db.backref('posted_requests', lazy='dynamic'), \
+                    foreign_keys=[poster_id])
+    sub_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    sub = db.relationship('User', 
+                    backref=db.backref('filled_requests', lazy='dynamic'), \
+                    foreign_keys=[sub_id])
     band_id = db.Column(db.Integer, db.ForeignKey('band.id'))
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
     instrument_id = db.Column(db.Integer, db.ForeignKey('instrument.id'))
@@ -232,7 +234,7 @@ def user(username):
     user = User.query.filter_by(username=username).first()
     if user:
         return render_template('user.html', user=user, \
-                            requests=user.requests, instruments=user.instruments)
+                            requests=user.posted_requests, instruments=user.instruments)
     return render_template('404.html')
 
 @app.route('/newuser', methods=['GET', 'POST'])
