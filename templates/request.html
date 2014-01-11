@@ -5,7 +5,7 @@
   <h1>Request</h1>
   <p>Band: {{ req.event.band.name }}</p>
   <p>Event: {{ req.event.eventtype.name  }}</p>
-  <p>Date: {{ req.event.date }}</p>
+  <p>Date: {{ req.event.date.strftime('%a %b %d, %H:%M%p') }}</p>
   <p>Instrument: {{ req.instrument.name }}</p>
   <p>Part: {{ req.part }}</p>
   <p>Poster: {% if req.poster.nickname %}

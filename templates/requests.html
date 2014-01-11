@@ -19,7 +19,7 @@
     <tbody>
     {% for req in requests %}
       <tr>
-        <td>{{ req.event.date }}</td>
+        <td>{{ req.event.date.strftime('%a %b %d, %H:%M%p') }}</td>
         <td>{% if req.poster.nickname %}
             {{ req.poster.nickname }}
             {% else %}

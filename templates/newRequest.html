@@ -18,7 +18,7 @@
       <dd>
         <select name="event">
           {% for event in events %}
-            <option value="{{ event.id }}">{{ event.eventtype.name }} {{ event.date }}</option>
+            <option value="{{ event.id }}">{{ event.eventtype.name }} {{ event.date.strftime('%a %b %d, %H:%M%p') }}</option>
           {% endfor %}
         </select>
       </dd>

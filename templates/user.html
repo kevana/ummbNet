@@ -16,7 +16,7 @@
   <h2>Requests</h2>
   <ul>
   {% for req in requests %}
-  <li>{{ req.event.band.name }} {{ req.event.eventtype.name }} {{ req.event.date }} {{ req.instrument.name }} {{ req.part }}</li>
+  <li>{{ req.event.band.name }} {{ req.event.eventtype.name }} {{ req.event.date.strftime('%a %b %d, %H:%M%p') }} {{ req.instrument.name }} {{ req.part }}</li>
   {% endfor %}
   </ul>
   <p><a href="{{ url_for('index') }}">home</a></p>
