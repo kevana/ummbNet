@@ -247,6 +247,7 @@ def user(username):
 def newuser():
     '''Add a new user.'''
     error = None
+    user = current_user.get_user()
     if request.method == 'POST':
         # Add a new user
         username = request.form['username']
@@ -267,7 +268,7 @@ def newuser():
                 error = 'Account creation failed: database error'
                 return redirect(url_for('newuser', error=error))
             return redirect(url_for('index'))
-    return render_template('newuser.html')
+    return render_template('newuser.html', user=user)
 
 @app.route('/requests')
 @login_required
