@@ -195,7 +195,8 @@ def load_user(user_id):
 @app.route('/')
 def index():
     '''Return the ummbNet homepage.'''
-    return render_template('index.html')
+    user = current_user.get_user()
+    return render_template('index.html', user=user)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -229,7 +230,8 @@ def logout():
 def users():
     '''Route to users collection.'''
     users = User.query.all()
-    return render_template('users.html', users=users)
+    user = current_user.get_user()
+    return render_template('users.html', users=users, user=user)
 
 @app.route('/users/<username>', methods=['GET', 'POST'])
 @login_required
@@ -272,23 +274,25 @@ def newuser():
 def requests():
     '''Route to Requests Collection.'''
     requests = Request.query.filter(Request.sub == None).all()
-    return render_template('requests.html', requests=requests)
+    user = current_user.get_user()
+    return render_template('requests.html', requests=requests, user=user)
 
 @app.route('/requests/<request_id>', methods=['GET', 'POST'])
 @login_required
 def req(request_id):
     '''Route to a particular request.'''
+    user = current_user.get_user()
     if request.method == 'GET':
         req = Request.query.get(request_id)
         if req:
-            return render_template('request.html', req=req)
-        return render_template('404.html')
+            return render_template('request.html', req=req, user=user)
+        return render_template('404.html', user=user)
     req = Request.query.filter_by(id=request_id).first()
     if req:
         req.sub = current_user.get_user()
         db.session.commit()
         return redirect(url_for('index', message='Success'))
-    return render_template('404.html')
+    return render_template('404.html', user=user)
     
 @app.route('/newrequest', methods=['GET', 'POST'])
 @login_required
@@ -312,18 +316,20 @@ def newrequest():
     bands = Band.query.all()
     events = Event.query.all()
     instruments = Instrument.query.all()
+    user = current_user.get_user()
     return render_template('newRequest.html', bands=bands, \
-                            events=events, instruments=instruments)
+                            events=events, instruments=instruments, user=user)
 
 @app.route('/confirm')
 @login_required
 def confirm():
+    user = current_user.get_user()
     if request.args.get('action') == 'pickup':
         req_id = request.args['request_id']
         req = Request.query.get(req_id)
         if not req or req.sub:
             return redirect(url_for('requests'))
-        return render_template('pickup-req-confirm.html', req=req)
+        return render_template('pickup-req-confirm.html', req=req, user=user)
     error = 'Nothing to confirm'
     return redirect(url_for('index', error=error))
 
