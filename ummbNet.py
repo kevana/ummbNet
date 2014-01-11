@@ -1,6 +1,7 @@
 from flask import (Flask, flash, redirect, render_template,
                    request, session, url_for)
-from flask_login import (LoginManager, login_required, login_user, logout_user)
+from flask_login import (LoginManager, login_required, login_user, \
+                         logout_user, current_user)
 from flask.ext.bcrypt import Bcrypt
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
@@ -75,6 +76,9 @@ class DbUser(object):
 
     def is_authenticated(self):
         return True
+    
+    def get_user(self):
+        return self._user
 
 class Request(db.Model):
     '''Represent a user's request for a substitute for an event.'''
@@ -274,12 +278,20 @@ def requests():
 @login_required
 def req(request_id):
     '''Route to a particular request.'''
-    req = Request.query.get(request_id)
+    if request.method == 'GET':
+        req = Request.query.get(request_id)
+        if req:
+            return render_template('request.html', req=req)
+        return render_template('404.html')
+    req = Request.query.filter_by(id=request_id).first()
     if req:
-        return render_template('request.html', req=req)
+        req.sub = current_user.get_user()
+        db.session.commit()
+        return redirect(url_for('index', message='Success'))
     return render_template('404.html')
     
 @app.route('/newrequest', methods=['GET', 'POST'])
+@login_required
 def newrequest():
     '''Add a new request.'''
     error = None
