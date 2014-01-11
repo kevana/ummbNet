@@ -294,6 +294,18 @@ def newrequest():
             return redirect(url_for('requests'))
     return render_template('newRequest.html', error=error)
 
+@app.route('/confirm')
+@login_required
+def confirm():
+    if request.args.get('action') == 'pickup':
+        req_id = request.args['request_id']
+        req = Request.query.get(req_id)
+        if not req or req.sub:
+            return redirect(url_for('requests'))
+        return render_template('pickup-req-confirm.html', req=req)
+    error = 'Nothing to confirm'
+    return redirect(url_for('index', error=error))
+
 # Helper functions
 
 def authenticate_user(username, password):
