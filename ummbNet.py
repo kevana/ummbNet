@@ -270,12 +270,15 @@ def requests():
     requests = Request.query.all()
     return render_template('requests.html', requests=requests)
 
-@app.route('/requests/<req>', methods=['GET', 'POST'])
+@app.route('/requests/<request_id>', methods=['GET', 'POST'])
 @login_required
-def req(req):
+def req(request_id):
     '''Route to a particular request.'''
-    return 'Request: %s' % req # render_template('request.html', request=req)
-
+    req = Request.query.get(request_id)
+    if req:
+        return render_template('request.html', req=req)
+    return render_template('404.html')
+    
 @app.route('/newrequest', methods=['GET', 'POST'])
 def newrequest():
     '''Add a new request.'''

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %} - Request{% endblock %}
+{% block content %}
+  <h1>Request</h1>
+  <p>Band: {{ req.event.band.name }}</p>
+  <p>Event: {{ req.event.eventtype.name  }}</p>
+  <p>Date: {{ req.event.date }}</p>
+  <p>Instrument: {{ req.instrument.name }}</p>
+  <p>Part: {{ req.part }}</p>
+  <p>Poster: {% if req.poster.nickname %}
+              {{ req.poster.nickname }}
+              {% else %}
+              {{ req.poster.first_name }}
+              {% endif %}
+  </p>
+  {% if req.sub %}
+  <p>Sub: {% if req.sub.nickname %}
+    {{ req.sub.nickname }}
+    {% else %}
+    {{ req.sub.first_name }}
+    {% endif %}
+  {% endif %}
+  <p><a href="{{ url_for('index') }}">home</a></p>
+{% endblock %}
