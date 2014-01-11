@@ -267,7 +267,7 @@ def newuser():
 @login_required
 def requests():
     '''Route to Requests Collection.'''
-    requests = Request.query.all()
+    requests = Request.query.filter(Request.sub == None).all()
     return render_template('requests.html', requests=requests)
 
 @app.route('/requests/<request_id>', methods=['GET', 'POST'])
