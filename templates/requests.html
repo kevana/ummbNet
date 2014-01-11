@@ -2,23 +2,38 @@
 {% block title %} - Requests{% endblock %}
 {% block content %}
   <h1>Requests</h1>
-  <table id="requests">
-    <tr>
-      <td>Poster</td>
-      <td>Band</td>
-      <td>Event</td>
-      <td>Instrument</td>
-      <td>Part</td>
-    </tr>
+  <table id="requests" class="table table-striped">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Poster</th>
+        <th>Band</th>
+        <th>Event</th>
+        <th>Instrument</th>
+        <th>Part</th>
+        <th>Details</th>
+        <th>Pick up</th>
+      </tr>
+    </thead>
+    <tbody>
     {% for req in requests %}
       <tr>
-        <td>{{ req.poster.username }}</td>
+        <td>{{ req.event.date }}</td>
+        <td>{% if req.poster.nickname %}
+            {{ req.poster.nickname }}
+            {% else %}
+            {{ req.poster.first_name }}
+            {% endif %}
+        </td>
         <td>{{ req.band.name }}</td>
         <td>{{ req.event.eventtype.name }}</td>
         <td>{{ req.instrument.name }}</td>
         <td>{{ req.part }}</td>
+        <td><a href="{{ url_for('req', request_id=req.id) }}">Details</a></td>
+          <td><a href="{{ url_for('confirm', action='pickup', request_id=req.id) }}">Pick up</a></td>
       </tr>
     {% endfor %}
+  </tbody>
   </table>
   <p><a href="{{ url_for('index') }}">home</a></p>
 {% endblock %}
