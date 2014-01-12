@@ -24,10 +24,9 @@
   <form action="{{ url_for('confirm') }}" method="GET">
     <input type="hidden" name="action" value="pickup">
     <input type="hidden" name="request_id" value="{{ req.id }}">
-    <input type="button" value="Back to Requests" onclick="location.href='{{ url_for('requests') }}'">
-    <input type="submit" value="Pick up">
+    <button type="button" class="btn btn-default btn-sm" onclick="location.href='{{ url_for('requests') }}'">Back to Requests</button>
+    <button type="submit" class="btn btn-primary">Pick up</button>
   </form>
-  <p><a href="{{ url_for('confirm', action='pickup', request_id=req.id) }}">Pick up</a></p>
   <p><a href="{{ url_for('index') }}">home</a></p>
 </div>
 {% endblock %}
