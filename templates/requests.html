@@ -32,14 +32,15 @@
         <td>{{ req.instrument.name }}</td>
         <td>{{ req.part }}</td>
         <td><a href="{{ url_for('req', request_id=req.id) }}">Details</a></td>
-          <td><a href="{{ url_for('confirm', action='pickup', request_id=req.id) }}">Pickup</a></td>
+        <td><a href="{{ url_for('confirm', action='pickup', request_id=req.id) }}">Pickup</a></td>
       </tr>
     {% endfor %}
   </tbody>
   </table>
   {% else %}
-  <p><em>No open requests found. <a href="{{ url_for('newrequest') }}">Create Request</a></em></p>
+  <p><em>No open requests found.</p>
   {% endif %}
+  <p><a class="btn btn-primary btn-lg" role="button" href="{{ url_for('newrequest') }}">Create Request</a></p>
   <p><a href="{{ url_for('index') }}">home</a></p>
 </div>
 {% endblock %}
