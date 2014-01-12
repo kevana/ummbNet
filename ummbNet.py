@@ -269,10 +269,11 @@ def newuser():
                 error = 'Account creation failed: database error'
                 return redirect(url_for('newuser', error=error))
             return redirect(url_for('index'))
+    instruments = Instrument.query.all()
     if session.get('logged_in') == True:    
         user = current_user.get_user()
-        return render_template('newuser.html', user=user)
-    return render_template('newuser.html')
+        return render_template('newuser.html', user=user, instruments=instruments)
+    return render_template('newuser.html', instruments=instruments)
 
 @app.route('/requests')
 @login_required
@@ -372,27 +373,27 @@ def add_request(band_id, event_id, instrument_id, part):
 
 def get_form_instr():
     instr = []
-    if request.form.get('piccolo', None) == 'True':
+    if request.form.get('Piccolo', None) == 'True':
         instr.append(Instrument.query.filter_by(name='Piccolo').first())
-    if request.form.get('flute', None) == 'True':
+    if request.form.get('Piccolo', None) == 'True':
         instr.append(Instrument.query.filter_by(name='Flute').first())
-    if request.form.get('clarinet', None) == 'True':
+    if request.form.get('Clarinet', None) == 'True':
         instr.append(Instrument.query.filter_by(name='Clarinet').first())
-    if request.form.get('alto_sax') == 'True':
+    if request.form.get('Alto Sax') == 'True':
         instr.append(Instrument.query.filter_by(name='Alto Sax').first())
-    if request.form.get('tenor_sax') == 'True':
+    if request.form.get('Tenor Sax') == 'True':
         instr.append(Instrument.query.filter_by(name='Tenor Sax').first())
-    if request.form.get('trumpet') == 'True':
+    if request.form.get('Trumpet') == 'True':
         instr.append(Instrument.query.filter_by(name='Trumpet').first())
-    if request.form.get('mellophone') == 'True':
+    if request.form.get('Mellophone') == 'True':
         instr.append(Instrument.query.filter_by(name='Mellophone').first())
-    if request.form.get('trombone') == 'True':
+    if request.form.get('Trombone') == 'True':
         instr.append(Instrument.query.filter_by(name='Trombone').first())
-    if request.form.get('baritone') == 'True':
+    if request.form.get('Baritone') == 'True':
         instr.append(Instrument.query.filter_by(name='Baritone').first())
-    if request.form.get('tuba') == 'True':
+    if request.form.get('Tuba') == 'True':
         instr.append(Instrument.query.filter_by(name='Tuba').first())
-    if request.form.get('drumline') == 'True':
+    if request.form.get('Drumline') == 'True':
         instr.append(Instrument.query.filter_by(name='Drumline').first())
     return instr
 
