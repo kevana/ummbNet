@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container">
   <h1>Users</h1>
-  <table id="users" class="table table-striped">
+  <table id="users" class="table">
     <thead>
       <tr>
         <th>Username</th>
@@ -22,7 +22,11 @@
         <td>{{ user.first_name }}</td>
         <td>{{ user.last_name }}</td>
         <td>{{ user.nickname }}</td>
-        <td>{{ user.instruments[0]|default('') }}</td>
+        <td>
+          {% if user.instruments[0] %}
+          {{ user.instruments[0].name }}
+          {% endif %}
+        </td>
       </tr>
       {% endfor %}
     </tbody>
