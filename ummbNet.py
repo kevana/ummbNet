@@ -195,8 +195,10 @@ def load_user(user_id):
 @app.route('/')
 def index():
     '''Return the ummbNet homepage.'''
-    user = current_user.get_user()
-    return render_template('index.html', user=user)
+    if session.get('logged_in') == True:
+        user = current_user.get_user()
+        return render_template('index.html', user=user)
+    return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -247,7 +249,6 @@ def user(username):
 def newuser():
     '''Add a new user.'''
     error = None
-    user = current_user.get_user()
     if request.method == 'POST':
         # Add a new user
         username = request.form['username']
@@ -268,7 +269,10 @@ def newuser():
                 error = 'Account creation failed: database error'
                 return redirect(url_for('newuser', error=error))
             return redirect(url_for('index'))
-    return render_template('newuser.html', user=user)
+    if session.get('logged_in') == True:    
+        user = current_user.get_user()
+        return render_template('newuser.html', user=user)
+    return render_template('newuser.html')
 
 @app.route('/requests')
 @login_required
