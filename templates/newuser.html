@@ -1,36 +1,45 @@
 {% extends "base.html" %}
 {% block title %} - New User{% endblock %}
 {% block content %}
+<div class="container">
   <h2>Register a new user</h2>
   {% if error %}<p class=error><strong>Error:</strong></p> {{ error }}{% endif %}
   <form action="{{ url_for('newuser') }}" method='POST'>
-    <dl>
-      <dt>Username:</dt>
-      <dd><input type="text" name="username"></dd>
-      <dt>Email Address:</dt>
-      <dd><input type="text" name="email"></dd>
-      <dt>Password:</dt>
-      <dd><input type="password" name="password"></dd>
-      <dt>First Name:</dt>
-      <dd><input type="text" name="first_name"></dd>
-      <dt>Last Name:</dt>
-      <dd><input type="text" name="last_name"></dd>
-      <dt>Nickname:</dt>
-      <dd><input type="text" name="nickname"></dd>
-      <dt>Instruments:</dt>
-      <dd><input type="checkbox" name="piccolo" value="True">Piccolo</option><br>
-          <input type="checkbox" name="flute" value="True">Flute</option><br>
-          <input type="checkbox" name="clarinet" value="True">Clarinet</option><br>
-          <input type="checkbox" name="alto_sax" value="True">Alto Sax</option><br>
-          <input type="checkbox" name="tenor_sax" value="True">Tenor Sax</option><br>
-          <input type="checkbox" name="trumpet" value="True">Trumpet</option><br>
-          <input type="checkbox" name="mellophone" value="True">Mellophone</option><br>
-          <input type="checkbox" name="trombone" value="True">Trombone</option><br>
-          <input type="checkbox" name="baritone" value="True">Baritone</option><br>
-          <input type="checkbox" name="tuba" value="True">Tuba</option><br>
-          <input type="checkbox" name="drumline" value="True">Drumline</option><br>
-      </dd>
-      <dd><input type="submit" value="Create Account"></dd>
-    </dl>
+    <div class="form-group">
+      <label for="username">Username:</label>
+      <input type="text" class="form-control" name="username" id="username" placeholder="username">
+    </div>
+    <div class="form-group">
+      <label for="email">Email Address:</label>
+      <input type="email" class="form-control" name="email" id="email" placeholder="email">
+    </div>
+    <div class="form-group">
+      <label for="password">Password:</label>
+      <input type="password" class="form-control" name="password" id="password" placeholder="password">
+    </div>
+    <div class="form-group">
+      <label for="first_name">First Name:</label>
+      <input type="text" class="form-control" name="first_name" id="name" placeholder="First Name">
+    </div>
+    <div class="form-group">
+      <label for="last_name">Last Name:</label>
+      <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Last Name">
+    </div>
+    <div class="form-group">
+      <label for="nickname">Nickname:</label>
+      <input type="text" class="form-control" name="nickname" id="nickname" placeholder="Nickname">
+    </div>
+    <div class="form-group">
+      <label>Instruments:</label>
+      {% for instr in instruments %}
+      <div class="checkbox">
+        <label>
+        <input type="checkbox" name="{{ instr.name }}" value="True">{{ instr.name }}
+        </label>
+      </div>
+      {% endfor %}
+    </div>
+      <button type="submit" class="btn btn-primary">Create Account</button>
   </form>
+</div>
 {% endblock %}

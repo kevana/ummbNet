@@ -1,22 +1,90 @@
 {% extends "base.html" %}
 {% block title %} - {{ user.username }}{% endblock %}
 {% block content %}
+<div class="container">
   <h1>{{ user.username }}</h1>
-  <p>First Name: {{ user.first_name }}</p>
-  <p>Last Name: {{ user.last_name }}</p>
-  <p>Nickname: {{ user.nickname }}</p>
-  <p>Email: {{ user.email }}</p>
+  <p>First Name: {{ user.first_name }}<br>
+     Last Name: {{ user.last_name }}<br>
+     Nickname: {{ user.nickname }}<br>
+     Email: {{ user.email }}</p>
   <h2>Instruments</h2>
   <ul>
   {% for instrument in instruments %}
     <li>{{ instrument.name }}</li>
+  {% else %}
+    <li><em>No instruments found</em></li>
   {% endfor %}
   </ul>
-  <h2>Requests</h2>
-  <ul>
-  {% for req in requests %}
-  <li>{{ req.event.band.name }} {{ req.event.eventtype.name }} {{ req.event.date }} {{ req.instrument.name }} {{ req.part }}</li>
-  {% endfor %}
-  </ul>
+  <div class="panel panel-primary">
+    <div class="panel-heading">Requests</div>
+    <div class="panel-body">
+      {% if requests %}
+      <table id="requests" class="table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Event</th>
+            <th>Instrument</th>
+            <th>Part</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for req in requests %}
+          <tr>
+            <td>{{ req.event.date.strftime('%a %b %d, %H:%M%p') }}</td>
+            <td>{{ req.event.eventtype.name }}</td>
+            <td>{{ req.instrument.name }}</td>
+            <td>{{ req.part }}</td>
+            <td><a href="{{ url_for('req', request_id=req.id) }}">Details</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      </table>
+      {% else %}
+      <p><em>No requests found.</em></p>
+      {% endif %}
+    </div>
+  </div>
+  <div class="panel panel-primary">
+    <div class="panel-heading">Subbing for</div>
+    <div class="panel-body">
+      {% if filled_reqs %}
+      <table id="filled_reqs" class="table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Event</th>
+            <th>Instrument</th>
+            <th>Part</th>
+            <th>Poster</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for req in filled_reqs %}
+          <tr>
+            <td>{{ req.event.date.strftime('%a %b %d, %H:%M%p') }}</td>
+            <td>{{ req.event.eventtype.name }}</td>
+            <td>{{ req.instrument.name }}</td>
+            <td>{{ req.part }}</td>
+            <td>
+              {% if req.poster.nickname %}
+                          {{ req.poster.nickname }}
+                          {% else %}
+                          {{ req.poster.first_name }}
+                          {% endif %}
+            </td>
+            <td><a href="{{ url_for('req', request_id=req.id) }}">Details</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      </table>
+      {% else %}
+      <p><em>You have not subbed for any events.</em></p>
+      {% endif %}
+    </div>
+  </div>
   <p><a href="{{ url_for('index') }}">home</a></p>
+</div>
 {% endblock %}

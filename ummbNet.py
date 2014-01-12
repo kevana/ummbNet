@@ -195,6 +195,9 @@ def load_user(user_id):
 @app.route('/')
 def index():
     '''Return the ummbNet homepage.'''
+    if session.get('logged_in') == True:
+        user = current_user.get_user()
+        return render_template('index.html', user=user)
     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -229,7 +232,8 @@ def logout():
 def users():
     '''Route to users collection.'''
     users = User.query.all()
-    return render_template('users.html', users=users)
+    user = current_user.get_user()
+    return render_template('users.html', users=users, user=user)
 
 @app.route('/users/<username>', methods=['GET', 'POST'])
 @login_required
@@ -238,7 +242,9 @@ def user(username):
     user = User.query.filter_by(username=username).first()
     if user:
         return render_template('user.html', user=user, \
-                            requests=user.posted_requests, instruments=user.instruments)
+                                requests=user.posted_requests.all(), \
+                                instruments=user.instruments, \
+                                filled_reqs=user.filled_requests.all())
     return render_template('404.html')
 
 @app.route('/newuser', methods=['GET', 'POST'])
@@ -265,30 +271,36 @@ def newuser():
                 error = 'Account creation failed: database error'
                 return redirect(url_for('newuser', error=error))
             return redirect(url_for('index'))
-    return render_template('newuser.html')
+    instruments = Instrument.query.all()
+    if session.get('logged_in') == True:    
+        user = current_user.get_user()
+        return render_template('newuser.html', user=user, instruments=instruments)
+    return render_template('newuser.html', instruments=instruments)
 
 @app.route('/requests')
 @login_required
 def requests():
     '''Route to Requests Collection.'''
     requests = Request.query.filter(Request.sub == None).all()
-    return render_template('requests.html', requests=requests)
+    user = current_user.get_user()
+    return render_template('requests.html', requests=requests, user=user)
 
 @app.route('/requests/<request_id>', methods=['GET', 'POST'])
 @login_required
 def req(request_id):
     '''Route to a particular request.'''
+    user = current_user.get_user()
     if request.method == 'GET':
         req = Request.query.get(request_id)
         if req:
-            return render_template('request.html', req=req)
-        return render_template('404.html')
+            return render_template('request.html', req=req, user=user)
+        return render_template('404.html', user=user)
     req = Request.query.filter_by(id=request_id).first()
     if req:
         req.sub = current_user.get_user()
         db.session.commit()
         return redirect(url_for('index', message='Success'))
-    return render_template('404.html')
+    return render_template('404.html', user=user)
     
 @app.route('/newrequest', methods=['GET', 'POST'])
 @login_required
@@ -312,18 +324,20 @@ def newrequest():
     bands = Band.query.all()
     events = Event.query.all()
     instruments = Instrument.query.all()
+    user = current_user.get_user()
     return render_template('newRequest.html', bands=bands, \
-                            events=events, instruments=instruments)
+                            events=events, instruments=instruments, user=user)
 
 @app.route('/confirm')
 @login_required
 def confirm():
+    user = current_user.get_user()
     if request.args.get('action') == 'pickup':
         req_id = request.args['request_id']
         req = Request.query.get(req_id)
         if not req or req.sub:
             return redirect(url_for('requests'))
-        return render_template('pickup-req-confirm.html', req=req)
+        return render_template('pickup-req-confirm.html', req=req, user=user)
     error = 'Nothing to confirm'
     return redirect(url_for('index', error=error))
 
@@ -361,27 +375,27 @@ def add_request(band_id, event_id, instrument_id, part):
 
 def get_form_instr():
     instr = []
-    if request.form.get('piccolo', None) == 'True':
+    if request.form.get('Piccolo', None) == 'True':
         instr.append(Instrument.query.filter_by(name='Piccolo').first())
-    if request.form.get('flute', None) == 'True':
+    if request.form.get('Piccolo', None) == 'True':
         instr.append(Instrument.query.filter_by(name='Flute').first())
-    if request.form.get('clarinet', None) == 'True':
+    if request.form.get('Clarinet', None) == 'True':
         instr.append(Instrument.query.filter_by(name='Clarinet').first())
-    if request.form.get('alto_sax') == 'True':
+    if request.form.get('Alto Sax') == 'True':
         instr.append(Instrument.query.filter_by(name='Alto Sax').first())
-    if request.form.get('tenor_sax') == 'True':
+    if request.form.get('Tenor Sax') == 'True':
         instr.append(Instrument.query.filter_by(name='Tenor Sax').first())
-    if request.form.get('trumpet') == 'True':
+    if request.form.get('Trumpet') == 'True':
         instr.append(Instrument.query.filter_by(name='Trumpet').first())
-    if request.form.get('mellophone') == 'True':
+    if request.form.get('Mellophone') == 'True':
         instr.append(Instrument.query.filter_by(name='Mellophone').first())
-    if request.form.get('trombone') == 'True':
+    if request.form.get('Trombone') == 'True':
         instr.append(Instrument.query.filter_by(name='Trombone').first())
-    if request.form.get('baritone') == 'True':
+    if request.form.get('Baritone') == 'True':
         instr.append(Instrument.query.filter_by(name='Baritone').first())
-    if request.form.get('tuba') == 'True':
+    if request.form.get('Tuba') == 'True':
         instr.append(Instrument.query.filter_by(name='Tuba').first())
-    if request.form.get('drumline') == 'True':
+    if request.form.get('Drumline') == 'True':
         instr.append(Instrument.query.filter_by(name='Drumline').first())
     return instr
 
