@@ -3,20 +3,24 @@
 {% block content %}
 <div class="container">
   <h1>{{ user.username }}</h1>
-  <p>First Name: {{ user.first_name }}</p>
-  <p>Last Name: {{ user.last_name }}</p>
-  <p>Nickname: {{ user.nickname }}</p>
-  <p>Email: {{ user.email }}</p>
+  <p>First Name: {{ user.first_name }}<br>
+     Last Name: {{ user.last_name }}<br>
+     Nickname: {{ user.nickname }}<br>
+     Email: {{ user.email }}</p>
   <h2>Instruments</h2>
   <ul>
   {% for instrument in instruments %}
     <li>{{ instrument.name }}</li>
+  {% else %}
+    <li><em>No instruments found</em></li>
   {% endfor %}
   </ul>
   <h2>Requests</h2>
   <ul>
   {% for req in requests %}
   <li>{{ req.event.band.name }} {{ req.event.eventtype.name }} {{ req.event.date.strftime('%a %b %d, %H:%M%p') }} {{ req.instrument.name }} {{ req.part }}</li>
+  {% else %}
+  <li><em>No requests found</em></li>
   {% endfor %}
   </ul>
   <p><a href="{{ url_for('index') }}">home</a></p>

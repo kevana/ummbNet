@@ -4,21 +4,23 @@
 <div class="container">
   <h1>Are you sure?</h1>
   <p>Please review the details below and confirm that you want to pick up this event</p>
-  <p>Band: {{ req.event.band.name }}</p>
-  <p>Event: {{ req.event.eventtype.name  }}</p>
-  <p>Date: {{ req.event.date.strftime('%a %b %d, %H:%M%p') }}</p>
-  <p>Instrument: {{ req.instrument.name }}</p>
-  <p>Part: {{ req.part }}</p>
-  <p>Poster: {% if req.poster.nickname %}
+  <p>Band: {{ req.event.band.name }}<br>
+     Event: {{ req.event.eventtype.name  }}<br>
+     Date: {{ req.event.date.strftime('%a %b %d, %H:%M%p') }}<br>
+     Instrument: {{ req.instrument.name }}<br>
+     Part: {{ req.part }}<br>
+     Poster: {% if req.poster.nickname %}
               {{ req.poster.nickname }}
               {% else %}
               {{ req.poster.first_name }}
               {% endif %}
-  </p>
+  </p
+  <p>
   <form action="{{ url_for('req', request_id=req.id) }}" method="POST">
     <input type="button" value="Cancel"></input>
     <input type="submit" value="Confirm pickup"></input>
   </form>
+  </p>
 
   <p><a href="{{ url_for('index') }}">home</a></p>
 </div>
