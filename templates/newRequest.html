@@ -4,36 +4,37 @@
 <div class="container">
   <h2>Create a new request</h2>
   {% if error %}<p class=error><strong>Error:</strong></p> {{ error }}{% endif %}
-  <form action="{{ url_for('newrequest') }}" method='POST'>
-    <dl>
-      <dt>Band:</dt>
-      <dd>
-        <select name="band">
+  <form role="form" action="{{ url_for('newrequest') }}" method='POST'>
+    <div class="form-group">
+      <label for="band">Band:</label>
+        <select class="form-control" name="band" id="band">
           {% for band in bands %}
           <option value="{{ band.id }}">{{ band.name }}</option>
           {% endfor %}
         </select>
-      </dd>
-      <dt>Event:</dt>
-      <dd>
-        <select name="event">
+    </div>
+    <div class="form-group">
+      <label for="event">Event:</label>
+        <select class="form-control" name="event" id="event">
           {% for event in events %}
             <option value="{{ event.id }}">{{ event.eventtype.name }} {{ event.date.strftime('%a %b %d, %H:%M%p') }}</option>
           {% endfor %}
         </select>
-      </dd>
-      <dt>Instrument</dt>
-      <dd>
-        <select name="instrument">
+    </div>
+    <div class="form-group">
+      <label for="instrument">Instrument</label>
+        <select class="form-control" name="instrument" id="instrument">
           {% for instr in instruments %}
           <option value="{{ instr.id }}">{{ instr.name }}</option>
           {% endfor %}
         </select>
-      </dd>
-      <dt>Part:</dt>
-      <dd><input type="text" name="part"></dd>
-      <dd><input type="submit" value="Create Request"></dd>
-    </dl>
+    </div>
+    <div class="form-group">
+      <label for="part">Part:</label>
+      <input type="text" class="form-control" name="part" id="part">
+    </div>
+      <button type="button" class="btn btn-default" onclick="location.href='{{ url_for('requests') }}'">Back to Requests</button>
+      <button type="submit" class="btn btn-primary">Create Request</button>
   </form>
 </div>
 {% endblock %}
