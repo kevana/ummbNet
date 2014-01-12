@@ -242,7 +242,9 @@ def user(username):
     user = User.query.filter_by(username=username).first()
     if user:
         return render_template('user.html', user=user, \
-                            requests=user.posted_requests, instruments=user.instruments)
+                                requests=user.posted_requests.all(), \
+                                instruments=user.instruments, \
+                                filled_reqs=user.filled_requests.all())
     return render_template('404.html')
 
 @app.route('/newuser', methods=['GET', 'POST'])
