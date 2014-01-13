@@ -1,10 +1,11 @@
 from flask import (Flask, flash, redirect, render_template,
-                   request, session, url_for)
+                   request, session, url_for, abort)
 from flask_login import (LoginManager, login_required, login_user, \
                          logout_user, current_user)
 from flask.ext.bcrypt import Bcrypt
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
+from datetime import datetime
 
 app = Flask(__name__)
 app.config.update(
@@ -32,6 +33,8 @@ class User(db.Model):
     username = db.Column(db.Text, unique=True)
     email = db.Column(db.Text, unique=True)
     pw_hash = db.Column(db.Text)
+    is_admin = db.Column(db.Boolean)
+    is_director = db.Column(db.Boolean)
     first_name = db.Column(db.Text)
     last_name = db.Column(db.Text)
     nickname = db.Column(db.Text)
@@ -41,7 +44,7 @@ class User(db.Model):
 
     def __init__(self, username, email, password, first_name=None, \
                 last_name=None, nickname=None, requests=None, enabled=True, \
-                instruments=None):
+                instruments=None, is_admin=False, is_director=False):
         self.username = username
         self.email = email
         self.pw_hash = bcrypt.generate_password_hash(password)
@@ -55,6 +58,8 @@ class User(db.Model):
             self.requests = requests
         if instruments:
             self.instruments = instruments
+        self.is_admin = is_admin
+        self.is_director = is_director
         self.enabled = enabled
 
     def __repr__(self):
@@ -328,9 +333,91 @@ def newrequest():
     return render_template('newRequest.html', bands=bands, \
                             events=events, instruments=instruments, user=user)
 
+@app.route('/events/')
+@login_required
+def events():
+    '''Route to Events collection.'''
+    user = current_user.get_user()
+    if user.is_director or user.is_admin:
+        events = Event.query.all()
+        return render_template('events.html', events=events, user=user)
+    abort(404)
+
+@app.route('/events/<event_id>')
+@login_required
+def event(event_id):
+    '''Route to a particular event.'''
+    user = current_user.get_user()
+    if user.is_director or user.is_admin:
+        if request.method == 'GET':
+            event = Event.query.get(event_id)
+            if event:
+                return render_template('event.html', event=event, user=user)
+            abort(404)
+        return 'POST unimplemented'
+    abort(404)
+
+@app.route('/newevent', methods=['GET', 'POST'])
+@login_required
+def newevent():
+    '''Add a new Event.'''
+    user = current_user.get_user()
+    if user.is_director or user.is_admin:
+        error = None
+        if request.method == 'POST':
+            date = request.form['date']
+            band_id = request.form['band']
+            event_type_id = request.form['event_type']
+            date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
+            add_event(date=date, band_id=band_id, event_type_id=event_type_id)
+            return redirect(url_for('events'))
+        bands = Band.query.all()
+        event_types = EventType.query.all()
+        return render_template('newevent.html', bands=bands, \
+                        event_types=event_types, user=user)
+    abort(404)
+
+@app.route('/editevent', methods=['GET', 'POST'])
+@login_required
+def editevent():
+    '''Edit an existing Event.'''
+    user = current_user.get_user()
+    error = None
+    if user.is_director or user.is_admin:
+        if request.method == 'GET':
+            event_id = request.args['event_id']
+            event = Event.query.get(event_id)
+            bands = Band.query.all()
+            event_types = EventType.query.all()
+            if not event:
+                return redirect(url_for('events'))
+            return render_template('editevent.html', event=event, bands=bands, event_types=event_types, user=user)
+        if request.method == 'POST':
+            event_id = request.form['event_id']
+            date = request.form['date']
+            band_id = request.form['band']
+            event_type_id = request.form['event_type']
+            date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
+            event = Event.query.get(event_id)
+            event.date = date
+            event.band_id = band_id
+            event.event_type_id = event_type_id
+            if not event:
+                error = 'Unable to find event.'
+            try:
+                db.session.commit()
+                return redirect(url_for('event', event_id=event_id))
+            except:
+                error = 'Unable to update event.'
+            return render_template('editevent.html', event=event, bands=bands, event_types=event_types, user=user, error=error)
+            
+            
+    abort(404)
+
 @app.route('/confirm')
 @login_required
 def confirm():
+    '''Confirm an action.'''
     user = current_user.get_user()
     if request.args.get('action') == 'pickup':
         req_id = request.args['request_id']
@@ -371,6 +458,17 @@ def add_request(band_id, event_id, instrument_id, part):
         except IntegrityError:
             return False
         return True # Not graceful logic
+    return False
+
+def add_event(date, band_id, event_type_id):
+    event = Event(date=date, band_id=band_id, event_type_id=event_type_id)
+    if event:
+        try:
+            db.session.add(event)
+            db.session.commit()
+        except IntegrityError:
+            return False
+        return True
     return False
 
 def get_form_instr():
