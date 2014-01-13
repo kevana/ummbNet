@@ -32,7 +32,7 @@
         <tbody>
         {% for req in requests %}
           <tr>
-            <td>{{ req.event.date.strftime('%a %b %d, %H:%M%p') }}</td>
+            <td>{{ req.event.date.strftime('%a %b %d, %I:%M%p') }}</td>
             <td>{{ req.event.eventtype.name }}</td>
             <td>{{ req.instrument.name }}</td>
             <td>{{ req.part }}</td>
@@ -64,7 +64,7 @@
         <tbody>
         {% for req in filled_reqs %}
           <tr>
-            <td>{{ req.event.date.strftime('%a %b %d, %H:%M%p') }}</td>
+            <td>{{ req.event.date.strftime('%a %b %d, %I:%M%p') }}</td>
             <td>{{ req.event.eventtype.name }}</td>
             <td>{{ req.instrument.name }}</td>
             <td>{{ req.part }}</td>
