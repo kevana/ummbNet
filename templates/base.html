@@ -50,11 +50,20 @@
                 <li><a href="{{ url_for('newrequest') }}">Add a New Request</a></li>
               </ul>
             </li>
-            <li><a href="{{ url_for('user', username=user.username) }}">Profile</a></li>
+            {% if user.is_admin or user.is_director %}
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Events<b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ url_for('events') }}">View Events</a></li>
+                <li><a href="{{ url_for('newevent') }}">Add a New Event</a></li>
+              </ul>
+            </li>
+            {% endif %}
         </ul>
         {% endif %}
         <ul class="nav navbar-nav navbar-right">
           {% if session.logged_in %}
+          <li><a href="{{ url_for('user', username=user.username) }}">{{ user.username }}</a></li>
           <li><a href="{{ url_for('logout') }}">Logout</a></li>
            {% else %}
           <li><a href="{{ url_for('login') }}">Login or Signup</a></li>

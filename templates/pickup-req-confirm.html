@@ -6,7 +6,7 @@
   <p>Please review the details below and confirm that you want to pick up this event</p>
   <p>Band: {{ req.event.band.name }}<br>
      Event: {{ req.event.eventtype.name  }}<br>
-     Date: {{ req.event.date.strftime('%a %b %d, %H:%M%p') }}<br>
+     Date: {{ req.event.date.strftime('%a %b %d, %I:%M%p') }}<br>
      Instrument: {{ req.instrument.name }}<br>
      Part: {{ req.part }}<br>
      Poster: {% if req.poster.nickname %}

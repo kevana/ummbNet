@@ -17,7 +17,7 @@
       <label for="event">Event:</label>
         <select class="form-control" name="event" id="event">
           {% for event in events %}
-            <option value="{{ event.id }}">{{ event.eventtype.name }} {{ event.date.strftime('%a %b %d, %H:%M%p') }}</option>
+            <option value="{{ event.id }}">{{ event.eventtype.name }} {{ event.date.strftime('%a %b %d, %I:%M%p') }}</option>
           {% endfor %}
         </select>
     </div>

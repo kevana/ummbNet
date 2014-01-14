@@ -51,9 +51,9 @@ To avoid extra configuration, the repo uses `sqlite` by default. If you'd like t
 to match your config.
 
 
-##REST?
+##API?
 
-That's the plan. In case there's ever an urge to make iPhone and Android apps for this, the backend will be structured as a RESTful API. The web interface will add some quirks, but I plan to make sure they don't interfere with a clean RESTful interface.
+If there's ever an urge to make iPhone and Android apps for this, the backend will be structured as a RESTful API. This is on the back burner until the web interface is more mature.
 
 ##License
 

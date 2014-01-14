@@ -52,7 +52,10 @@ next_month = now + one_month
 # Create Users
 admin = User(username='admin', email='kevan@ummb.net', password='password', \
             first_name='Kevan', last_name='Ahlquist', nickname='Krevan', \
-            instruments=[trumpet, drumline])
+            instruments=[trumpet, drumline], is_admin=True, is_director=True)
+director = User(username='director', email='user_1@example.com', password='password', \
+            first_name='Skeeter', last_name='Boroughs', nickname='Skeeter', \
+            instruments=[], is_director=True)
 user_1 = User(username='user_1', email='user_1@example.com', password='password', \
             first_name='Mitch', last_name='Gulbransen', nickname='Gulbie', \
             instruments=[piccolo, flute])
