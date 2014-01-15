@@ -23,9 +23,9 @@ app.debug = True
 
 # Define Database entities
 
-users_instrs = db.Table('association', db.Model.metadata,
-    db.Column('left_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('right_id', db.Integer, db.ForeignKey('instrument.id')))
+users_instrs = db.Table('users_instrs', db.Model.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('instrument_id', db.Integer, db.ForeignKey('instrument.id')))
 
 class User(db.Model):
     '''Represent a user that can log into ummbNet.'''
@@ -81,7 +81,7 @@ class DbUser(object):
 
     def is_authenticated(self):
         return True
-    
+
     def get_user(self):
         return self._user
 
@@ -93,7 +93,7 @@ class Request(db.Model):
                     backref=db.backref('posted_requests', lazy='dynamic'), \
                     foreign_keys=[poster_id])
     sub_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    sub = db.relationship('User', 
+    sub = db.relationship('User',
                     backref=db.backref('filled_requests', lazy='dynamic'), \
                     foreign_keys=[sub_id])
     band_id = db.Column(db.Integer, db.ForeignKey('band.id'))
@@ -139,7 +139,7 @@ class Event(db.Model):
     '''Represent a specific band event.'''
     id = db.Column(db.Integer, primary_key=True)
     event_type_id = db.Column(
-        db.Integer, db.ForeignKey('eventtype.id', schema='dbo'))
+                    db.Integer, db.ForeignKey('event_type.id', schema='dbo'))
     date = db.Column(db.DateTime)
     requests = db.relationship('Request', backref='event', lazy='dynamic')
     band_id = db.Column(db.Integer, db.ForeignKey('band.id'))
@@ -154,14 +154,14 @@ class Event(db.Model):
 
     def __repr__(self):
         return '<Event Type: %r Date: %r Call: %r>' % \
-            (self.eventtype, self.date, self.date.time())
+            (self.event_type, self.date, self.date.time())
 
 class EventType(db.Model):
     '''Represent the type of band event.'''
-    __tablename__ = 'eventtype'
+    __tablename__ = 'event_type'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
-    events = db.relationship('Event', backref='eventtype', lazy='dynamic')
+    events = db.relationship('Event', backref='event_type', lazy='dynamic')
 
     def __init__(self, name, events=None):
         self.name = name
@@ -277,9 +277,10 @@ def newuser():
                 return redirect(url_for('newuser', error=error))
             return redirect(url_for('index'))
     instruments = Instrument.query.all()
-    if session.get('logged_in') == True:    
+    if session.get('logged_in') == True:
         user = current_user.get_user()
-        return render_template('newuser.html', user=user, instruments=instruments)
+        return render_template('newuser.html', user=user, \
+                                instruments=instruments)
     return render_template('newuser.html', instruments=instruments)
 
 @app.route('/requests')
@@ -306,7 +307,7 @@ def req(request_id):
         db.session.commit()
         return redirect(url_for('index', message='Success'))
     return render_template('404.html', user=user)
-    
+
 @app.route('/newrequest', methods=['GET', 'POST'])
 @login_required
 def newrequest():
@@ -391,7 +392,8 @@ def editevent():
             event_types = EventType.query.all()
             if not event:
                 return redirect(url_for('events'))
-            return render_template('editevent.html', event=event, bands=bands, event_types=event_types, user=user)
+            return render_template('editevent.html', event=event, user=user, \
+                                    event_types=event_types, bands=bands)
         if request.method == 'POST':
             event_id = request.form['event_id']
             date = request.form['date']
@@ -409,9 +411,11 @@ def editevent():
                 return redirect(url_for('event', event_id=event_id))
             except:
                 error = 'Unable to update event.'
-            return render_template('editevent.html', event=event, bands=bands, event_types=event_types, user=user, error=error)
-            
-            
+            return render_template('editevent.html', event=event, \
+                                    bands=bands, event_types=event_types, \
+                                    user=user, error=error)
+
+
     abort(404)
 
 @app.route('/confirm')
@@ -461,6 +465,7 @@ def add_request(band_id, event_id, instrument_id, part):
     return False
 
 def add_event(date, band_id, event_type_id):
+    '''Add a new event to the database.'''
     event = Event(date=date, band_id=band_id, event_type_id=event_type_id)
     if event:
         try:
@@ -472,6 +477,7 @@ def add_event(date, band_id, event_type_id):
     return False
 
 def get_form_instr():
+    '''Retrieve chosen instruments from form. Return a list containing them.'''
     instr = []
     if request.form.get('Piccolo', None) == 'True':
         instr.append(Instrument.query.filter_by(name='Piccolo').first())

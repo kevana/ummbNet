@@ -28,7 +28,7 @@
             {% endif %}
         </td>-->
         <!--<td>{{ req.band.name }}</td>-->
-        <td>{{ req.event.eventtype.name }}</td>
+        <td>{{ req.event.event_type.name }}</td>
         <td>{{ req.instrument.name }}</td>
         <td>{{ req.part }}</td>
         <td><a href="{{ url_for('req', request_id=req.id) }}">Details</a></td>
