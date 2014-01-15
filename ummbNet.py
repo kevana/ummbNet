@@ -23,9 +23,9 @@ app.debug = True
 
 # Define Database entities
 
-users_instrs = db.Table('association', db.Model.metadata,
-    db.Column('left_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('right_id', db.Integer, db.ForeignKey('instrument.id')))
+users_instrs = db.Table('users_instrs', db.Model.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('instrument_id', db.Integer, db.ForeignKey('instrument.id')))
 
 class User(db.Model):
     '''Represent a user that can log into ummbNet.'''
