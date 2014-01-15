@@ -19,7 +19,7 @@
       <tr>
         <td>{{ event.date.strftime('%a %b %d, %I:%M%p') }}</td>
         <td>{{ event.band.name }}</td>
-        <td>{{ event.eventtype.name }}</td>
+        <td>{{ event.event_type.name }}</td>
         <td><a href="{{ url_for('event', event_id=event.id) }}">Details</a></td>
         <td><a href="{{ url_for('editevent', event_id=event.id) }}">Edit</a></td>
       </tr>
