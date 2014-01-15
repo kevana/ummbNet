@@ -120,7 +120,7 @@ class Event(db.Model):
     '''Represent a specific band event.'''
     id = db.Column(db.Integer, primary_key=True)
     event_type_id = db.Column(
-                    db.Integer, db.ForeignKey('event_type.id', schema='dbo'))
+                    db.Integer, db.ForeignKey('event_type.id'))
     date = db.Column(db.DateTime)
     requests = db.relationship('Request', backref='event', lazy='dynamic')
     band_id = db.Column(db.Integer, db.ForeignKey('band.id'))
