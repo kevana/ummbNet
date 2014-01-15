@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta
-from ummbNet import *
+from datetime import timedelta
+from main import *
 
 
 # Get event_types
