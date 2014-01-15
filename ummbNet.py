@@ -139,7 +139,7 @@ class Event(db.Model):
     '''Represent a specific band event.'''
     id = db.Column(db.Integer, primary_key=True)
     event_type_id = db.Column(
-        db.Integer, db.ForeignKey('eventtype.id', schema='dbo'))
+                    db.Integer, db.ForeignKey('event_type.id', schema='dbo'))
     date = db.Column(db.DateTime)
     requests = db.relationship('Request', backref='event', lazy='dynamic')
     band_id = db.Column(db.Integer, db.ForeignKey('band.id'))
@@ -154,14 +154,14 @@ class Event(db.Model):
 
     def __repr__(self):
         return '<Event Type: %r Date: %r Call: %r>' % \
-            (self.eventtype, self.date, self.date.time())
+            (self.event_type, self.date, self.date.time())
 
 class EventType(db.Model):
     '''Represent the type of band event.'''
-    __tablename__ = 'eventtype'
+    __tablename__ = 'event_type'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
-    events = db.relationship('Event', backref='eventtype', lazy='dynamic')
+    events = db.relationship('Event', backref='event_type', lazy='dynamic')
 
     def __init__(self, name, events=None):
         self.name = name
@@ -465,6 +465,7 @@ def add_request(band_id, event_id, instrument_id, part):
     return False
 
 def add_event(date, band_id, event_type_id):
+    '''Add a new event to the database.'''
     event = Event(date=date, band_id=band_id, event_type_id=event_type_id)
     if event:
         try:
@@ -476,6 +477,7 @@ def add_event(date, band_id, event_type_id):
     return False
 
 def get_form_instr():
+    '''Retrieve chosen instruments from form. Return a list containing them.'''
     instr = []
     if request.form.get('Piccolo', None) == 'True':
         instr.append(Instrument.query.filter_by(name='Piccolo').first())
