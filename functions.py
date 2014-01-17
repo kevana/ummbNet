@@ -4,9 +4,12 @@ Functions for ummbNet
 
 from flask import request
 from flask_login import current_user
+from hashlib import sha1
+from os import urandom
 
-from app import bcrypt, login_manager
+from app import bcrypt, db, login_manager
 from models import *
+from emails import *
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -85,3 +88,20 @@ def get_form_instr():
     if request.form.get('Drumline') == 'True':
         instr.append(Instrument.query.filter_by(name='Drumline').first())
     return instr
+
+def get_hash_key():
+    m = sha1()
+    m.update(urandom(10))
+    return m.hexdigest()
+
+def reset_password_start(user):
+    key = get_hash_key()
+    user.pw_reset_key = key
+    db.session.commit()
+    send_pw_reset_email(user=user, key=key)
+
+def verify_email_start(user):
+    key = get_hash_key()
+    user.email_verify_key = key
+    db.session.commit()
+    send_verify_email(user=user, key=key)
