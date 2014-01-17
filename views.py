@@ -48,6 +48,47 @@ def logout():
     session['logged_in'] = False
     return render_template('logout.html')
 
+@app.route('/resetpassword', methods=['GET', 'POST'])
+def reset_pw():
+    username = request.args.get('username')
+    key = request.args.get('k')
+    email = request.form.get('email')
+    user = User.query.filter_by(username=username).first()
+
+    if request.method == 'GET':
+        if user and user.pw_reset_key != None and user.pw_reset_key == key:
+            key = get_hash_key()
+            user.pw_reset_key = key
+            db.session.commit()
+            return render_template('setpassword.html', user=user, key=key)
+        #return 'Username: %r User: %r' % (username, user)
+        return render_template('resetpassword.html', user=None, key=None)
+    
+    username = request.form.get('username')
+    user = User.query.filter_by(username=username).first()
+    if user and user.email == email:
+        reset_password_start(user=user)
+        return render_template('resetpassword.html', sent=True)
+    error = 'No account with that username/email combination found.'
+    return render_template('resetpassword.html', error=error)
+
+@app.route('/setpassword', methods=['POST'])
+def set_pw():
+    username = request.form.get('username')
+    user = User.query.filter_by(username=username).first()
+    password1 = request.form.get('password1')
+    password2 = request.form.get('password2')
+    key = request.form.get('k')
+    if user and user.pw_reset_key != None and user.pw_reset_key == key and \
+                        password1 != None and password1 == password2:
+            user.set_pw(password2)
+            return redirect(url_for('user', username=user.username))
+    elif password1 == None or password1 != password2:
+        error = 'Both passwords must match.'
+    else:
+        error = 'Unable to reset password'
+    return render_template('setpassword.html', user=user, key=key, error=error)
+
 @app.route('/users')
 @login_required
 def users():
