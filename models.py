@@ -16,6 +16,8 @@ class User(db.Model):
     pw_hash = db.Column(db.Text)
     is_admin = db.Column(db.Boolean)
     is_director = db.Column(db.Boolean)
+    email_verify_key = db.Column(db.Text)
+    pw_reset_key = db.Column(db.Text)
     first_name = db.Column(db.Text)
     last_name = db.Column(db.Text)
     nickname = db.Column(db.Text)
@@ -23,8 +25,12 @@ class User(db.Model):
                                 secondary=users_instrs, backref='users')
     enabled = db.Column(db.Boolean)
 
+    def set_pw(self, password):
+        self.pw_hash = bcrypt.generate_password_hash(password)
+        db.session.commit()
+
     def __init__(self, username, email, password, first_name=None, \
-                last_name=None, nickname=None, requests=None, enabled=True, \
+                last_name=None, nickname=None, requests=None, enabled=False, \
                 instruments=None, is_admin=False, is_director=False):
         self.username = username
         self.email = email

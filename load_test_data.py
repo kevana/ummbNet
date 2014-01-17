@@ -52,37 +52,38 @@ next_month = now + one_month
 # Create Users
 admin = User(username='admin', email='kevan@ummb.net', password='password', \
             first_name='Kevan', last_name='Ahlquist', nickname='Krevan', \
-            instruments=[trumpet, drumline], is_admin=True, is_director=True)
+            instruments=[trumpet], is_admin=True, is_director=True, \
+            enabled=True)
 director = User(username='director', email='user_1@example.com', password='password', \
             first_name='Skeeter', last_name='Boroughs', nickname='Skeeter', \
-            instruments=[], is_director=True)
+            instruments=[], is_director=True, enabled=True)
 user_1 = User(username='user_1', email='user_1@example.com', password='password', \
             first_name='Mitch', last_name='Gulbransen', nickname='Gulbie', \
-            instruments=[piccolo, flute])
+            instruments=[piccolo, flute], enabled=True)
 user_2 = User(username='user_2', email='user_2@example.com', password='password', \
             first_name='Phillip', last_name='Homen', nickname='Phil', \
-            instruments=[clarinet])
+            instruments=[clarinet], enabled=True)
 user_3 = User(username='user_3', email='user_3@example.com', password='password', \
             first_name='Raoul', last_name='Shah', nickname='Batman', \
-            instruments=[alto_sax])
+            instruments=[alto_sax], enabled=True)
 user_4 = User(username='user_4', email='user_4@example.com', password='password', \
             first_name='Joe', last_name='Walsh', nickname='', \
-            instruments=[mellophone])
+            instruments=[mellophone, drumline], enabled=True)
 user_5 = User(username='user_5', email='user_5@example.com', password='password', \
             first_name='Colin', last_name='Campbell', nickname='', \
-            instruments=[trombone])
+            instruments=[trombone], enabled=True)
 user_6 = User(username='user_6', email='user_6@example.com', password='password', \
             first_name='Jeff', last_name='Korum', nickname='Twitch', \
-            instruments=[baritone])
+            instruments=[baritone], enabled=True)
 user_7 = User(username='user_7', email='user_7@example.com', password='password', \
             first_name='Tyler', last_name='Hoffman', nickname='Ty', \
-            instruments=[tuba])
+            instruments=[tuba], enabled=True)
 user_8 = User(username='user_8', email='user_8@example.com', password='password', \
             first_name='Brad', last_name='Billstein', nickname='Colin2', \
-            instruments=[drumline, flute])
+            instruments=[drumline, flute], enabled=True)
 user_9 = User(username='user_9', email='user_9@example.com', password='password', \
             first_name='Tomas', last_name='Icenogle', nickname='Iceman', \
-            instruments=[trumpet])
+            instruments=[trumpet], enabled=True)
 
 db.session.add_all([admin, user_1, user_2, user_3, user_4, \
                     user_5, user_6, user_7, user_8, user_9])
