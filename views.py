@@ -9,9 +9,9 @@ from flask_login import (login_required, login_user, \
 from datetime import datetime
 
 from app import app
-from models import *
 from emails import *
 from functions import *
+from models import *
 
 
 @app.route('/')
@@ -27,6 +27,10 @@ def login():
     '''Log in a user with their credentials.'''
     error = None
     next = request.args.get('next')
+    if session.get('logged_in') == True:
+        user = current_user.get_user()
+        return redirect(next or url_for('index'))
+        
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -37,7 +41,10 @@ def login():
                 flash("You have logged in")
                 session['logged_in'] = True
                 return redirect(next or url_for('index', error=error))
-        error = "Login failed"
+        if user.email_verify_key:
+            error = 'Please verify your email address before logging in.'
+        else:
+            error = 'Your account has been disabled.'
     return render_template('login.html', login=True, next=next, error=error)
 
 @app.route('/logout')
