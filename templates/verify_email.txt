@@ -1,0 +1,6 @@
+Hello,
+
+Please follow the link below to verify your email. 
+If you encounter problems, manually copy and paste the link in your browser.
+
+{{ url_for('verify_email', username=user.username, k=key) }}

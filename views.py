@@ -10,6 +10,7 @@ from datetime import datetime
 
 from app import app
 from models import *
+from emails import *
 from functions import *
 
 
@@ -132,13 +133,35 @@ def newuser():
             if not add_user(user):
                 error = 'Account creation failed: database error'
                 return redirect(url_for('newuser', error=error))
-            return redirect(url_for('index'))
+            verify_email_start(user)
+            if session.get('logged_in') == True:
+                user = current_user.get_user()
+            return render_template('postreg.html', user=user)
     instruments = Instrument.query.all()
     if session.get('logged_in') == True:
         user = current_user.get_user()
         return render_template('newuser.html', user=user, \
                                 instruments=instruments)
     return render_template('newuser.html', instruments=instruments)
+
+@app.route('/verify')
+def verify_email():
+    username = request.args.get('username')
+    key = request.args.get('k')
+    user = User.query.filter_by(username=username).first()
+    
+    if user and user.email_verify_key != None and user.email_verify_key == key:
+        user.email_verify_key = None
+        user.enabled = True
+        db.session.commit()
+        if session.get('logged_in') == True:
+            user = current_user.get_user()
+            return render_template('verified.html', success=True, user=user)
+        return render_template('verified.html', success=True)
+    if session.get('logged_in') == True:
+        user = current_user.get_user()
+        return render_template('verified.html', success=False, user=user)
+    return render_template('verified.html', success=False)
 
 @app.route('/requests')
 @login_required
