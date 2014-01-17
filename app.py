@@ -3,6 +3,7 @@ Initialize app, db, login_manager, and bcrypt objects
 '''
 
 from flask import Flask
+from flask.ext.mail import Mail
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask.ext.bcrypt import Bcrypt
@@ -10,6 +11,7 @@ from flask.ext.bcrypt import Bcrypt
 app = Flask(__name__)
 app.config.from_object('config')
 
+mail = Mail(app)
 db = SQLAlchemy(app)
 
 login_manager = LoginManager()
