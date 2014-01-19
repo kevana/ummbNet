@@ -13,8 +13,12 @@ def send_async_email(app, msg):
     with app.app_context():
         mail.send(msg)
 
-def send_email(subject, sender, recipients, text_body, html_body):
-    msg = Message(subject, sender = sender, recipients = recipients)
+def send_email(subject, recipients, text_body, html_body, sender=None):
+    if sender:
+        msg = Message(subject, sender = sender, recipients = recipients)
+    else:
+        msg = Message(subject, recipients = recipients)
+
     msg.body = text_body
     msg.html = html_body
     
@@ -37,4 +41,19 @@ def send_verify_email(user, key):
     txt_body = render_template('verify_email.txt', user=user, key=key)
     html_body = render_template('verify_email.html', user=user, key=key)
     send_email(subject=subject, sender=msg_from, recipients=msg_to, \
+def send_new_req_emails(req):
+    # Send confirmation to poster
+    subject = 'Request created'
+    msg_to = [req.poster.email]
+    txt_body = render_template('email/req_add_conf_email.txt', req=req)
+    html_body = render_template('email/req_add_conf_email.html', req=req)
+    send_email(subject=subject, recipients=msg_to, \
                text_body=txt_body, html_body=html_body)
+    # Send notification to subscribed users if list is not empty
+    if req.instrument.notify_users_add:
+        subject = 'New %s sub request posted' % req.instrument.name
+        msg_to = [user.email for user in req.instrument.notify_users_add]
+        txt_body = render_template('email/req_add_notify_email.txt', req=req)
+        html_body = render_template('email/req_add_notify_email.html', req=req)
+        send_email(subject=subject, recipients=msg_to, \
+                   text_body=txt_body, html_body=html_body)

@@ -15,9 +15,11 @@ MAIL_USE_TLS = False
 MAIL_USE_SSL = True
 MAIL_USERNAME = 'noreply@example.com'
 MAIL_PASSWORD = 'examplePassword'
+MAIL_DEFAULT_SENDER = 'noreply@example.com'
 
 # administrator list
 ADMINS = ['admin@example.com']
 
 # Development
+TESTING=True
 DEBUG=True
