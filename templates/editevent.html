@@ -4,7 +4,7 @@
 <div class="container">
   <h1>Edit Event</h1>
   {% if error %}<p class=error><strong>Error:</strong></p> {{ error }}{% endif %}
-  <form action="{{ url_for('editevent') }}" method='POST'>
+  <form role="form" action="{{ url_for('editevent') }}" method='POST'>
     <div class="form-group">
       <label for="date">Date:</label>
       <input type="datetime-local" class="form-control" name="date" id="date" value="{{ event.date.strftime('%Y-%m-%dT%H:%M') }}">

@@ -13,17 +13,12 @@ Each section has their own system for finding subs. Some sections use Facebook g
 
 ##How
 
-Flask, SQLAlchemy, Postgres, running through uWSGI behind an nginx frontend. The maximum anticipated scale is ~350 total (not concurrent) users. But hey, we'll make it relatively scalable for fun.
+Flask, SQLAlchemy, Postgres, running through uWSGI behind an nginx frontend.
 
 
 ##Who
 
-Anyone who wants to help. I'll be upfront, I am receiving independent study credits for this, but if you want to help feel free.
-
-
-##When
-
-Right now.
+Anyone who wants to help. I am receiving independent study credits for this, but if you want to help feel free.
 
 
 ##Getting Started
@@ -32,28 +27,39 @@ Dependencies:
 
 + Python 2.7+
 + `pip`
-+ Flask
+
+First, rename `sample-config.py	` to `config.py`. You will need to change the settings to match your database and mail server configuration, and change `SECRET_KEY` to a real secret key.
 
 Run the following commands:
 
     $ git clone https://github.com/aterlumen/ummbNet.git
     $ cd ummbNet
     $ pip install -r requirements.txt
-    $ python createDb.py
-    $ python ummbNet.py
+    $ python create_db.py
+    $ python main.py
     
-If you follow those steps you should have a copy of ummbNet running at `http://localhost:5000/`. 
+If you follow those steps you should have an empty copy of ummbNet running at `http://localhost:5000/`. There is currently no way to create a user with admin or director privileges through the web interface. You can create users programmatically in a python interpreter using the `is_admin` and `is_director` flags. 
 
-To avoid extra configuration, the repo uses `sqlite` by default. If you'd like to use a different database system just change the line in `ummbNet.py` from:
+Example:
 
-`app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'`
+    $ cd ummbNet
+    $ source env/bin/activate
+    (env)$ python
+    >>> from main import *
+    >>> admin = User(username='admin', \
+    ...              email='admin@example.com', \
+    ...              password='PASSWORD', \
+    ...              is_admin=True, \
+    ...              is_director=True)
+    ...
+    >>> db.session.add(admin)
+    >>> db.session.commit()
 
-to match your config.
 
+##API
 
-##API?
+This is on the back burner until the web interface is more mature,
 
-If there's ever an urge to make iPhone and Android apps for this, the backend will be structured as a RESTful API. This is on the back burner until the web interface is more mature.
 
 ##License
 

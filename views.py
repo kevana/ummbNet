@@ -9,8 +9,9 @@ from flask_login import (login_required, login_user, \
 from datetime import datetime
 
 from app import app
-from models import *
+from emails import *
 from functions import *
+from models import *
 
 
 @app.route('/')
@@ -26,6 +27,10 @@ def login():
     '''Log in a user with their credentials.'''
     error = None
     next = request.args.get('next')
+    if session.get('logged_in') == True:
+        user = current_user.get_user()
+        return redirect(next or url_for('index'))
+        
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -36,7 +41,10 @@ def login():
                 flash("You have logged in")
                 session['logged_in'] = True
                 return redirect(next or url_for('index', error=error))
-        error = "Login failed"
+        if user.email_verify_key:
+            error = 'Please verify your email address before logging in.'
+        else:
+            error = 'Your account has been disabled.'
     return render_template('login.html', login=True, next=next, error=error)
 
 @app.route('/logout')
@@ -47,6 +55,47 @@ def logout():
     flash('You have logged out')
     session['logged_in'] = False
     return render_template('logout.html')
+
+@app.route('/resetpassword', methods=['GET', 'POST'])
+def reset_pw():
+    username = request.args.get('username')
+    key = request.args.get('k')
+    email = request.form.get('email')
+    user = User.query.filter_by(username=username).first()
+
+    if request.method == 'GET':
+        if user and user.pw_reset_key != None and user.pw_reset_key == key:
+            key = get_hash_key()
+            user.pw_reset_key = key
+            db.session.commit()
+            return render_template('setpassword.html', user=user, key=key)
+        #return 'Username: %r User: %r' % (username, user)
+        return render_template('resetpassword.html', user=None, key=None)
+    
+    username = request.form.get('username')
+    user = User.query.filter_by(username=username).first()
+    if user and user.email == email:
+        reset_password_start(user=user)
+        return render_template('resetpassword.html', sent=True)
+    error = 'No account with that username/email combination found.'
+    return render_template('resetpassword.html', error=error)
+
+@app.route('/setpassword', methods=['POST'])
+def set_pw():
+    username = request.form.get('username')
+    user = User.query.filter_by(username=username).first()
+    password1 = request.form.get('password1')
+    password2 = request.form.get('password2')
+    key = request.form.get('k')
+    if user and user.pw_reset_key != None and user.pw_reset_key == key and \
+                        password1 != None and password1 == password2:
+            user.set_pw(password2)
+            return redirect(url_for('user', username=user.username))
+    elif password1 == None or password1 != password2:
+        error = 'Both passwords must match.'
+    else:
+        error = 'Unable to reset password'
+    return render_template('setpassword.html', user=user, key=key, error=error)
 
 @app.route('/users')
 @login_required
@@ -91,13 +140,35 @@ def newuser():
             if not add_user(user):
                 error = 'Account creation failed: database error'
                 return redirect(url_for('newuser', error=error))
-            return redirect(url_for('index'))
+            verify_email_start(user)
+            if session.get('logged_in') == True:
+                user = current_user.get_user()
+            return render_template('postreg.html', user=user)
     instruments = Instrument.query.all()
     if session.get('logged_in') == True:
         user = current_user.get_user()
         return render_template('newuser.html', user=user, \
                                 instruments=instruments)
     return render_template('newuser.html', instruments=instruments)
+
+@app.route('/verify')
+def verify_email():
+    username = request.args.get('username')
+    key = request.args.get('k')
+    user = User.query.filter_by(username=username).first()
+    
+    if user and user.email_verify_key != None and user.email_verify_key == key:
+        user.email_verify_key = None
+        user.enabled = True
+        db.session.commit()
+        if session.get('logged_in') == True:
+            user = current_user.get_user()
+            return render_template('verified.html', success=True, user=user)
+        return render_template('verified.html', success=True)
+    if session.get('logged_in') == True:
+        user = current_user.get_user()
+        return render_template('verified.html', success=False, user=user)
+    return render_template('verified.html', success=False)
 
 @app.route('/requests')
 @login_required
