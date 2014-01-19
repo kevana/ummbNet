@@ -1,0 +1,14 @@
+Hello,
+
+You have created a new request. 
+
+Band: {{ req.band.name }}
+Event Type: {{ req.event.event_type.name }}
+Date: {{ req.event.date.strftime('%a %b %d, %I:%M%p') }}
+Instrument: {{ req.instrument.name }}
+Part: {{ req.part }}
+
+To view this request on ummbNet click the following link:
+{{ url_for('req', request_id=req.id, _external=True) }}
+
+ummbNet
