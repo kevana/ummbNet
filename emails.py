@@ -60,3 +60,19 @@ def send_new_req_emails(req):
         html_body = render_template('email/req_add_notify_email.html', req=req)
         send_email(subject=subject, recipients=msg_to, \
                    text_body=txt_body, html_body=html_body)
+
+def send_req_pickup_emails(req):
+    # Send notification to poster
+    subject = 'Your request has been picked up'
+    msg_to = [req.poster.email]
+    txt_body = render_template('email/req_pickup_notify_email.txt', req=req)
+    html_body = render_template('email/req_pickup_notify_email.html', req=req)
+    send_email(subject=subject, recipients=msg_to, \
+               text_body=txt_body, html_body=html_body)
+    # Send confirmation to sub
+    subject = 'You have picked up a request'
+    msg_to = [req.sub.email]
+    txt_body = render_template('email/req_pickup_conf_email.txt', req=req)
+    html_body = render_template('email/req_pickup_conf_email.html', req=req)
+    send_email(subject=subject, recipients=msg_to, \
+               text_body=txt_body, html_body=html_body)

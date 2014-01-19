@@ -192,6 +192,7 @@ def req(request_id):
     if req:
         req.sub = current_user.get_user()
         db.session.commit()
+        send_req_pickup_emails(req)
         return redirect(url_for('index', message='Success'))
     return render_template('404.html', user=user)
 

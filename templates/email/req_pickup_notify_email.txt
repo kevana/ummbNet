@@ -1,0 +1,13 @@
+Your request has been picked up.
+
+Band: {{ req.band.name }}
+Event Type: {{ req.event.event_type.name }}
+Date: {{ req.event.date.strftime('%a %b %d, %I:%M%p') }}
+Instrument: {{ req.instrument.name }}
+Part: {{ req.part }}
+Sub: {% if req.sub.nickname %}{{ req.sub.nickname}}{% else %}{{ req.sub.first_name }}{% endif %}
+
+To view this request on ummbNet click the following link:
+{{ url_for('req', request_id=req.id, _external=True) }}
+
+ummbNet
