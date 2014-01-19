@@ -22,25 +22,28 @@ def send_email(subject, recipients, text_body, html_body, sender=None):
     msg.body = text_body
     msg.html = html_body
     
-    thr = Thread(target = send_async_email, args = [app, msg])
-    thr.start()
+    if app.config.get('TESTING'):
+        mail.send(msg)
+    else:
+        thr = Thread(target = send_async_email, args = [app, msg])
+        thr.start()
 
 def send_pw_reset_email(user, key):
     subject = 'Password reset for %r on ummbNet' % user.username
-    msg_from = 'noreply@ummb.net'
     msg_to  = [user.email]
-    txt_body = render_template('pw_reset_email.txt', user=user, key=key)
-    html_body = render_template('pw_reset_email.html', user=user, key=key)
-    send_email(subject=subject, sender=msg_from, recipients=msg_to, \
+    txt_body = render_template('email/pw_reset_email.txt', user=user, key=key)
+    html_body = render_template('email/pw_reset_email.html', user=user, key=key)
+    send_email(subject=subject, recipients=msg_to, \
                text_body=txt_body, html_body=html_body)
 
 def send_verify_email(user, key):
     subject = 'Verify email address for %r on ummbNet' % user.username
-    msg_from = 'noreply@ummb.net'
     msg_to  = [user.email]
-    txt_body = render_template('verify_email.txt', user=user, key=key)
-    html_body = render_template('verify_email.html', user=user, key=key)
-    send_email(subject=subject, sender=msg_from, recipients=msg_to, \
+    txt_body = render_template('email/verify_email.txt', user=user, key=key)
+    html_body = render_template('email/verify_email.html', user=user, key=key)
+    send_email(subject=subject, recipients=msg_to, \
+               text_body=txt_body, html_body=html_body)
+
 def send_new_req_emails(req):
     # Send confirmation to poster
     subject = 'Request created'
