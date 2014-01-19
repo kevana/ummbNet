@@ -1,5 +1,3 @@
-Hello,
-
 A new request has been posted:
 
 Band: {{ req.band.name }}
