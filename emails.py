@@ -5,35 +5,74 @@ Email functions for ummbNet
 from flask import render_template
 from flask.ext.mail import Message
 
-from app import mail
+from app import app, mail
 from async import async, Thread
 
 @async
-def send_async_email(msg):
-    mail.send(msg)
+def send_async_email(app, msg):
+    with app.app_context():
+        mail.send(msg)
 
-def send_email(subject, sender, recipients, text_body, html_body):
-    msg = Message(subject, sender = sender, recipients = recipients)
+def send_email(subject, recipients, text_body, html_body, sender=None):
+    if sender:
+        msg = Message(subject, sender = sender, recipients = recipients)
+    else:
+        msg = Message(subject, recipients = recipients)
+
     msg.body = text_body
     msg.html = html_body
-    mail.send(msg)
-    thr = Thread(target = send_async_email, args = [msg])
-    thr.start()
+    
+    if app.config.get('TESTING'):
+        mail.send(msg)
+    else:
+        thr = Thread(target = send_async_email, args = [app, msg])
+        thr.start()
 
 def send_pw_reset_email(user, key):
     subject = 'Password reset for %r on ummbNet' % user.username
-    msg_from = 'noreply@ummb.net'
     msg_to  = [user.email]
-    txt_body = render_template('pw_reset_email.txt', user=user, key=key)
-    html_body = render_template('pw_reset_email.html', user=user, key=key)
-    send_email(subject=subject, sender=msg_from, recipients=msg_to, \
+    txt_body = render_template('email/pw_reset_email.txt', user=user, key=key)
+    html_body = render_template('email/pw_reset_email.html', user=user, key=key)
+    send_email(subject=subject, recipients=msg_to, \
                text_body=txt_body, html_body=html_body)
 
 def send_verify_email(user, key):
     subject = 'Verify email address for %r on ummbNet' % user.username
-    msg_from = 'noreply@ummb.net'
     msg_to  = [user.email]
-    txt_body = render_template('verify_email.txt', user=user, key=key)
-    html_body = render_template('verify_email.html', user=user, key=key)
-    send_email(subject=subject, sender=msg_from, recipients=msg_to, \
+    txt_body = render_template('email/verify_email.txt', user=user, key=key)
+    html_body = render_template('email/verify_email.html', user=user, key=key)
+    send_email(subject=subject, recipients=msg_to, \
+               text_body=txt_body, html_body=html_body)
+
+def send_new_req_emails(req):
+    # Send confirmation to poster
+    subject = 'Request created'
+    msg_to = [req.poster.email]
+    txt_body = render_template('email/req_add_conf_email.txt', req=req)
+    html_body = render_template('email/req_add_conf_email.html', req=req)
+    send_email(subject=subject, recipients=msg_to, \
+               text_body=txt_body, html_body=html_body)
+    # Send notification to subscribed users if list is not empty
+    if req.instrument.notify_users_add:
+        subject = 'New %s sub request posted' % req.instrument.name
+        msg_to = [user.email for user in req.instrument.notify_users_add]
+        txt_body = render_template('email/req_add_notify_email.txt', req=req)
+        html_body = render_template('email/req_add_notify_email.html', req=req)
+        send_email(subject=subject, recipients=msg_to, \
+                   text_body=txt_body, html_body=html_body)
+
+def send_req_pickup_emails(req):
+    # Send notification to poster
+    subject = 'Your request has been picked up'
+    msg_to = [req.poster.email]
+    txt_body = render_template('email/req_pickup_notify_email.txt', req=req)
+    html_body = render_template('email/req_pickup_notify_email.html', req=req)
+    send_email(subject=subject, recipients=msg_to, \
+               text_body=txt_body, html_body=html_body)
+    # Send confirmation to sub
+    subject = 'You have picked up a request'
+    msg_to = [req.sub.email]
+    txt_body = render_template('email/req_pickup_conf_email.txt', req=req)
+    html_body = render_template('email/req_pickup_conf_email.html', req=req)
+    send_email(subject=subject, recipients=msg_to, \
                text_body=txt_body, html_body=html_body)

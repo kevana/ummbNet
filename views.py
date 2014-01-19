@@ -76,9 +76,9 @@ def reset_pw():
     user = User.query.filter_by(username=username).first()
     if user and user.email == email:
         reset_password_start(user=user)
-        return render_template('resetpassword.html', sent=True)
+        return render_template('resetpassword.html', sent=True, user=None)
     error = 'No account with that username/email combination found.'
-    return render_template('resetpassword.html', error=error)
+    return render_template('resetpassword.html', error=error, user=None)
 
 @app.route('/setpassword', methods=['POST'])
 def set_pw():
@@ -192,6 +192,7 @@ def req(request_id):
     if req:
         req.sub = current_user.get_user()
         db.session.commit()
+        send_req_pickup_emails(req)
         return redirect(url_for('index', message='Success'))
     return render_template('404.html', user=user)
 

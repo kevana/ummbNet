@@ -4,7 +4,11 @@ SQLAlchemy db models for ummbNet
 
 from app import db, bcrypt
 
-users_instrs = db.Table('users_instrs', db.Model.metadata,
+users_instrs_play = db.Table('users_instrs_play', db.Model.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('instrument_id', db.Integer, db.ForeignKey('instrument.id')))
+
+users_instrs_notify = db.Table('users_instrs_notify', db.Model.metadata,
     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('instrument_id', db.Integer, db.ForeignKey('instrument.id')))
 
@@ -22,7 +26,9 @@ class User(db.Model):
     last_name = db.Column(db.Text)
     nickname = db.Column(db.Text)
     instruments = db.relationship('Instrument', \
-                                secondary=users_instrs, backref='users')
+                                secondary=users_instrs_play, backref='users')
+    req_add_notify_instrs = db.relationship('Instrument', \
+                secondary=users_instrs_notify, backref='notify_users_add')
     enabled = db.Column(db.Boolean)
 
     def set_pw(self, password):
@@ -31,7 +37,8 @@ class User(db.Model):
 
     def __init__(self, username, email, password, first_name=None, \
                 last_name=None, nickname=None, requests=None, enabled=False, \
-                instruments=None, is_admin=False, is_director=False):
+                instruments=None, is_admin=False, is_director=False, \
+                req_add_notify_instrs=None):
         self.username = username
         self.email = email
         self.pw_hash = bcrypt.generate_password_hash(password)
@@ -45,6 +52,9 @@ class User(db.Model):
             self.requests = requests
         if instruments:
             self.instruments = instruments
+        if req_add_notify_instrs:
+            self.req_add_notify_instrs = req_add_notify_instrs
+
         self.is_admin = is_admin
         self.is_director = is_director
         self.enabled = enabled

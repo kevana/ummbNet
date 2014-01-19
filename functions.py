@@ -47,7 +47,8 @@ def add_request(band_id, event_id, instrument_id, part):
             db.session.commit()
         except IntegrityError:
             return False
-        return True # Not graceful logic
+        send_new_req_emails(req)
+        return True
     return False
 
 def add_event(date, band_id, event_type_id):
