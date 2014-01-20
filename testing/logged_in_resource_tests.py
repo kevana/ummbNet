@@ -1,5 +1,9 @@
 import os
+import sys
 import unittest
+
+# Add parent directory to import path
+sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
 from app import app, db
 from config import basedir
@@ -11,7 +15,7 @@ from views import *
 
 
 class LoggedInResourceTests(unittest.TestCase):
-    '''Tests run with a logged in user but no context'''
+    '''Test route access for a logged in user.'''
     def setUp(self):
         '''Pre-test setup.'''
         app.config['TESTING'] = True
@@ -102,3 +106,9 @@ class LoggedInResourceTests(unittest.TestCase):
 
     def test_confirm(self):
         self.assert_get_status_code('/confirm', 302)
+
+if __name__ == '__main__':
+    try:
+        unittest.main()
+    except:
+        pass
