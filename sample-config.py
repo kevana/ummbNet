@@ -24,5 +24,5 @@ MAIL_DEFAULT_SENDER = 'noreply@example.com'
 ADMINS = ['admin@example.com']
 
 # Development
-TESTING=True
+MAIL_SUPPRESS_SEND = True
 DEBUG=True
