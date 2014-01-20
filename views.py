@@ -69,7 +69,6 @@ def reset_pw():
             user.pw_reset_key = key
             db.session.commit()
             return render_template('setpassword.html', user=user, key=key)
-        #return 'Username: %r User: %r' % (username, user)
         return render_template('resetpassword.html', user=None, key=None)
     
     username = request.form.get('username')
@@ -139,7 +138,8 @@ def newuser():
                         nickname=nickname, instruments=instruments)
             if not add_user(user):
                 error = 'Account creation failed: database error'
-                return redirect(url_for('newuser', error=error))
+                return render_template('newuser.html', error=error, \
+                                        instruments=instruments)
             verify_email_start(user)
             if session.get('logged_in') == True:
                 user = current_user.get_user()

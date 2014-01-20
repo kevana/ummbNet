@@ -6,6 +6,7 @@ from flask import request
 from flask_login import current_user
 from hashlib import sha1
 from os import urandom
+from sqlalchemy.exc import IntegrityError
 
 from app import bcrypt, db, login_manager
 from models import *
@@ -46,6 +47,7 @@ def add_request(band_id, event_id, instrument_id, part):
             db.session.add(req)
             db.session.commit()
         except IntegrityError:
+            db.session.rollback()
             return False
         send_new_req_emails(req)
         return True
@@ -68,7 +70,7 @@ def get_form_instr():
     instr = []
     if request.form.get('Piccolo', None) == 'True':
         instr.append(Instrument.query.filter_by(name='Piccolo').first())
-    if request.form.get('Piccolo', None) == 'True':
+    if request.form.get('Flute', None) == 'True':
         instr.append(Instrument.query.filter_by(name='Flute').first())
     if request.form.get('Clarinet', None) == 'True':
         instr.append(Instrument.query.filter_by(name='Clarinet').first())
