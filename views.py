@@ -139,7 +139,8 @@ def newuser():
                         nickname=nickname, instruments=instruments)
             if not add_user(user):
                 error = 'Account creation failed: database error'
-                return redirect(url_for('newuser', error=error))
+                return render_template('newuser.html', error=error, \
+                                        instruments=instruments)
             verify_email_start(user)
             if session.get('logged_in') == True:
                 user = current_user.get_user()
