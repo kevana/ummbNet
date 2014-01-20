@@ -50,7 +50,25 @@ class PasswordResetTests(unittest.TestCase):
         return self.app.get('/logout', follow_redirects=True)
 
     def test_reset_password(self):
-        return True
+        rv = self.app.post('/resetpassword', data=dict(
+                username='user',
+                email='admin@example.com'
+            ), follow_redirects=True)
+        self.assertIn('Reset successful', rv.data)
+    
+    def test_fail_reset_password(self):
+        rv = self.app.post('/resetpassword', data=dict(
+                username='user',
+                email='fakeuser@example.com'
+            ), follow_redirects=True)
+        self.assertIn('No account with that username/email combinat', rv.data)
+
+    def test_resetpassword_fail_pw_mismatch(self):
+        rv = self.app.get('/resetpassword', data=dict(username='user',
+                                                    password1='pw1',
+                                                    password2='pw2'))
+        self.assertIn('Password Reset', rv.data)
+        
 
 if __name__ == '__main__':
     try:

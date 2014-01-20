@@ -69,7 +69,6 @@ def reset_pw():
             user.pw_reset_key = key
             db.session.commit()
             return render_template('setpassword.html', user=user, key=key)
-        #return 'Username: %r User: %r' % (username, user)
         return render_template('resetpassword.html', user=None, key=None)
     
     username = request.form.get('username')
