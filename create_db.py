@@ -1,4 +1,7 @@
-from app import db
+from alembic.config import Config
+from alembic import command
+
+from app import app, db
 from models import *
 
 
@@ -52,5 +55,9 @@ def db_insert_all():
 if __name__ == '__main__':
     db.drop_all()
     db.create_all()
+    
+    with app.app_context():
+        alembic_cfg = Config('migrations/alembic.ini')
+        command.stamp(alembic_cfg, 'head')
     
     db_insert_all()
