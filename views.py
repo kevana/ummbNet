@@ -41,10 +41,12 @@ def login():
                 flash("You have logged in")
                 session['logged_in'] = True
                 return redirect(next or url_for('index', error=error))
-        if user.email_verify_key:
-            error = 'Please verify your email address before logging in.'
+                if user.email_verify_key:
+                    error = 'Please verify your email address before logging in.'
+                else:
+                    error = 'Your account has been disabled.'
         else:
-            error = 'Your account has been disabled.'
+            error ='Incorrect username or password.'
     return render_template('login.html', login=True, next=next, error=error)
 
 @app.route('/logout')

@@ -151,7 +151,7 @@ class Event(db.Model):
 
     def __repr__(self):
         return '<Event Type: %r Date: %r Call: %r>' % \
-            (self.event_type, self.date, self.date.time())
+            (self.event_type_id, self.date, self.date.time())
 
 class EventType(db.Model):
     '''Represent the type of band event.'''
