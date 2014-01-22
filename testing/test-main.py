@@ -17,7 +17,7 @@ from password_reset_tests import PasswordResetTests
 
 if __name__ == '__main__':
     # Initialize coverage
-    cov = coverage(branch = True, omit = ['env/*', 'testing/*'])
+    cov = coverage(branch = True, omit = ['env/*', 'testing/*', 'migrations/*'])
     cov.start()
     
     try:
