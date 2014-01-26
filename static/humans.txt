@@ -1,0 +1,25 @@
+                              _      _   _        _   
+                             | |    | \ | |      | |  
+ _   _  _ __ ___   _ __ ___  | |__  |  \| |  ___ | |_ 
+| | | || '_ ` _ \ | '_ ` _ \ | '_ \ | . ` | / _ \| __|
+| |_| || | | | | || | | | | || |_) || |\  ||  __/| |_ 
+ \__,_||_| |_| |_||_| |_| |_||_.__/ \_| \_/ \___| \__|
+
+
+/* ABOUT THIS FILE */
+  Description: We Are People, Not Machines
+  More informations: <http://humanstxt.org/>
+
+/*TEAM*/
+  Developer: Kevan Ahlquist
+  Site: http://github.com/kevana
+  Location: Minneapolis
+
+/*THANKS*/
+  Matthew Lewis
+
+/*SITE*/
+  Last update: 2014/01/25
+  Doctype: HTML5
+  IDE: TextMate
+  Components: JQuery, Bootstrap
