@@ -26,11 +26,13 @@ Run the following commands:
 
     $ git clone https://github.com/aterlumen/ummbNet.git
     $ cd ummbNet
+    $ mkdir log
+    $ mkdir tmp
     $ pip install -r requirements.txt
     $ python create_db.py
     $ python main.py
 
-`load_test_data.py` contains dummy data (users, events, requests) you can load:
+`load_test_data.py` contains dummy data (users, events, requests) you can load into your db. Do not load this in production.
 
     $ python load_test_data.py
 
