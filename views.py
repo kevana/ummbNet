@@ -3,8 +3,8 @@ Views for ummbNet
 '''
 
 from flask import (flash, redirect, render_template,
-                   request, session, url_for, abort)
-from flask_login import (login_required, login_user, \
+                   request, session, url_for, abort, g)
+from flask_login import (login_required, login_user,
                          logout_user, current_user)
 from datetime import datetime
 
@@ -12,50 +12,49 @@ from app import app
 from emails import *
 from functions import *
 from models import *
+from forms import LoginForm
 
+
+@app.before_request
+def before_request():
+    g.user = current_user
 
 @app.route('/')
 def index():
     '''Return the ummbNet homepage.'''
     if session.get('logged_in') == True:
-        user = current_user.get_user()
+        user = g.user
         return render_template('index.html', user=user)
     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     '''Log in a user with their credentials.'''
-    error = None
     next = request.args.get('next')
-    if session.get('logged_in') == True:
-        user = current_user.get_user()
-        return redirect(next or url_for('index'))
-        
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+    user = g.user
+    error = None
+    if user is not None and user.is_authenticated():
+            return redirect(next or url_for('index'))
 
+    form = LoginForm()
+    username = form.username.data
+    password = form.password.data
+    if form.validate_on_submit():
         if authenticate_user(username, password):
             user = User.query.filter_by(username=username).first()
-            if login_user(DbUser(user)):
-                flash("You have logged in")
-                session['logged_in'] = True
-                return redirect(next or url_for('index', error=error))
-                if user.email_verify_key:
-                    error = 'Please verify your email address before logging in.'
-                else:
-                    error = 'Your account has been disabled.'
-        else:
-            error ='Incorrect username or password.'
-    return render_template('login.html', login=True, next=next, error=error)
+            login_user(user)
+            session['logged_in'] = True
+            return redirect(next or url_for('index'))
+        error = 'Incorrect username or password.'
+
+    return render_template('login.html', form=form, user=user, error=error)
 
 @app.route('/logout')
-@login_required
 def logout():
     '''Log out the currently logged-in user.'''
     logout_user()
     flash('You have logged out')
-    session['logged_in'] = False
+    session.pop('logged_in', None)
     return render_template('logout.html')
 
 @app.route('/resetpassword', methods=['GET', 'POST'])
@@ -103,7 +102,7 @@ def set_pw():
 def users():
     '''Route to users collection.'''
     users = User.query.all()
-    user = current_user.get_user()
+    user = g.user
     return render_template('users.html', users=users, user=user)
 
 @app.route('/users/<username>', methods=['GET', 'POST'])
@@ -144,11 +143,11 @@ def newuser():
                                         instruments=instruments)
             verify_email_start(user)
             if session.get('logged_in') == True:
-                user = current_user.get_user()
+                user = g.user
             return render_template('postreg.html', user=user)
     instruments = Instrument.query.all()
     if session.get('logged_in') == True:
-        user = current_user.get_user()
+        user = g.user
         return render_template('newuser.html', user=user, \
                                 instruments=instruments)
     return render_template('newuser.html', instruments=instruments)
@@ -164,11 +163,11 @@ def verify_email():
         user.enabled = True
         db.session.commit()
         if session.get('logged_in') == True:
-            user = current_user.get_user()
+            user = g.user
             return render_template('verified.html', success=True, user=user)
         return render_template('verified.html', success=True)
     if session.get('logged_in') == True:
-        user = current_user.get_user()
+        user = g.user
         return render_template('verified.html', success=False, user=user)
     return render_template('verified.html', success=False)
 
@@ -177,14 +176,14 @@ def verify_email():
 def requests():
     '''Route to Requests Collection.'''
     requests = Request.query.filter(Request.sub == None).all()
-    user = current_user.get_user()
+    user = g.user
     return render_template('requests.html', requests=requests, user=user)
 
 @app.route('/requests/<request_id>', methods=['GET', 'POST'])
 @login_required
 def req(request_id):
     '''Route to a particular request.'''
-    user = current_user.get_user()
+    user = g.user
     if request.method == 'GET':
         req = Request.query.get(request_id)
         if req:
@@ -192,7 +191,7 @@ def req(request_id):
         return render_template('404.html', user=user)
     req = Request.query.filter_by(id=request_id).first()
     if req:
-        req.sub = current_user.get_user()
+        req.sub = g.user
         db.session.commit()
         send_req_pickup_emails(req)
         return redirect(url_for('index', message='Success'))
@@ -220,7 +219,7 @@ def newrequest():
     bands = Band.query.all()
     events = Event.query.all()
     instruments = Instrument.query.all()
-    user = current_user.get_user()
+    user = g.user
     return render_template('newRequest.html', bands=bands, \
                             events=events, instruments=instruments, user=user)
 
@@ -228,7 +227,7 @@ def newrequest():
 @login_required
 def events():
     '''Route to Events collection.'''
-    user = current_user.get_user()
+    user = g.user
     if user.is_director or user.is_admin:
         events = Event.query.all()
         return render_template('events.html', events=events, user=user)
@@ -238,7 +237,7 @@ def events():
 @login_required
 def event(event_id):
     '''Route to a particular event.'''
-    user = current_user.get_user()
+    user = g.user
     if user.is_director or user.is_admin:
         if request.method == 'GET':
             event = Event.query.get(event_id)
@@ -252,7 +251,7 @@ def event(event_id):
 @login_required
 def newevent():
     '''Add a new Event.'''
-    user = current_user.get_user()
+    user = g.user
     if user.is_director or user.is_admin:
         error = None
         if request.method == 'POST':
@@ -272,7 +271,7 @@ def newevent():
 @login_required
 def editevent():
     '''Edit an existing Event.'''
-    user = current_user.get_user()
+    user = g.user
     error = None
     if user.is_director or user.is_admin:
         if request.method == 'GET':
@@ -312,7 +311,7 @@ def editevent():
 @login_required
 def confirm():
     '''Confirm an action.'''
-    user = current_user.get_user()
+    user = g.user
     if request.args.get('action') == 'pickup':
         req_id = request.args['request_id']
         req = Request.query.get(req_id)

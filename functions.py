@@ -15,11 +15,7 @@ from emails import *
 @login_manager.user_loader
 def load_user(user_id):
     '''login_manager callback, Return user in DbUser wrapper.'''
-    user = User.query.get(user_id)
-    if user:
-        return DbUser(user)
-    else:
-        return None
+    return User.query.get(int(user_id))
 
 def authenticate_user(username, password):
     '''Authenticate a user. Return True if username and password are valid.'''

@@ -19,6 +19,8 @@ class LoggedInResourceTests(unittest.TestCase):
     def setUp(self):
         '''Pre-test setup.'''
         app.config['TESTING'] = True
+        app.config['CSRF_ENABLED'] = False
+        app.config['WTF_CSRF_ENABLED'] = False
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'tmp/test.db')
         self.app = app.test_client()
         db.drop_all()

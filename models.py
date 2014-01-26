@@ -58,29 +58,21 @@ class User(db.Model):
         self.is_admin = is_admin
         self.is_director = is_director
         self.enabled = enabled
-
-    def __repr__(self):
-        return '<User %r>' % self.username
-
-class DbUser(object):
-    '''Wrap User object for Flask-Login.'''
-    def __init__(self, user):
-        self._user = user
-
-    def get_id(self):
-        return unicode(self._user.id)
-
-    def is_active(self):
-        return self._user.enabled
-
-    def is_anonymous(self):
-        return False
-
+    
     def is_authenticated(self):
         return True
-
-    def get_user(self):
-        return self._user
+    
+    def is_active(self):
+        return self.enabled
+    
+    def is_anonymous(self):
+        return False
+    
+    def get_id(self):
+        return unicode(self.id)
+    
+    def __repr__(self):
+        return '<User %r>' % self.username
 
 class Request(db.Model):
     '''Represent a user's request for a substitute for an event.'''

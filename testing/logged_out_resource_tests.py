@@ -40,7 +40,7 @@ class LoggedOutResourceTests(unittest.TestCase):
 
     # Test redirects to resources that require a logged-in user
     def test_logout(self):
-        self.assert_get_status_code('/logout', 302)
+        self.assert_get_status_code('/logout', 200)
 
     def test_resetpassword(self):
         self.assert_get_status_code('/resetpassword', 200)
