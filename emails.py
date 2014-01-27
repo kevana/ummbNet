@@ -33,7 +33,7 @@ def send_pw_reset_email(user, key):
     msg_to  = [user.email]
     txt_body = render_template('email/pw_reset_email.txt', user=user, key=key)
     html_body = render_template('email/pw_reset_email.html', user=user, key=key)
-    send_email(subject=subject, recipients=msg_to, \
+    send_email(subject=subject, recipients=msg_to,
                text_body=txt_body, html_body=html_body)
 
 def send_verify_email(user, key):

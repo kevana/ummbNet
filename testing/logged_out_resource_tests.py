@@ -17,7 +17,7 @@ class LoggedOutResourceTests(unittest.TestCase):
     '''Test route access for users that are not logged in.'''
     def setUp(self):
         '''Pre-test setup.'''
-        #self.assertFalse(app.config['TESTING'])
+        app.config['MAIL_SUPPRESS_SEND'] = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'tmp/test.db')
         self.app = app.test_client()
         db.create_all()
@@ -46,7 +46,7 @@ class LoggedOutResourceTests(unittest.TestCase):
         self.assert_get_status_code('/resetpassword', 200)
 
     def test_setpassword(self):
-        self.assert_get_status_code('/setpassword', 405)
+        self.assert_get_status_code('/setpassword', 200)
 
     def test_users(self):
         self.assert_get_status_code('/users', 301)

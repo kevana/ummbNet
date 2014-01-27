@@ -19,6 +19,7 @@ class LoggedInResourceTests(unittest.TestCase):
     def setUp(self):
         '''Pre-test setup.'''
         app.config['TESTING'] = True
+        app.config['MAIL_SUPPRESS_SEND'] = True
         app.config['CSRF_ENABLED'] = False
         app.config['WTF_CSRF_ENABLED'] = False
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'tmp/test.db')
@@ -68,7 +69,7 @@ class LoggedInResourceTests(unittest.TestCase):
         self.assert_get_status_code('/resetpassword', 200)
 
     def test_setpassword(self):
-        self.assert_get_status_code('/setpassword', 405)
+        self.assert_get_status_code('/setpassword', 200)
 
     def test_users(self):
         self.assert_get_status_code('/users', 301)

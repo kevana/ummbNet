@@ -19,6 +19,7 @@ class PasswordResetTests(unittest.TestCase):
     def setUp(self):
         '''Pre-test setup.'''
         app.config['TESTING'] = True
+        app.config['MAIL_SUPPRESS_SEND'] = True
         app.config['CSRF_ENABLED'] = False
         app.config['WTF_CSRF_ENABLED'] = False
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'tmp/test.db')
@@ -63,7 +64,7 @@ class PasswordResetTests(unittest.TestCase):
                 username='user',
                 email='fakeuser@example.com'
             ), follow_redirects=True)
-        self.assertIn('No account with that username/email combinat', rv.data)
+        self.assertIn('Invalid username email combination', rv.data)
 
     def test_resetpassword_fail_pw_mismatch(self):
         rv = self.app.get('/resetpassword', data=dict(username='user',

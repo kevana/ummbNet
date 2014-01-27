@@ -33,6 +33,7 @@ class User(db.Model):
 
     def set_pw(self, password):
         self.pw_hash = bcrypt.generate_password_hash(password)
+        self.pw_reset_key = None
         db.session.commit()
 
     def __init__(self, username, email, password, first_name=None, \

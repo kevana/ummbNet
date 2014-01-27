@@ -12,7 +12,7 @@ from app import app
 from emails import *
 from functions import *
 from models import *
-from forms import LoginForm
+from forms import LoginForm, PasswordResetForm, SetPasswordForm
 
 
 @app.before_request
@@ -59,43 +59,42 @@ def logout():
 
 @app.route('/resetpassword', methods=['GET', 'POST'])
 def reset_pw():
-    username = request.args.get('username')
-    key = request.args.get('k')
-    email = request.form.get('email')
-    user = User.query.filter_by(username=username).first()
-
-    if request.method == 'GET':
-        if user and user.pw_reset_key != None and user.pw_reset_key == key:
-            key = get_hash_key()
-            user.pw_reset_key = key
-            db.session.commit()
-            return render_template('setpassword.html', user=user, key=key)
-        return render_template('resetpassword.html', user=None, key=None)
-    
-    username = request.form.get('username')
-    user = User.query.filter_by(username=username).first()
-    if user and user.email == email:
+    form = PasswordResetForm()
+    if form.validate_on_submit(): # Checks for post
+        username = form.username.data
+        user = User.query.filter_by(username=username).first()
         reset_password_start(user=user)
         return render_template('resetpassword.html', sent=True, user=None)
-    error = 'No account with that username/email combination found.'
-    return render_template('resetpassword.html', error=error, user=None)
+    return render_template('resetpassword.html', form=form, user=None)
 
-@app.route('/setpassword', methods=['POST'])
+@app.route('/setpassword', methods=['GET', 'POST'])
 def set_pw():
-    username = request.form.get('username')
-    user = User.query.filter_by(username=username).first()
-    password1 = request.form.get('password1')
-    password2 = request.form.get('password2')
-    key = request.form.get('k')
-    if user and user.pw_reset_key != None and user.pw_reset_key == key and \
-                        password1 != None and password1 == password2:
-            user.set_pw(password2)
+    error = None
+    form = SetPasswordForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        user = User.query.filter_by(username=username).first()
+        if user:
+            user.set_pw(password)
             return redirect(url_for('user', username=user.username))
-    elif password1 == None or password1 != password2:
-        error = 'Both passwords must match.'
-    else:
-        error = 'Unable to reset password'
-    return render_template('setpassword.html', user=user, key=key, error=error)
+        error = 'Unable to reset password.'
+        return render_template('setpassword.html',
+                            form=form, user=None, error=error)
+
+    username = request.args.get('username')
+    user = User.query.filter_by(username=username).first()
+    key = request.args.get('k')
+    if user and user.pw_reset_key != None and user.pw_reset_key == key:
+        form = SetPasswordForm(username=user.username)
+        form.validate()
+        return render_template('setpassword.html',
+                            form=form, user=None, error=error)
+    
+    form = PasswordResetForm()
+    error = 'Invalid link, please complete this form to receive a new link'
+    return render_template('resetpassword.html', form=form, 
+                            user=None, error=error)
 
 @app.route('/users')
 @login_required
