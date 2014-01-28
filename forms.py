@@ -3,7 +3,8 @@ Form classes for ummbNet
 '''
 
 from flask.ext.wtf import Form
-from wtforms import TextField, BooleanField, PasswordField, HiddenField
+from wtforms import (TextField, BooleanField, PasswordField, 
+                    HiddenField, SelectMultipleField)
 from wtforms.validators import Required, EqualTo, Email, ValidationError
 
 from app import db
@@ -46,3 +47,19 @@ class SetPasswordForm(Form):
                              validators=[EqualTo('password',
                                     message='Passwords must match')])
     username = HiddenField('username')
+
+class NewUserForm(Form):
+    '''Form for new user screen.'''
+    username = TextField('Username:', validators=[Required()])
+    email = TextField('Email:', validators=[Required(), Email()])
+    password = PasswordField('Password:',
+                             validators=[Required()])
+    confirm = PasswordField('Please re-enter your password:',
+                             validators=[EqualTo('password',
+                                    message='Passwords must match')])
+    first_name = TextField('First Name:', validators=[Required()])
+    last_name = TextField('Last Name:')
+    nickname = TextField('Nickname:')
+    instrs = [(instr.name, instr.name) for instr in Instrument.query.all()]
+    instruments = SelectMultipleField('Instruments: (ctrl+click or cmd+click to select multiple)', choices=instrs)
+    

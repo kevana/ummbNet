@@ -12,7 +12,7 @@ from app import app
 from emails import *
 from functions import *
 from models import *
-from forms import LoginForm, PasswordResetForm, SetPasswordForm
+from forms import LoginForm, PasswordResetForm, SetPasswordForm, NewUserForm
 
 
 @app.before_request
@@ -118,38 +118,27 @@ def user(username):
 
 @app.route('/newuser', methods=['GET', 'POST'])
 def newuser():
-    '''Add a new user.'''
-    error = None
-    if request.method == 'POST':
-        # Add a new user
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        first_name = request.form['first_name']
-        last_name = request.form['last_name']
-        nickname = request.form['nickname']
-        instruments = get_form_instr()
-        if not username or not password or not email:
-            error = ('Account creation failed: '
-                     'missing username, email, or password')
-        else:
-            user = User(username=username, email=email, password=password, \
-                        first_name=first_name, last_name=last_name, \
-                        nickname=nickname, instruments=instruments)
-            if not add_user(user):
-                error = 'Account creation failed: database error'
-                return render_template('newuser.html', error=error, \
-                                        instruments=instruments)
+    user = g.user
+    if user is not None and user.is_authenticated():
+            return redirect(url_for('index'))
+    form = NewUserForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
+        first_name = form.first_name.data
+        last_name = form.last_name.data
+        nickname = form.nickname.data
+        instruments = get_form_instr(form)
+        user = User(username=username, email=email, password=password, \
+                    first_name=first_name, last_name=last_name, \
+                    nickname=nickname, instruments=instruments)
+        if add_user(user):
             verify_email_start(user)
-            if session.get('logged_in') == True:
-                user = g.user
-            return render_template('postreg.html', user=user)
-    instruments = Instrument.query.all()
-    if session.get('logged_in') == True:
-        user = g.user
-        return render_template('newuser.html', user=user, \
-                                instruments=instruments)
-    return render_template('newuser.html', instruments=instruments)
+            return render_template('postreg.html', user=None)
+        print(form.errors)
+        form.errors['username'] = ['This username is taken.']
+    return render_template('newuser.html', user=None, form=form)
 
 @app.route('/verify')
 def verify_email():

@@ -5,41 +5,66 @@
   <h2>Register a new user</h2>
   {% if error %}<p class=error><strong>Error:</strong></p> {{ error }}{% endif %}
   <form action="{{ url_for('newuser') }}" method='POST'>
-    <div class="form-group">
-      <label for="username">Username:</label>
-      <input type="text" class="form-control" name="username" id="username" placeholder="username">
-    </div>
-    <div class="form-group">
-      <label for="email">Email Address:</label>
-      <input type="email" class="form-control" name="email" id="email" placeholder="email">
-    </div>
-    <div class="form-group">
-      <label for="password">Password:</label>
-      <input type="password" class="form-control" name="password" id="password" placeholder="password">
-    </div>
-    <div class="form-group">
-      <label for="first_name">First Name:</label>
-      <input type="text" class="form-control" name="first_name" id="name" placeholder="First Name">
-    </div>
-    <div class="form-group">
-      <label for="last_name">Last Name:</label>
-      <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Last Name">
-    </div>
-    <div class="form-group">
-      <label for="nickname">Nickname:</label>
-      <input type="text" class="form-control" name="nickname" id="nickname" placeholder="Nickname">
-    </div>
-    <div class="form-group">
-      <label>Instruments:</label>
-      {% for instr in instruments %}
-      <div class="checkbox">
-        <label>
-        <input type="checkbox" name="{{ instr.name }}" value="True">{{ instr.name }}
-        </label>
-      </div>
+    {{ form.hidden_tag() }}
+    <div class="form-group col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+      {{ form.username.label }}
+      {{ form.username(class='form-control', placeholder='Username') }}
+      {% for error in form.errors.username %}
+        <span class="alert-danger">{{ error }}</span>
       {% endfor %}
     </div>
+    <div class="form-group col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+      {{ form.email.label }}
+      {{ form.email(class='form-control', placeholder='Email address') }}
+      {% for error in form.errors.email %}
+        <span class="alert-danger">{{ error }}</span>
+      {% endfor %}
+    </div>
+    <div class="form-group col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+      {{ form.password.label }}
+      {{ form.password(class='form-control', placeholder='Password') }}
+      {% for error in form.errors.password %}
+        <span class="alert-danger">{{ error }}</span>
+      {% endfor %}
+    </div>
+    <div class="form-group col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+      {{ form.confirm.label }}
+      {{ form.confirm(class='form-control', placeholder='Password') }}
+      {% for error in form.errors.confirm %}
+        <span class="alert-danger">{{ error }}</span>
+      {% endfor %}
+    </div>
+    <div class="form-group col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+      {{ form.first_name.label }}
+      {{ form.first_name(class='form-control', placeholder='First Name') }}
+      {% for error in form.errors.first_name %}
+        <span class="alert-danger">{{ error }}</span>
+      {% endfor %}
+    </div>
+    <div class="form-group col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+      {{ form.last_name.label }}
+      {{ form.last_name(class='form-control', placeholder='Last Name') }}
+      {% for error in form.errors.last_name %}
+        <span class="alert-danger">{{ error }}</span>
+      {% endfor %}
+    </div>
+    <div class="form-group col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+      {{ form.nickname.label }}
+      {{ form.nickname(class='form-control', placeholder='Nickname') }}
+      {% for error in form.errors.nickname %}
+        <span class="alert-danger">{{ error }}</span>
+      {% endfor %}
+    </div>
+    <div class="form-group col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+      {{ form.instruments.label }}
+      {{ form.instruments(class='form-control') }}
+      {% for error in form.errors.instruments %}
+        <span class="alert-danger">{{ error }}</span>
+      {% endfor %}
+    </div>
+    <div class="col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
       <button type="submit" class="btn btn-primary">Create Account</button>
+    </div>
   </form>
 </div>
 {% endblock %}

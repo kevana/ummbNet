@@ -174,3 +174,9 @@ class Instrument(db.Model):
 
     def __repr__(self):
         return '<Instrument Name: %r>' % self.name
+
+    @staticmethod
+    def get_by_name(name):
+        instr = Instrument.query.filter_by(name=name).first()
+        print(instr)
+        return instr
