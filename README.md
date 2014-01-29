@@ -1,16 +1,10 @@
 #ummbNet
 
-This is web-app for the University of Minnesota Pep Bands. It will serve as a request board for members to "trade shifts", picking up events when they want to, and finding others to take their place at events.
+A web app for the University of Minnesota Pep Bands. It serves as a request board for members to easily trade performance spots while keeping the directors informed of who will be at each event.
 
+It started as an independent study project to dive into Python web development. The first version with minimal functionality is live now. As time permits, a long list of security and usability changes will be implemented. It is very much a work in progress.
 
-Each section has their own system for finding subs. Some sections use Facebook groups, the trumpets use an email listserv. It's not efficient, we get a lot of emails, and older requests get lost.
-
-
-ummbNet is built with Flask and SQLAlchemy, it is web-server and database agnostic. The deployed version will be using Postgres, running through uWSGI behind nginx.
-
-
-Anyone who wants to help is welcome. I am receiving independent study credits for this, but feel free to contribute.
-
+ummbNet is built with Flask and SQLAlchemy. The deployed version (at [ummb.net](http://ummb.net)) runs through uWSGI behind nginx with a Postgres database.
 
 ##Getting Started
 
@@ -24,7 +18,7 @@ First, rename `sample-config.py	` to `config.py`. You will need to change the se
 
 Run the following commands:
 
-    $ git clone https://github.com/aterlumen/ummbNet.git
+    $ git clone https://github.com/kevana/ummbNet.git
     $ cd ummbNet
     $ mkdir log
     $ mkdir tmp
@@ -32,7 +26,9 @@ Run the following commands:
     $ python create_db.py
     $ python main.py
 
-`load_test_data.py` contains dummy data (users, events, requests) you can load into your db. Do not load this in production.
+`requirements.txt` includes psycopg2 for use with a Postgres database. To use a different database system you will need to install the DBAPI for it (e.g. mysql-python for MySQL).
+
+Optional: `load_test_data.py` contains dummy data (users, events, requests) to see how it looks with content.
 
     $ python load_test_data.py
 
@@ -55,7 +51,7 @@ Example:
 
 ###Testing
 
-ummbNet uses python's `unittest` module. Tests are in the `testing` subfolder, split into separate files by test contents. To run all test cases and generate a code coverage report at `tmp/coverage/index.html` use the main test module:
+ummbNet uses python's `unittest` module. Tests are in the `testing` subfolder, split into separate files nominally by feature. To run all test cases and generate a code coverage report at `tmp/coverage/index.html` use the main test module:
 
     $ python testing/test-main.py
 
@@ -63,13 +59,22 @@ This may take a fair amount of time to run. To run individual test cases, call t
 
     $ python testing/sub_module_tests.py
 
-##API
+# Toolbox
 
-This is on the back burner until the web interface is more mature.
+What I've used to make ummbNet so far. 
 
+Flask extensions:
+* Flask-Bcrypt
+* Flask-Login
+* Flask-Mail
+* Flask-Migrate
+* Flask-SQLAlchemy
+* Flask-WTF
+
+UI eye candy: Twitter's [Bootstrap](http://getbootstrap.com/)
 
 ##License
 
-All source code is open source and released under the MIT License. All user content is owned by its respective creator.
+All source code is released under the MIT License. All user content is owned by its respective creator.
 
 See `LICENSE` for more information.
