@@ -2,6 +2,8 @@
 SQLAlchemy db models for ummbNet
 '''
 
+from datetime import datetime
+
 from app import db, bcrypt
 
 users_instrs_play = db.Table('users_instrs_play', db.Model.metadata,
@@ -145,6 +147,10 @@ class Event(db.Model):
     def __repr__(self):
         return '<Event Type: %r Date: %r Call: %r>' % \
             (self.event_type_id, self.date, self.date.time())
+    
+    @staticmethod # Event.get_current()
+    def get_future_events():
+        return Event.query.filter(Event.date > datetime.utcnow()).all()
 
 class EventType(db.Model):
     '''Represent the type of band event.'''

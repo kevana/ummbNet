@@ -12,7 +12,8 @@ from app import app
 from emails import *
 from functions import *
 from models import *
-from forms import LoginForm, PasswordResetForm, SetPasswordForm, NewUserForm
+from forms import (LoginForm, PasswordResetForm, SetPasswordForm, 
+                    NewUserForm, NewRequestForm)
 
 
 @app.before_request
@@ -189,27 +190,27 @@ def req(request_id):
 @login_required
 def newrequest():
     '''Add a new request.'''
-    error = None
-    if request.method == 'POST':
-        # Add a new request
-        band_id = request.form['band']
-        event_id = request.form['event']
-        instrument_id = request.form['instrument']
-        part = request.form['part']
-        if part == None:
-            part = ""
-        if not band_id or not event_id or not instrument_id:
-            error = 'Request creation failed: missing information'
-        else:
-            add_request(band_id=band_id, event_id=event_id, \
-                        instrument_id=instrument_id, part=part)
-            return redirect(url_for('requests'))
-    bands = Band.query.all()
-    events = Event.query.all()
-    instruments = Instrument.query.all()
     user = g.user
-    return render_template('newRequest.html', bands=bands, \
-                            events=events, instruments=instruments, user=user)
+    form = NewRequestForm()
+    form.instrument.choices = [(instr.id, instr.name) 
+                                for instr in user.instruments]
+    events = Event.get_future_events()
+    choices = [(event.id, event.event_type.name + ' ' + event.date.strftime('%a %b %d, %I:%M%p')) 
+        for event in Event.get_future_events()]
+    form.event_id.choices = choices
+
+    if form.validate_on_submit():
+        band_id = form.band_id.data
+        event_id = form.event_id.data
+        instrument_id = form.instrument.data
+        part = form.part.data if form.part.data else ''
+        req_id = add_request(band_id=band_id, event_id=event_id,
+                            instrument_id=instrument_id, part=part)
+        if req_id:
+            return redirect(url_for('req', request_id=req_id))
+        form.errors['event_id'] = ['You have already created a request for this event.']
+
+    return render_template('newRequest.html', form=form, user=user)
 
 @app.route('/events/')
 @login_required

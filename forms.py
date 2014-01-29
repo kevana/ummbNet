@@ -4,7 +4,7 @@ Form classes for ummbNet
 
 from flask.ext.wtf import Form
 from wtforms import (TextField, BooleanField, PasswordField, 
-                    HiddenField, SelectMultipleField)
+                    HiddenField, SelectField, SelectMultipleField)
 from wtforms.validators import Required, EqualTo, Email, ValidationError
 
 from app import db
@@ -61,5 +61,15 @@ class NewUserForm(Form):
     last_name = TextField('Last Name:')
     nickname = TextField('Nickname:')
     instrs = [(instr.name, instr.name) for instr in Instrument.query.all()]
-    instruments = SelectMultipleField('Instruments: (ctrl+click or cmd+click to select multiple)', choices=instrs)
-    
+    instruments = SelectMultipleField(
+                'Instruments: (ctrl+click or cmd+click to select multiple)', 
+                choices=instrs)
+
+class NewRequestForm(Form):
+    '''Form for new request screen.'''
+    bands = [(band.id, band.name) for band in Band.query.all()]
+    band_id = SelectField('Band:', choices=bands, 
+                        validators=[Required()], coerce=int)
+    event_id = SelectField('Event:', validators=[Required()], coerce=int)
+    instrument = SelectField('Instrument:', validators=[Required()], coerce=int)
+    part = TextField('Part:')

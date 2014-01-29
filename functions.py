@@ -2,7 +2,7 @@
 Functions for ummbNet
 '''
 
-from flask import request
+from flask import request, g
 from flask_login import current_user
 from hashlib import sha1
 from os import urandom
@@ -35,19 +35,22 @@ def add_user(user):
 
 def add_request(band_id, event_id, instrument_id, part):
     '''Add a new request to the database.'''
-    user = current_user.get_user()
-    if user:
-        req = Request(poster=user, band_id=band_id, event_id=event_id, \
-                      instrument_id=instrument_id, part=part)
-        try:
-            db.session.add(req)
-            db.session.commit()
-        except IntegrityError:
-            db.session.rollback()
-            return False
-        send_new_req_emails(req)
-        return True
-    return False
+    user = g.user
+    part = '' if part == None else part
+    # Check if user has already created a request for this event
+    if [] != user.posted_requests.filter(Request.event_id == event_id).all():
+        return None
+    
+    req = Request(poster=user, band_id=band_id, event_id=event_id, \
+                  instrument_id=instrument_id, part=part)
+    try:
+        db.session.add(req)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return None
+    send_new_req_emails(req)
+    return req.id
 
 def add_event(date, band_id, event_type_id):
     '''Add a new event to the database.'''
