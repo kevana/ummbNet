@@ -3,8 +3,9 @@ Form classes for ummbNet
 '''
 
 from flask.ext.wtf import Form
-from wtforms import (TextField, BooleanField, PasswordField, 
+from wtforms import (TextField, BooleanField, PasswordField,
                     HiddenField, SelectField, SelectMultipleField)
+from wtforms.fields.html5 import DateTimeLocalField
 from wtforms.validators import Required, EqualTo, Email, ValidationError
 
 from app import db
@@ -73,3 +74,13 @@ class NewRequestForm(Form):
     event_id = SelectField('Event:', validators=[Required()], coerce=int)
     instrument = SelectField('Instrument:', validators=[Required()], coerce=int)
     part = TextField('Part:')
+
+class NewEventForm(Form):
+    '''Form for new event screen.'''
+    bands = [(band.id, band.name) for band in Band.query.all()]
+    event_types = [(typ.id, typ.name) for typ in EventType.query.all()]
+    date = DateTimeLocalField('Date:', format='%Y-%m-%dT%H:%M')
+    band_id = SelectField('Band:', choices=bands, 
+                        validators=[Required()], coerce=int)
+    event_type = SelectField('Event Type:', choices=event_types, 
+                        validators=[Required()], coerce=int)

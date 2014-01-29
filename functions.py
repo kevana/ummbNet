@@ -60,9 +60,9 @@ def add_event(date, band_id, event_type_id):
             db.session.add(event)
             db.session.commit()
         except IntegrityError:
-            return False
-        return True
-    return False
+            return None
+        return event.id
+    return None
 
 def get_form_instr(form):
     '''Retrieve chosen instruments from form. Return a list containing them.'''

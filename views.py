@@ -13,7 +13,7 @@ from emails import *
 from functions import *
 from models import *
 from forms import (LoginForm, PasswordResetForm, SetPasswordForm, 
-                    NewUserForm, NewRequestForm)
+                    NewUserForm, NewRequestForm, NewEventForm)
 
 
 @app.before_request
@@ -236,9 +236,9 @@ def event(event_id):
         return 'POST unimplemented'
     abort(404)
 
-@app.route('/newevent', methods=['GET', 'POST'])
+@app.route('/oldnewevent', methods=['GET', 'POST'])
 @login_required
-def newevent():
+def oldnewevent():
     '''Add a new Event.'''
     user = g.user
     if user.is_director or user.is_admin:
@@ -254,6 +254,23 @@ def newevent():
         event_types = EventType.query.all()
         return render_template('newevent.html', bands=bands, \
                         event_types=event_types, user=user)
+    abort(404)
+
+@app.route('/newevent', methods=['GET', 'POST'])
+@login_required
+def newevent():
+    '''Add a new Event.'''
+    user = g.user
+    if user.is_director or user.is_admin:
+        form = NewEventForm()
+        if form.validate_on_submit():
+            date = form.date.data
+            band_id = form.band_id.data
+            event_type_id = form.event_type.data
+            event_id = add_event(date=date, band_id=band_id, event_type_id=event_type_id)
+            return redirect(url_for('event', event_id=event_id))
+        
+        return render_template('newevent.html', form=form, user=user)
     abort(404)
 
 @app.route('/editevent', methods=['GET', 'POST'])
