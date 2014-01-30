@@ -75,12 +75,14 @@ class NewRequestForm(Form):
     instrument = SelectField('Instrument:', validators=[Required()], coerce=int)
     part = TextField('Part:')
 
-class NewEventForm(Form):
+class EventForm(Form):
     '''Form for new event screen.'''
     bands = [(band.id, band.name) for band in Band.query.all()]
     event_types = [(typ.id, typ.name) for typ in EventType.query.all()]
+    
+    event_id = HiddenField('event_id')
     date = DateTimeLocalField('Date:', format='%Y-%m-%dT%H:%M')
     band_id = SelectField('Band:', choices=bands, 
                         validators=[Required()], coerce=int)
-    event_type = SelectField('Event Type:', choices=event_types, 
+    event_type_id = SelectField('Event Type:', choices=event_types, 
                         validators=[Required()], coerce=int)

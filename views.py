@@ -13,7 +13,7 @@ from emails import *
 from functions import *
 from models import *
 from forms import (LoginForm, PasswordResetForm, SetPasswordForm, 
-                    NewUserForm, NewRequestForm, NewEventForm)
+                    NewUserForm, NewRequestForm, EventForm)
 
 
 @app.before_request
@@ -236,33 +236,13 @@ def event(event_id):
         return 'POST unimplemented'
     abort(404)
 
-@app.route('/oldnewevent', methods=['GET', 'POST'])
-@login_required
-def oldnewevent():
-    '''Add a new Event.'''
-    user = g.user
-    if user.is_director or user.is_admin:
-        error = None
-        if request.method == 'POST':
-            date = request.form['date']
-            band_id = request.form['band']
-            event_type_id = request.form['event_type']
-            date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
-            add_event(date=date, band_id=band_id, event_type_id=event_type_id)
-            return redirect(url_for('events'))
-        bands = Band.query.all()
-        event_types = EventType.query.all()
-        return render_template('newevent.html', bands=bands, \
-                        event_types=event_types, user=user)
-    abort(404)
-
 @app.route('/newevent', methods=['GET', 'POST'])
 @login_required
 def newevent():
     '''Add a new Event.'''
     user = g.user
     if user.is_director or user.is_admin:
-        form = NewEventForm()
+        form = EventForm()
         if form.validate_on_submit():
             date = form.date.data
             band_id = form.band_id.data
@@ -270,47 +250,32 @@ def newevent():
             event_id = add_event(date=date, band_id=band_id, event_type_id=event_type_id)
             return redirect(url_for('event', event_id=event_id))
         
-        return render_template('newevent.html', form=form, user=user)
+        return render_template('create_update_event.html', form=form, user=user)
     abort(404)
 
 @app.route('/editevent', methods=['GET', 'POST'])
 @login_required
 def editevent():
-    '''Edit an existing Event.'''
     user = g.user
-    error = None
     if user.is_director or user.is_admin:
-        if request.method == 'GET':
-            event_id = request.args['event_id']
+        form = EventForm()
+        if form.validate_on_submit():
+            event_id = form.event_id.data
             event = Event.query.get(event_id)
-            bands = Band.query.all()
-            event_types = EventType.query.all()
-            if not event:
-                return redirect(url_for('events'))
-            return render_template('editevent.html', event=event, user=user, \
-                                    event_types=event_types, bands=bands)
-        if request.method == 'POST':
-            event_id = request.form['event_id']
-            date = request.form['date']
-            band_id = request.form['band']
-            event_type_id = request.form['event_type']
-            date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
+            event.date = form.date.data
+            event.band_id = form.band_id.data
+            event.event_type_id = form.event_type_id.data
+            db.session.commit()
+            return redirect(url_for('event', event_id=event_id))
+        event_id = request.args.get('event_id')
+        if event_id:
             event = Event.query.get(event_id)
-            event.date = date
-            event.band_id = band_id
-            event.event_type_id = event_type_id
-            if not event:
-                error = 'Unable to find event.'
-            try:
-                db.session.commit()
-                return redirect(url_for('event', event_id=event_id))
-            except:
-                error = 'Unable to update event.'
-            return render_template('editevent.html', event=event, \
-                                    bands=bands, event_types=event_types, \
-                                    user=user, error=error)
-
-
+            form.event_id.data = event_id
+            form.date.data = event.date
+            form.band_id.data = event.band_id
+            form.event_type_id.data = event.event_type_id
+            return render_template('create_update_event.html', form=form, user=user)
+            
     abort(404)
 
 @app.route('/confirm')
