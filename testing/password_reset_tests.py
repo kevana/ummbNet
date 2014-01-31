@@ -6,11 +6,14 @@ import unittest
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
 from app import app, db
-from config import basedir
 from async import *
+from config import basedir
 from email import *
 from functions import *
 from models import *
+# Nuke the db and create empty tables
+db.drop_all()
+db.create_all()
 from views import *
 from create_db import *
 
@@ -22,9 +25,8 @@ class PasswordResetTests(unittest.TestCase):
         app.config['MAIL_SUPPRESS_SEND'] = True
         app.config['CSRF_ENABLED'] = False
         app.config['WTF_CSRF_ENABLED'] = False
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'tmp/test.db')
+        
         self.app = app.test_client()
-        db.drop_all()
         db.create_all()
         user = User(username='user', \
                     email='admin@example.com', \

@@ -11,6 +11,9 @@ from async import *
 from email import *
 from functions import *
 from models import *
+# Nuke the db and create new tables
+db.drop_all()
+db.create_all()
 from views import *
 
 class LoggedOutResourceTests(unittest.TestCase):
@@ -18,7 +21,6 @@ class LoggedOutResourceTests(unittest.TestCase):
     def setUp(self):
         '''Pre-test setup.'''
         app.config['MAIL_SUPPRESS_SEND'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'tmp/test.db')
         self.app = app.test_client()
         db.create_all()
 
