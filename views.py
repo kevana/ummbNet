@@ -122,6 +122,7 @@ def newuser():
     user = g.user
     if user is not None and user.is_authenticated():
             return redirect(url_for('index'))
+
     form = NewUserForm()
     if form.validate_on_submit():
         username = form.username.data
@@ -131,14 +132,20 @@ def newuser():
         last_name = form.last_name.data
         nickname = form.nickname.data
         instruments = get_form_instr(form)
+        
+        username_avail = [] == User.query.filter_by(username=username).all()
+        email_avail = [] == User.query.filter_by(email=email).all()
         user = User(username=username, email=email, password=password, \
                     first_name=first_name, last_name=last_name, \
                     nickname=nickname, instruments=instruments)
-        if add_user(user):
+        if username_avail and email_avail and add_user(user):
             verify_email_start(user)
             return render_template('postreg.html', user=None)
-        print(form.errors)
-        form.errors['username'] = ['This username is taken.']
+
+        if not username_avail:
+            form.errors['username'] = ['This username is taken.']
+        if not email_avail:
+            form.errors['email'] = ['This email address is taken.']
     return render_template('newuser.html', user=None, form=form)
 
 @app.route('/verify')
