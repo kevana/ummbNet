@@ -3,8 +3,8 @@ Views for ummbNet
 '''
 
 from flask import (flash, redirect, render_template,
-                   request, session, url_for, abort)
-from flask_login import (login_required, login_user, \
+                   request, session, url_for, abort, g)
+from flask_login import (login_required, login_user,
                          logout_user, current_user)
 from datetime import datetime
 
@@ -12,98 +12,97 @@ from app import app
 from emails import *
 from functions import *
 from models import *
+from forms import (LoginForm, PasswordResetForm, SetPasswordForm, 
+                    NewUserForm, NewRequestForm, EventForm)
 
+
+@app.before_request
+def before_request():
+    g.user = current_user
 
 @app.route('/')
 def index():
     '''Return the ummbNet homepage.'''
     if session.get('logged_in') == True:
-        user = current_user.get_user()
+        user = g.user
         return render_template('index.html', user=user)
     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     '''Log in a user with their credentials.'''
-    error = None
     next = request.args.get('next')
-    if session.get('logged_in') == True:
-        user = current_user.get_user()
-        return redirect(next or url_for('index'))
-        
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+    user = g.user
+    error = None
+    if user is not None and user.is_authenticated():
+            return redirect(next or url_for('index'))
 
+    form = LoginForm()
+    username = form.username.data
+    password = form.password.data
+    if form.validate_on_submit():
         if authenticate_user(username, password):
             user = User.query.filter_by(username=username).first()
-            if login_user(DbUser(user)):
-                flash("You have logged in")
-                session['logged_in'] = True
-                return redirect(next or url_for('index', error=error))
-                if user.email_verify_key:
-                    error = 'Please verify your email address before logging in.'
-                else:
-                    error = 'Your account has been disabled.'
-        else:
-            error ='Incorrect username or password.'
-    return render_template('login.html', login=True, next=next, error=error)
+            login_user(user)
+            session['logged_in'] = True
+            return redirect(next or url_for('index'))
+        error = 'Incorrect username or password.'
+
+    return render_template('login.html', form=form, user=user, error=error)
 
 @app.route('/logout')
-@login_required
 def logout():
     '''Log out the currently logged-in user.'''
     logout_user()
     flash('You have logged out')
-    session['logged_in'] = False
+    session.pop('logged_in', None)
     return render_template('logout.html')
 
 @app.route('/resetpassword', methods=['GET', 'POST'])
 def reset_pw():
-    username = request.args.get('username')
-    key = request.args.get('k')
-    email = request.form.get('email')
-    user = User.query.filter_by(username=username).first()
-
-    if request.method == 'GET':
-        if user and user.pw_reset_key != None and user.pw_reset_key == key:
-            key = get_hash_key()
-            user.pw_reset_key = key
-            db.session.commit()
-            return render_template('setpassword.html', user=user, key=key)
-        return render_template('resetpassword.html', user=None, key=None)
-    
-    username = request.form.get('username')
-    user = User.query.filter_by(username=username).first()
-    if user and user.email == email:
+    form = PasswordResetForm()
+    if form.validate_on_submit(): # Checks for post
+        username = form.username.data
+        user = User.query.filter_by(username=username).first()
         reset_password_start(user=user)
         return render_template('resetpassword.html', sent=True, user=None)
-    error = 'No account with that username/email combination found.'
-    return render_template('resetpassword.html', error=error, user=None)
+    return render_template('resetpassword.html', form=form, user=None)
 
-@app.route('/setpassword', methods=['POST'])
+@app.route('/setpassword', methods=['GET', 'POST'])
 def set_pw():
-    username = request.form.get('username')
-    user = User.query.filter_by(username=username).first()
-    password1 = request.form.get('password1')
-    password2 = request.form.get('password2')
-    key = request.form.get('k')
-    if user and user.pw_reset_key != None and user.pw_reset_key == key and \
-                        password1 != None and password1 == password2:
-            user.set_pw(password2)
+    error = None
+    form = SetPasswordForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        user = User.query.filter_by(username=username).first()
+        if user:
+            user.set_pw(password)
             return redirect(url_for('user', username=user.username))
-    elif password1 == None or password1 != password2:
-        error = 'Both passwords must match.'
-    else:
-        error = 'Unable to reset password'
-    return render_template('setpassword.html', user=user, key=key, error=error)
+        error = 'Unable to reset password.'
+        return render_template('setpassword.html',
+                            form=form, user=None, error=error)
+
+    username = request.args.get('username')
+    user = User.query.filter_by(username=username).first()
+    key = request.args.get('k')
+    if user and user.pw_reset_key != None and user.pw_reset_key == key:
+        form = SetPasswordForm(username=user.username)
+        form.validate()
+        return render_template('setpassword.html',
+                            form=form, user=None, error=error)
+    
+    form = PasswordResetForm()
+    error = 'Invalid link, please complete this form to receive a new link'
+    return render_template('resetpassword.html', form=form, 
+                            user=None, error=error)
 
 @app.route('/users')
 @login_required
 def users():
     '''Route to users collection.'''
     users = User.query.all()
-    user = current_user.get_user()
+    user = g.user
     return render_template('users.html', users=users, user=user)
 
 @app.route('/users/<username>', methods=['GET', 'POST'])
@@ -120,38 +119,34 @@ def user(username):
 
 @app.route('/newuser', methods=['GET', 'POST'])
 def newuser():
-    '''Add a new user.'''
-    error = None
-    if request.method == 'POST':
-        # Add a new user
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        first_name = request.form['first_name']
-        last_name = request.form['last_name']
-        nickname = request.form['nickname']
-        instruments = get_form_instr()
-        if not username or not password or not email:
-            error = ('Account creation failed: '
-                     'missing username, email, or password')
-        else:
-            user = User(username=username, email=email, password=password, \
-                        first_name=first_name, last_name=last_name, \
-                        nickname=nickname, instruments=instruments)
-            if not add_user(user):
-                error = 'Account creation failed: database error'
-                return render_template('newuser.html', error=error, \
-                                        instruments=instruments)
+    user = g.user
+    if user is not None and user.is_authenticated():
+            return redirect(url_for('index'))
+
+    form = NewUserForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
+        first_name = form.first_name.data
+        last_name = form.last_name.data
+        nickname = form.nickname.data
+        instruments = get_form_instr(form)
+        
+        username_avail = [] == User.query.filter_by(username=username).all()
+        email_avail = [] == User.query.filter_by(email=email).all()
+        user = User(username=username, email=email, password=password, \
+                    first_name=first_name, last_name=last_name, \
+                    nickname=nickname, instruments=instruments)
+        if username_avail and email_avail and add_user(user):
             verify_email_start(user)
-            if session.get('logged_in') == True:
-                user = current_user.get_user()
-            return render_template('postreg.html', user=user)
-    instruments = Instrument.query.all()
-    if session.get('logged_in') == True:
-        user = current_user.get_user()
-        return render_template('newuser.html', user=user, \
-                                instruments=instruments)
-    return render_template('newuser.html', instruments=instruments)
+            return render_template('postreg.html', user=None)
+
+        if not username_avail:
+            form.errors['username'] = ['This username is taken.']
+        if not email_avail:
+            form.errors['email'] = ['This email address is taken.']
+    return render_template('newuser.html', user=None, form=form)
 
 @app.route('/verify')
 def verify_email():
@@ -164,11 +159,11 @@ def verify_email():
         user.enabled = True
         db.session.commit()
         if session.get('logged_in') == True:
-            user = current_user.get_user()
+            user = g.user
             return render_template('verified.html', success=True, user=user)
         return render_template('verified.html', success=True)
     if session.get('logged_in') == True:
-        user = current_user.get_user()
+        user = g.user
         return render_template('verified.html', success=False, user=user)
     return render_template('verified.html', success=False)
 
@@ -176,15 +171,15 @@ def verify_email():
 @login_required
 def requests():
     '''Route to Requests Collection.'''
-    requests = Request.query.filter(Request.sub == None).all()
-    user = current_user.get_user()
+    requests = Request.get_open_reqs()
+    user = g.user
     return render_template('requests.html', requests=requests, user=user)
 
 @app.route('/requests/<request_id>', methods=['GET', 'POST'])
 @login_required
 def req(request_id):
     '''Route to a particular request.'''
-    user = current_user.get_user()
+    user = g.user
     if request.method == 'GET':
         req = Request.query.get(request_id)
         if req:
@@ -192,7 +187,7 @@ def req(request_id):
         return render_template('404.html', user=user)
     req = Request.query.filter_by(id=request_id).first()
     if req:
-        req.sub = current_user.get_user()
+        req.sub = g.user
         db.session.commit()
         send_req_pickup_emails(req)
         return redirect(url_for('index', message='Success'))
@@ -202,35 +197,35 @@ def req(request_id):
 @login_required
 def newrequest():
     '''Add a new request.'''
-    error = None
-    if request.method == 'POST':
-        # Add a new request
-        band_id = request.form['band']
-        event_id = request.form['event']
-        instrument_id = request.form['instrument']
-        part = request.form['part']
-        if part == None:
-            part = ""
-        if not band_id or not event_id or not instrument_id:
-            error = 'Request creation failed: missing information'
-        else:
-            add_request(band_id=band_id, event_id=event_id, \
-                        instrument_id=instrument_id, part=part)
-            return redirect(url_for('requests'))
-    bands = Band.query.all()
-    events = Event.query.all()
-    instruments = Instrument.query.all()
-    user = current_user.get_user()
-    return render_template('newRequest.html', bands=bands, \
-                            events=events, instruments=instruments, user=user)
+    user = g.user
+    form = NewRequestForm()
+    form.instrument.choices = [(instr.id, instr.name) 
+                                for instr in user.instruments]
+    events = Event.get_future_events()
+    choices = [(event.id, event.event_type.name + ' ' + event.date.strftime('%a %b %d, %I:%M%p')) 
+        for event in Event.get_future_events()]
+    form.event_id.choices = choices
+
+    if form.validate_on_submit():
+        band_id = form.band_id.data
+        event_id = form.event_id.data
+        instrument_id = form.instrument.data
+        part = form.part.data if form.part.data else ''
+        req_id = add_request(band_id=band_id, event_id=event_id,
+                            instrument_id=instrument_id, part=part)
+        if req_id:
+            return redirect(url_for('req', request_id=req_id))
+        form.errors['event_id'] = ['You have already created a request for this event.']
+
+    return render_template('newRequest.html', form=form, user=user)
 
 @app.route('/events/')
 @login_required
 def events():
     '''Route to Events collection.'''
-    user = current_user.get_user()
+    user = g.user
     if user.is_director or user.is_admin:
-        events = Event.query.all()
+        events = Event.get_future_events()
         return render_template('events.html', events=events, user=user)
     abort(404)
 
@@ -238,7 +233,7 @@ def events():
 @login_required
 def event(event_id):
     '''Route to a particular event.'''
-    user = current_user.get_user()
+    user = g.user
     if user.is_director or user.is_admin:
         if request.method == 'GET':
             event = Event.query.get(event_id)
@@ -252,67 +247,49 @@ def event(event_id):
 @login_required
 def newevent():
     '''Add a new Event.'''
-    user = current_user.get_user()
+    user = g.user
     if user.is_director or user.is_admin:
-        error = None
-        if request.method == 'POST':
-            date = request.form['date']
-            band_id = request.form['band']
-            event_type_id = request.form['event_type']
-            date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
-            add_event(date=date, band_id=band_id, event_type_id=event_type_id)
-            return redirect(url_for('events'))
-        bands = Band.query.all()
-        event_types = EventType.query.all()
-        return render_template('newevent.html', bands=bands, \
-                        event_types=event_types, user=user)
+        form = EventForm()
+        if form.validate_on_submit():
+            date = form.date.data
+            band_id = form.band_id.data
+            event_type_id = form.event_type.data
+            event_id = add_event(date=date, band_id=band_id, event_type_id=event_type_id)
+            return redirect(url_for('event', event_id=event_id))
+        
+        return render_template('create_update_event.html', form=form, user=user)
     abort(404)
 
 @app.route('/editevent', methods=['GET', 'POST'])
 @login_required
 def editevent():
-    '''Edit an existing Event.'''
-    user = current_user.get_user()
-    error = None
+    user = g.user
     if user.is_director or user.is_admin:
-        if request.method == 'GET':
-            event_id = request.args['event_id']
+        form = EventForm()
+        if form.validate_on_submit():
+            event_id = form.event_id.data
             event = Event.query.get(event_id)
-            bands = Band.query.all()
-            event_types = EventType.query.all()
-            if not event:
-                return redirect(url_for('events'))
-            return render_template('editevent.html', event=event, user=user, \
-                                    event_types=event_types, bands=bands)
-        if request.method == 'POST':
-            event_id = request.form['event_id']
-            date = request.form['date']
-            band_id = request.form['band']
-            event_type_id = request.form['event_type']
-            date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
+            event.date = form.date.data
+            event.band_id = form.band_id.data
+            event.event_type_id = form.event_type_id.data
+            db.session.commit()
+            return redirect(url_for('event', event_id=event_id))
+        event_id = request.args.get('event_id')
+        if event_id:
             event = Event.query.get(event_id)
-            event.date = date
-            event.band_id = band_id
-            event.event_type_id = event_type_id
-            if not event:
-                error = 'Unable to find event.'
-            try:
-                db.session.commit()
-                return redirect(url_for('event', event_id=event_id))
-            except:
-                error = 'Unable to update event.'
-            return render_template('editevent.html', event=event, \
-                                    bands=bands, event_types=event_types, \
-                                    user=user, error=error)
-
-
+            form.event_id.data = event_id
+            form.date.data = event.date
+            form.band_id.data = event.band_id
+            form.event_type_id.data = event.event_type_id
+            return render_template('create_update_event.html', form=form, user=user)
+            
     abort(404)
 
 @app.route('/confirm')
 @login_required
 def confirm():
     '''Confirm an action.'''
-    user = current_user.get_user()
+    user = g.user
     if request.args.get('action') == 'pickup':
         req_id = request.args['request_id']
         req = Request.query.get(req_id)

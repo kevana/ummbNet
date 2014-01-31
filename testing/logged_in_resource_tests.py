@@ -6,11 +6,13 @@ import unittest
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
 from app import app, db
-from config import basedir
 from async import *
 from email import *
 from functions import *
 from models import *
+# Nuke the db and create new tables
+db.drop_all()
+db.create_all()
 from views import *
 
 
@@ -19,9 +21,11 @@ class LoggedInResourceTests(unittest.TestCase):
     def setUp(self):
         '''Pre-test setup.'''
         app.config['TESTING'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'tmp/test.db')
+        app.config['MAIL_SUPPRESS_SEND'] = True
+        app.config['CSRF_ENABLED'] = False
+        app.config['WTF_CSRF_ENABLED'] = False
+        
         self.app = app.test_client()
-        db.drop_all()
         db.create_all()
         user = User(username='user', \
                     email='admin@example.com', \
@@ -66,7 +70,7 @@ class LoggedInResourceTests(unittest.TestCase):
         self.assert_get_status_code('/resetpassword', 200)
 
     def test_setpassword(self):
-        self.assert_get_status_code('/setpassword', 405)
+        self.assert_get_status_code('/setpassword', 200)
 
     def test_users(self):
         self.assert_get_status_code('/users', 301)

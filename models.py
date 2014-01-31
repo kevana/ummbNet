@@ -2,6 +2,8 @@
 SQLAlchemy db models for ummbNet
 '''
 
+from datetime import datetime
+
 from app import db, bcrypt
 
 users_instrs_play = db.Table('users_instrs_play', db.Model.metadata,
@@ -33,6 +35,7 @@ class User(db.Model):
 
     def set_pw(self, password):
         self.pw_hash = bcrypt.generate_password_hash(password)
+        self.pw_reset_key = None
         db.session.commit()
 
     def __init__(self, username, email, password, first_name=None, \
@@ -58,29 +61,21 @@ class User(db.Model):
         self.is_admin = is_admin
         self.is_director = is_director
         self.enabled = enabled
-
-    def __repr__(self):
-        return '<User %r>' % self.username
-
-class DbUser(object):
-    '''Wrap User object for Flask-Login.'''
-    def __init__(self, user):
-        self._user = user
-
-    def get_id(self):
-        return unicode(self._user.id)
-
-    def is_active(self):
-        return self._user.enabled
-
-    def is_anonymous(self):
-        return False
-
+    
     def is_authenticated(self):
         return True
-
-    def get_user(self):
-        return self._user
+    
+    def is_active(self):
+        return self.enabled
+    
+    def is_anonymous(self):
+        return False
+    
+    def get_id(self):
+        return unicode(self.id)
+    
+    def __repr__(self):
+        return '<User %r>' % self.username
 
 class Request(db.Model):
     '''Represent a user's request for a substitute for an event.'''
@@ -114,6 +109,13 @@ class Request(db.Model):
     def __repr__(self):
         return '<Request Event: %r Posted by: %r>' % \
             (self.event_id, self.poster)
+    
+    @staticmethod
+    def get_open_reqs():
+        return Request.query.filter(Request.sub == None).\
+                join(Request.event).\
+                filter(Event.date > datetime.utcnow()).\
+                order_by(Event.date).all()
 
 class Band(db.Model):
     '''Represent which band the request is for.'''
@@ -152,6 +154,10 @@ class Event(db.Model):
     def __repr__(self):
         return '<Event Type: %r Date: %r Call: %r>' % \
             (self.event_type_id, self.date, self.date.time())
+    
+    @staticmethod # Event.get_current()
+    def get_future_events():
+        return Event.query.filter(Event.date > datetime.utcnow()).order_by(Event.date).all()
 
 class EventType(db.Model):
     '''Represent the type of band event.'''
@@ -181,3 +187,9 @@ class Instrument(db.Model):
 
     def __repr__(self):
         return '<Instrument Name: %r>' % self.name
+
+    @staticmethod
+    def get_by_name(name):
+        instr = Instrument.query.filter_by(name=name).first()
+        print(instr)
+        return instr

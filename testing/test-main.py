@@ -6,7 +6,6 @@ import unittest
 # Add parent directory to import path
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
-#from app import app, db
 from config import basedir
 
 from logged_out_resource_tests import LoggedOutResourceTests

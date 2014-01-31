@@ -2,4 +2,4 @@ A password reset was requested for ummbNet user {{ user.username }}.
 Please follow the link below to reset your password. 
 If you encounter problems, manually copy and paste the link in your browser.
 
-{{ url_for('reset_pw', username=user.username, k=key) }}
+{{ url_for('set_pw', username=user.username, k=key, _external=True) }}

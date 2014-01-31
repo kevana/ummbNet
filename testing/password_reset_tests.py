@@ -6,11 +6,14 @@ import unittest
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
 from app import app, db
-from config import basedir
 from async import *
+from config import basedir
 from email import *
 from functions import *
 from models import *
+# Nuke the db and create empty tables
+db.drop_all()
+db.create_all()
 from views import *
 from create_db import *
 
@@ -19,9 +22,11 @@ class PasswordResetTests(unittest.TestCase):
     def setUp(self):
         '''Pre-test setup.'''
         app.config['TESTING'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'tmp/test.db')
+        app.config['MAIL_SUPPRESS_SEND'] = True
+        app.config['CSRF_ENABLED'] = False
+        app.config['WTF_CSRF_ENABLED'] = False
+        
         self.app = app.test_client()
-        db.drop_all()
         db.create_all()
         user = User(username='user', \
                     email='admin@example.com', \
@@ -61,7 +66,7 @@ class PasswordResetTests(unittest.TestCase):
                 username='user',
                 email='fakeuser@example.com'
             ), follow_redirects=True)
-        self.assertIn('No account with that username/email combinat', rv.data)
+        self.assertIn('Invalid username email combination', rv.data)
 
     def test_resetpassword_fail_pw_mismatch(self):
         rv = self.app.get('/resetpassword', data=dict(username='user',

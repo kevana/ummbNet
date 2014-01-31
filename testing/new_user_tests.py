@@ -11,6 +11,9 @@ from async import *
 from email import *
 from functions import *
 from models import *
+# Nuke the db and create new tables
+db.drop_all()
+db.create_all()
 from views import *
 from create_db import *
 
@@ -18,9 +21,8 @@ class NewUserTests(unittest.TestCase):
     '''Create new users.'''
     def setUp(self):
         '''Pre-test setup.'''
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'tmp/test.db')
+        app.config['MAIL_SUPPRESS_SEND'] = True
         self.app = app.test_client()
-        db.drop_all()
         db.create_all()
         db_insert_all()
 
@@ -31,48 +33,51 @@ class NewUserTests(unittest.TestCase):
 
     def test_newuser_all_instrs(self):
         rv = self.app.post('/newuser', data=dict({
-                        'username' : 'user',
-                        'email' : 'user@example.com',
-                        'password' : 'password',
+                        'username'   : 'user',
+                        'email'      : 'user@example.com',
+                        'password'   : 'password',
+                        'confirm'    : 'password',
                         'first_name' : 'User',
-                        'last_name' : 'Name',
-                        'nickname' : 'nickname',
-                        'Piccolo' : 'True',
-                        'Flute' : 'True',
-                        'Clarinet' : 'True',
-                        'Alto Sax' : 'True',
-                        'Tenor Sax' : 'True',
-                        'Trumpet' : 'True',
+                        'last_name'  : 'Name',
+                        'nickname'   : 'nickname',
+                        'Piccolo'    : 'True',
+                        'Flute'      : 'True',
+                        'Clarinet'   : 'True',
+                        'Alto Sax'   : 'True',
+                        'Tenor Sax'  : 'True',
+                        'Trumpet'    : 'True',
                         'Mellophone' : 'True',
-                        'Trombone' : 'True',
-                        'Baritone' : 'True',
-                        'Tuba' : 'True',
-                        'Drumline' : 'True'
+                        'Trombone'   : 'True',
+                        'Baritone'   : 'True',
+                        'Tuba'       : 'True',
+                        'Drumline'   : 'True'
                     }), follow_redirects=True)
         self.assertIn('Registration Complete', rv.data)
 
     def test_newuser_no_instrs(self):
         rv = self.app.post('/newuser', data=dict({
-                        'username' : 'user',
-                        'email' : 'user@example.com',
-                        'password' : 'password',
+                        'username'   : 'user',
+                        'email'      : 'user@example.com',
+                        'password'   : 'password',
+                        'confirm'    : 'password',
                         'first_name' : 'User',
-                        'last_name' : 'Name',
-                        'nickname' : 'nickname'
+                        'last_name'  : 'Name',
+                        'nickname'   : 'nickname'
                     }), follow_redirects=True)
         self.assertIn('Registration Complete', rv.data)
 
     def test_newuser_dupl_username(self):
         self.test_newuser_no_instrs()
         rv = self.app.post('/newuser', data=dict({
-                        'username' : 'user',
-                        'email' : 'user@example.com',
-                        'password' : 'password',
+                        'username'   : 'user',
+                        'email'      : 'user@example.com',
+                        'password'   : 'password',
+                        'confirm'    : 'password',
                         'first_name' : 'User',
-                        'last_name' : 'Name',
-                        'nickname' : 'nickname'
+                        'last_name'  : 'Name',
+                        'nickname'   : 'nickname'
                     }), follow_redirects=True)
-        self.assertIn('Account creation failed: database error', rv.data)
+        self.assertIn('This username is taken.', rv.data)
 
 if __name__ == '__main__':
     try:

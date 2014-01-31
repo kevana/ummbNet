@@ -2,6 +2,6 @@
 Please follow the link below to reset your password. 
 If you encounter problems, manually copy and paste the link in your browser.</p>
 
-<a href="{{ url_for('reset_pw', username=user.username, k=key, _external=True) }}">
-  {{ url_for('reset_pw', username=user.username, k=key, _external=True) }}
+<a href="{{ url_for('set_pw', username=user.username, k=key, _external=True) }}">
+  {{ url_for('set_pw', username=user.username, k=key, _external=True) }}
 </a>

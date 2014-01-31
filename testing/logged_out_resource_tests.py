@@ -11,14 +11,16 @@ from async import *
 from email import *
 from functions import *
 from models import *
+# Nuke the db and create new tables
+db.drop_all()
+db.create_all()
 from views import *
 
 class LoggedOutResourceTests(unittest.TestCase):
     '''Test route access for users that are not logged in.'''
     def setUp(self):
         '''Pre-test setup.'''
-        #self.assertFalse(app.config['TESTING'])
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'tmp/test.db')
+        app.config['MAIL_SUPPRESS_SEND'] = True
         self.app = app.test_client()
         db.create_all()
 
@@ -40,13 +42,13 @@ class LoggedOutResourceTests(unittest.TestCase):
 
     # Test redirects to resources that require a logged-in user
     def test_logout(self):
-        self.assert_get_status_code('/logout', 302)
+        self.assert_get_status_code('/logout', 200)
 
     def test_resetpassword(self):
         self.assert_get_status_code('/resetpassword', 200)
 
     def test_setpassword(self):
-        self.assert_get_status_code('/setpassword', 405)
+        self.assert_get_status_code('/setpassword', 200)
 
     def test_users(self):
         self.assert_get_status_code('/users', 301)

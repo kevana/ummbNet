@@ -5,36 +5,39 @@
   <h2>Create a new request</h2>
   {% if error %}<p class=error><strong>Error:</strong></p> {{ error }}{% endif %}
   <form role="form" action="{{ url_for('newrequest') }}" method='POST'>
-    <div class="form-group">
-      <label for="band">Band:</label>
-        <select class="form-control" name="band" id="band">
-          {% for band in bands %}
-          <option value="{{ band.id }}">{{ band.name }}</option>
-          {% endfor %}
-        </select>
+    {{ form.hidden_tag() }}
+    <div class="form-group col-xs-7 col-sm-6 col-md-5 col-lg-4 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+      {{ form.band_id.label }}
+      {{ form.band_id(class='form-control') }}
+      {% for error in form.errors.band_id %}
+        <span class="alert-danger">{{ error }}</span>
+      {% endfor %}
     </div>
-    <div class="form-group">
-      <label for="event">Event:</label>
-        <select class="form-control" name="event" id="event">
-          {% for event in events %}
-            <option value="{{ event.id }}">{{ event.event_type.name }} {{ event.date.strftime('%a %b %d, %I:%M%p') }}</option>
-          {% endfor %}
-        </select>
+    <div class="form-group col-xs-7 col-sm-6 col-md-5 col-lg-4 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+      {{ form.event_id.label }}
+      {{ form.event_id(class='form-control') }}
+      {% for error in form.errors.event_id %}
+        <span class="alert-danger">{{ error }}</span>
+      {% endfor %}
     </div>
-    <div class="form-group">
-      <label for="instrument">Instrument</label>
-        <select class="form-control" name="instrument" id="instrument">
-          {% for instr in instruments %}
-          <option value="{{ instr.id }}">{{ instr.name }}</option>
-          {% endfor %}
-        </select>
+    <div class="form-group col-xs-7 col-sm-6 col-md-5 col-lg-4 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+      {{ form.instrument.label }}
+      {{ form.instrument(class='form-control') }}
+      {% for error in form.errors.instrument %}
+        <span class="alert-danger">{{ error }}</span>
+      {% endfor %}
     </div>
-    <div class="form-group">
-      <label for="part">Part:</label>
-      <input type="text" class="form-control" name="part" id="part">
+    <div class="form-group col-xs-7 col-sm-6 col-md-5 col-lg-4 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+      {{ form.part.label }}
+      {{ form.part(class='form-control', placeholder='Part') }}
+      {% for error in form.errors.part %}
+        <span class="alert-danger">{{ error }}</span>
+      {% endfor %}
     </div>
+    <div class="col-xs-7 col-sm-6 col-md-4 col-lg-5 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
       <button type="button" class="btn btn-default" onclick="location.href='{{ url_for('requests') }}'">Back to Requests</button>
       <button type="submit" class="btn btn-primary">Create Request</button>
+    </div>
   </form>
 </div>
 {% endblock %}
