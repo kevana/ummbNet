@@ -171,7 +171,7 @@ def verify_email():
 @login_required
 def requests():
     '''Route to Requests Collection.'''
-    requests = Request.query.filter(Request.sub == None).all()
+    requests = Request.get_open_reqs()
     user = g.user
     return render_template('requests.html', requests=requests, user=user)
 
@@ -225,7 +225,7 @@ def events():
     '''Route to Events collection.'''
     user = g.user
     if user.is_director or user.is_admin:
-        events = Event.query.all()
+        events = Event.get_future_events()
         return render_template('events.html', events=events, user=user)
     abort(404)
 

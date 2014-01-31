@@ -109,6 +109,13 @@ class Request(db.Model):
     def __repr__(self):
         return '<Request Event: %r Posted by: %r>' % \
             (self.event_id, self.poster)
+    
+    @staticmethod
+    def get_open_reqs():
+        return Request.query.filter(Request.sub == None).\
+                join(Request.event).\
+                filter(Event.date > datetime.utcnow()).\
+                order_by(Event.date).all()
 
 class Band(db.Model):
     '''Represent which band the request is for.'''
@@ -150,7 +157,7 @@ class Event(db.Model):
     
     @staticmethod # Event.get_current()
     def get_future_events():
-        return Event.query.filter(Event.date > datetime.utcnow()).all()
+        return Event.query.filter(Event.date > datetime.utcnow()).order_by(Event.date).all()
 
 class EventType(db.Model):
     '''Represent the type of band event.'''
