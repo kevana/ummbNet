@@ -101,21 +101,22 @@ def set_pw():
 @login_required
 def users():
     '''Route to users collection.'''
-    users = User.query.all()
     user = g.user
-    return render_template('users.html', users=users, user=user)
+    if user.is_director or user.is_admin:
+        users = User.query.all()
+        return render_template('users.html', users=users, user=user)
+    abort(404)
 
 @app.route('/users/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
     '''Route to a particular user.'''
-    user = User.query.filter_by(username=username).first()
-    if user:
-        return render_template('user.html', user=user, \
-                                requests=user.posted_requests.all(), \
-                                instruments=user.instruments, \
-                                filled_reqs=user.filled_requests.all())
-    return render_template('404.html')
+    user = g.user
+    if user.is_director or user.is_admin:
+        page_user = User.query.filter_by(username=username).first()
+        if page_user:
+            return render_template('user.html', user=user, page_user=page_user)
+    abort(404)
 
 @app.route('/newuser', methods=['GET', 'POST'])
 def newuser():

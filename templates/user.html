@@ -2,14 +2,14 @@
 {% block title %} - {{ user.username }}{% endblock %}
 {% block content %}
 <div class="container">
-  <h1>{{ user.username }}</h1>
-  <p>First Name: {{ user.first_name }}<br>
-     Last Name: {{ user.last_name }}<br>
-     Nickname: {{ user.nickname }}<br>
-     Email: {{ user.email }}</p>
+  <h1>{{ page_user.username }}</h1>
+  <p>First Name: {{ page_user.first_name }}<br>
+     Last Name: {{ page_user.last_name }}<br>
+     Nickname: {{ page_user.nickname }}<br>
+     Email: {{ page_user.email }}</p>
   <h2>Instruments</h2>
   <ul>
-  {% for instrument in instruments %}
+  {% for instrument in page_user.instruments %}
     <li>{{ instrument.name }}</li>
   {% else %}
     <li><em>No instruments found</em></li>
@@ -18,7 +18,7 @@
   <div class="panel panel-primary">
     <div class="panel-heading">Requests</div>
     <div class="panel-body">
-      {% if requests %}
+      {% if page_user.posted_requests %}
       <table id="requests" class="table">
         <thead>
           <tr>
@@ -30,7 +30,7 @@
           </tr>
         </thead>
         <tbody>
-        {% for req in requests %}
+        {% for req in page_user.posted_requests %}
           <tr>
             <td>{{ req.event.date.strftime('%a %b %d, %I:%M%p') }}</td>
             <td>{{ req.event.event_type.name }}</td>
@@ -49,7 +49,7 @@
   <div class="panel panel-primary">
     <div class="panel-heading">Subbing for</div>
     <div class="panel-body">
-      {% if filled_reqs %}
+      {% if page_user.filled_requests %}
       <table id="filled_reqs" class="table">
         <thead>
           <tr>
@@ -62,7 +62,7 @@
           </tr>
         </thead>
         <tbody>
-        {% for req in filled_reqs %}
+        {% for req in page_user.filled_requests %}
           <tr>
             <td>{{ req.event.date.strftime('%a %b %d, %I:%M%p') }}</td>
             <td>{{ req.event.event_type.name }}</td>
