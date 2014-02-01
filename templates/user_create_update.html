@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %} - New User{% endblock %}
+{% block content %}
+<div class="container">
+  <h2>{% if user %}Update your account{% else %}Register a new user{% endif %}</h2>
+  {% if error %}<p class=error><strong>Error:</strong></p> {{ error }}{% endif %}
+  <form action="{% if user %}{{ url_for('user_edit', username=user.username) }}{% else %}{{ url_for('user_new') }}{% endif %}" method='POST'>
+    {{ form.hidden_tag() }}
+    {% if form.username %}
+      <div class="form-group col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+        {{ form.username.label }}
+        {{ form.username(class='form-control', placeholder='Username') }}
+        {% for error in form.errors.username %}
+          <span class="alert-danger">{{ error }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% if form.email %}
+      <div class="form-group col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+        {{ form.email.label }}
+        {{ form.email(class='form-control', placeholder='Email address') }}
+        {% for error in form.errors.email %}
+          <span class="alert-danger">{{ error }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% if form.password %}
+      <div class="form-group col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+        {{ form.password.label }}
+        {{ form.password(class='form-control', placeholder='Password') }}
+        {% for error in form.errors.password %}
+          <span class="alert-danger">{{ error }}</span>
+        {% endfor %}
+      </div>
+      <div class="form-group col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+        {{ form.confirm.label }}
+        {{ form.confirm(class='form-control', placeholder='Password') }}
+        {% for error in form.errors.confirm %}
+          <span class="alert-danger">{{ error }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div class="form-group col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+      {{ form.first_name.label }}
+      {{ form.first_name(class='form-control', placeholder='First Name') }}
+      {% for error in form.errors.first_name %}
+        <span class="alert-danger">{{ error }}</span>
+      {% endfor %}
+    </div>
+    <div class="form-group col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+      {{ form.last_name.label }}
+      {{ form.last_name(class='form-control', placeholder='Last Name') }}
+      {% for error in form.errors.last_name %}
+        <span class="alert-danger">{{ error }}</span>
+      {% endfor %}
+    </div>
+    <div class="form-group col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+      {{ form.nickname.label }}
+      {{ form.nickname(class='form-control', placeholder='Nickname') }}
+      {% for error in form.errors.nickname %}
+        <span class="alert-danger">{{ error }}</span>
+      {% endfor %}
+    </div>
+    <div class="form-group col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+      {{ form.instruments.label }}
+      {{ form.instruments(class='form-control') }}
+      {% for error in form.errors.instruments %}
+        <span class="alert-danger">{{ error }}</span>
+      {% endfor %}
+    </div>
+    <div class="col-xs-7 col-sm-5 col-md-4 col-lg-3 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
+      <button type="submit" class="btn btn-primary">{% if user %}Update Account{% else %}Create Account{% endif %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

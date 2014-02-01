@@ -13,7 +13,7 @@ from emails import *
 from functions import *
 from models import *
 from forms import (LoginForm, PasswordResetForm, SetPasswordForm, 
-                    NewUserForm, NewRequestForm, EventForm)
+                    UserForm, NewRequestForm, EventForm)
 
 
 @app.before_request
@@ -113,7 +113,7 @@ def user_new():
     if user is not None and user.is_authenticated():
             return redirect(url_for('index'))
 
-    form = NewUserForm()
+    form = UserForm()
     if form.validate_on_submit():
         username = form.username.data
         email = form.email.data
@@ -136,7 +136,7 @@ def user_new():
             form.errors['username'] = ['This username is taken.']
         if not email_avail:
             form.errors['email'] = ['This email address is taken.']
-    return render_template('newuser.html', user=None, form=form)
+    return render_template('user_create_update.html', user=None, form=form)
 
 @app.route('/users/<username>', methods=['GET', 'POST'])
 @login_required
@@ -147,6 +147,33 @@ def user(username):
     if user.is_director or user.is_admin or user == page_user:
         if page_user:
             return render_template('user.html', user=user, page_user=page_user)
+    abort(404)
+
+@app.route('/users/<username>/edit', methods=['GET', 'POST'])
+@login_required
+def user_edit(username):
+    user = g.user
+    edit_user = User.query.filter_by(username=username).first()
+    if user == edit_user:
+        form = UserForm()
+        del form.username
+        del form.email
+        del form.password
+        del form.confirm
+        if form.validate_on_submit():
+            edit_user.first_name = form.first_name.data
+            edit_user.last_name = form.last_name.data
+            edit_user.nickname = form.nickname.data
+            edit_user.instruments = get_form_instr(form)
+            db.session.commit()
+            return redirect(url_for('user', username=username))
+
+        form.first_name.data = user.first_name
+        form.last_name.data = user.last_name
+        form.nickname.data = user.nickname
+        form.instruments.data = user.instruments
+        return render_template('user_create_update.html', form=form, user=user)
+
     abort(404)
 
 @app.route('/requests')

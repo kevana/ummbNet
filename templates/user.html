@@ -85,6 +85,7 @@
       {% endif %}
     </div>
   </div>
+  <button type="button" class="btn btn-default btn-primary" onclick="location.href='{{ url_for('user_edit', username=user.username) }}'">Edit Account</button>
   <p><a href="{{ url_for('index') }}">home</a></p>
 </div>
 {% endblock %}

@@ -50,7 +50,7 @@ class SetPasswordForm(Form):
                                     message='Passwords must match')])
     username = HiddenField('username')
 
-class NewUserForm(Form):
+class UserForm(Form):
     '''Form for new user screen.'''
     username = TextField('Username:', validators=[Required()])
     email = TextField('Email:', validators=[Required(), Email()])

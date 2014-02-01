@@ -77,7 +77,7 @@ class LoggedInResourceTests(unittest.TestCase):
         self.assert_get_status_code('/users/', 404)
 
     def test_user(self):
-        self.assert_get_status_code('/users/user', 404)
+        self.assert_get_status_code('/users/user', 200)
 
     def test_user_new(self):
         self.assert_get_status_code('/users/new', 302)
@@ -90,7 +90,7 @@ class LoggedInResourceTests(unittest.TestCase):
         self.assert_get_status_code('/requests/', 200)
 
     def test_request(self):
-        self.assert_get_status_code('/requests/request_id', 200)
+        self.assert_get_status_code('/requests/request_id', 404)
     
     def test_request_confirm_add(self):
         self.assert_get_status_code('/requests/request_id/pickup/confirm', 302)
