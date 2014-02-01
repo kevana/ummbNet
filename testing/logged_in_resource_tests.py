@@ -92,8 +92,8 @@ class LoggedInResourceTests(unittest.TestCase):
     def test_request(self):
         self.assert_get_status_code('/requests/request_id', 200)
 
-    def test_newrequest(self):
-        self.assert_get_status_code('/newrequest', 200)
+    def test_request_new(self):
+        self.assert_get_status_code('/requests/new', 200)
 
     def test_events(self):
         self.assert_get_status_code('/events', 301)

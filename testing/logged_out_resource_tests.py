@@ -70,8 +70,8 @@ class LoggedOutResourceTests(unittest.TestCase):
     def test_request(self):
         self.assert_get_status_code('/requests/request_id', 302)
 
-    def test_newrequest(self):
-        self.assert_get_status_code('/newrequest', 302)
+    def test_request_new(self):
+        self.assert_get_status_code('/requests/new', 302)
 
     def test_events(self):
         self.assert_get_status_code('/events', 301)

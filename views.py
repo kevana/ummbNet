@@ -194,9 +194,9 @@ def req(request_id):
         return redirect(url_for('index', message='Success'))
     return render_template('404.html', user=user)
 
-@app.route('/newrequest', methods=['GET', 'POST'])
+@app.route('/requests/new', methods=['GET', 'POST'])
 @login_required
-def newrequest():
+def request_new():
     '''Add a new request.'''
     user = g.user
     form = NewRequestForm()
