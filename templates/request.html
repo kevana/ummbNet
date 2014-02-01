@@ -22,8 +22,11 @@
     {% endif %}
   </p>
   <button type="button" class="btn btn-default btn-sm" onclick="location.href='{{ url_for('requests') }}'">Back to Requests</button>
-  {% if not req.sub %}
-  <button type="button" class="btn btn-default btn-primary" onclick="location.href='{{ url_for('req_pickup_confirm', request_id=req.id) }}'">Pick up</button>
+  {% if req.poster != user and not req.sub %}
+    <button type="button" class="btn btn-default btn-primary" onclick="location.href='{{ url_for('req_pickup_confirm', request_id=req.id) }}'">Pick up</button>
+  {% endif %}
+  {% if user == req.poster or user.is_admin or user.is_director %}
+    <button type="button" class="btn btn-default alert-danger" onclick="location.href='{{ url_for('req_delete_confirm', request_id=req.id) }}'">Delete</button>
   {% endif %}
   <p><a href="{{ url_for('index') }}">home</a></p>
 </div>

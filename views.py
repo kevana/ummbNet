@@ -112,8 +112,8 @@ def users():
 def user(username):
     '''Route to a particular user.'''
     user = g.user
-    if user.is_director or user.is_admin:
-        page_user = User.query.filter_by(username=username).first()
+    page_user = User.query.filter_by(username=username).first()
+    if user.is_director or user.is_admin or user == page_user:
         if page_user:
             return render_template('user.html', user=user, page_user=page_user)
     abort(404)
@@ -185,7 +185,7 @@ def req(request_id):
         req = Request.query.get(request_id)
         if req:
             return render_template('request.html', req=req, user=user)
-        return render_template('404.html', user=user)
+        abort(404)
     req = Request.query.filter_by(id=request_id).first()
     if req:
         if not req.sub:
@@ -193,15 +193,36 @@ def req(request_id):
             db.session.commit()
             send_req_pickup_emails(req)
         return redirect(url_for('req', request_id=req.id))
-    return render_template('404.html', user=user)
+    abort(404)
 
-@app.route('/requests/<request_id>/pickup/confirm', methods=['GET', 'POST'])
+@app.route('/requests/<request_id>/pickup/confirm')
+@login_required
 def req_pickup_confirm(request_id):
     user = g.user
     req = Request.query.get(request_id)
     if not req or req.sub:
         return redirect(url_for('requests'))
     return render_template('pickup-req-confirm.html', req=req, user=user)
+
+@app.route('/requests/<request_id>/delete/confirm')
+@login_required
+def req_delete_confirm(request_id):
+    user = g.user
+    req = Request.query.get(request_id)
+    if req and (user == req.poster or user.is_admin or user.is_director):
+        return render_template('req_delete_confirm.html', req=req, user=user)
+    return redirect(url_for('req', request_id=req.id))
+
+@app.route('/requests/<request_id>/delete', methods=['POST'])
+@login_required
+def req_delete(request_id):
+    user = g.user
+    req = Request.query.get(request_id)
+    if req and (user == req.poster or user.is_admin or user.is_director):
+        db.session.delete(req)
+        db.session.commit()
+        return redirect(url_for('requests'))
+    return redirect(url_for('req', request_id=req.id))
 
 @app.route('/requests/new', methods=['GET', 'POST'])
 @login_required
