@@ -118,8 +118,8 @@ def user(username):
             return render_template('user.html', user=user, page_user=page_user)
     abort(404)
 
-@app.route('/newuser', methods=['GET', 'POST'])
-def newuser():
+@app.route('/users/new', methods=['GET', 'POST'])
+def user_new():
     user = g.user
     if user is not None and user.is_authenticated():
             return redirect(url_for('index'))

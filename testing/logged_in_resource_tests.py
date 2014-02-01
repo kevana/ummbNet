@@ -79,8 +79,8 @@ class LoggedInResourceTests(unittest.TestCase):
     def test_user(self):
         self.assert_get_status_code('/users/user', 404)
 
-    def test_newuser(self):
-        self.assert_get_status_code('/newuser', 302)
+    def test_user_new(self):
+        self.assert_get_status_code('/users/new', 302)
 
     def test_verify(self):
         self.assert_get_status_code('/verify', 200)

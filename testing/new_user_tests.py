@@ -31,8 +31,8 @@ class NewUserTests(unittest.TestCase):
         db.session.remove()
         db.drop_all()
 
-    def test_newuser_all_instrs(self):
-        rv = self.app.post('/newuser', data=dict({
+    def test_user_new_all_instrs(self):
+        rv = self.app.post('/users/new', data=dict({
                         'username'   : 'user',
                         'email'      : 'user@example.com',
                         'password'   : 'password',
@@ -54,8 +54,8 @@ class NewUserTests(unittest.TestCase):
                     }), follow_redirects=True)
         self.assertIn('Registration Complete', rv.data)
 
-    def test_newuser_no_instrs(self):
-        rv = self.app.post('/newuser', data=dict({
+    def test_user_new_no_instrs(self):
+        rv = self.app.post('/users/new', data=dict({
                         'username'   : 'user',
                         'email'      : 'user@example.com',
                         'password'   : 'password',
@@ -66,9 +66,9 @@ class NewUserTests(unittest.TestCase):
                     }), follow_redirects=True)
         self.assertIn('Registration Complete', rv.data)
 
-    def test_newuser_dupl_username(self):
-        self.test_newuser_no_instrs()
-        rv = self.app.post('/newuser', data=dict({
+    def test_user_new_dupl_username(self):
+        self.test_user_new_no_instrs()
+        rv = self.app.post('/users/new', data=dict({
                         'username'   : 'user',
                         'email'      : 'user@example.com',
                         'password'   : 'password',
