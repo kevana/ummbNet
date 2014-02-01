@@ -191,8 +191,16 @@ def req(request_id):
         req.sub = g.user
         db.session.commit()
         send_req_pickup_emails(req)
-        return redirect(url_for('index', message='Success'))
+        return redirect(url_for('req', request_id=req.id))
     return render_template('404.html', user=user)
+
+@app.route('/requests/<request_id>/pickup/confirm', methods=['GET', 'POST'])
+def req_pickup_confirm(request_id):
+    user = g.user
+    req = Request.query.get(request_id)
+    if not req or req.sub:
+        return redirect(url_for('requests'))
+    return render_template('pickup-req-confirm.html', req=req, user=user)
 
 @app.route('/requests/new', methods=['GET', 'POST'])
 @login_required
@@ -289,17 +297,3 @@ def event_edit(event_id):
             return render_template('create_update_event.html', form=form, user=user)
             
     abort(404)
-
-@app.route('/confirm')
-@login_required
-def confirm():
-    '''Confirm an action.'''
-    user = g.user
-    if request.args.get('action') == 'pickup':
-        req_id = request.args['request_id']
-        req = Request.query.get(req_id)
-        if not req or req.sub:
-            return redirect(url_for('requests'))
-        return render_template('pickup-req-confirm.html', req=req, user=user)
-    error = 'Nothing to confirm'
-    return redirect(url_for('index', error=error))

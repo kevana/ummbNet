@@ -32,7 +32,7 @@
         <td>{{ req.instrument.name }}</td>
         <td>{{ req.part }}</td>
         <td><a href="{{ url_for('req', request_id=req.id) }}">Details</a></td>
-        <td><a href="{{ url_for('confirm', action='pickup', request_id=req.id) }}">Pickup</a></td>
+        <td><a href="{{ url_for('req_pickup_confirm', request_id=req.id) }}">Pickup</a></td>
       </tr>
     {% endfor %}
   </tbody>
