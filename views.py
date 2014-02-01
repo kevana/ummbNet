@@ -107,17 +107,6 @@ def users():
         return render_template('users.html', users=users, user=user)
     abort(404)
 
-@app.route('/users/<username>', methods=['GET', 'POST'])
-@login_required
-def user(username):
-    '''Route to a particular user.'''
-    user = g.user
-    page_user = User.query.filter_by(username=username).first()
-    if user.is_director or user.is_admin or user == page_user:
-        if page_user:
-            return render_template('user.html', user=user, page_user=page_user)
-    abort(404)
-
 @app.route('/users/new', methods=['GET', 'POST'])
 def user_new():
     user = g.user
@@ -149,24 +138,16 @@ def user_new():
             form.errors['email'] = ['This email address is taken.']
     return render_template('newuser.html', user=None, form=form)
 
-@app.route('/verify')
-def verify_email():
-    username = request.args.get('username')
-    key = request.args.get('k')
-    user = User.query.filter_by(username=username).first()
-    
-    if user and user.email_verify_key != None and user.email_verify_key == key:
-        user.email_verify_key = None
-        user.enabled = True
-        db.session.commit()
-        if session.get('logged_in') == True:
-            user = g.user
-            return render_template('verified.html', success=True, user=user)
-        return render_template('verified.html', success=True)
-    if session.get('logged_in') == True:
-        user = g.user
-        return render_template('verified.html', success=False, user=user)
-    return render_template('verified.html', success=False)
+@app.route('/users/<username>', methods=['GET', 'POST'])
+@login_required
+def user(username):
+    '''Route to a particular user.'''
+    user = g.user
+    page_user = User.query.filter_by(username=username).first()
+    if user.is_director or user.is_admin or user == page_user:
+        if page_user:
+            return render_template('user.html', user=user, page_user=page_user)
+    abort(404)
 
 @app.route('/requests')
 @login_required
@@ -175,54 +156,6 @@ def requests():
     requests = Request.get_open_reqs()
     user = g.user
     return render_template('requests.html', requests=requests, user=user)
-
-@app.route('/requests/<request_id>', methods=['GET', 'POST'])
-@login_required
-def req(request_id):
-    '''Route to a particular request.'''
-    user = g.user
-    if request.method == 'GET':
-        req = Request.query.get(request_id)
-        if req:
-            return render_template('request.html', req=req, user=user)
-        abort(404)
-    req = Request.query.filter_by(id=request_id).first()
-    if req:
-        if not req.sub:
-            req.sub = g.user
-            db.session.commit()
-            send_req_pickup_emails(req)
-        return redirect(url_for('req', request_id=req.id))
-    abort(404)
-
-@app.route('/requests/<request_id>/pickup/confirm')
-@login_required
-def req_pickup_confirm(request_id):
-    user = g.user
-    req = Request.query.get(request_id)
-    if not req or req.sub:
-        return redirect(url_for('requests'))
-    return render_template('pickup-req-confirm.html', req=req, user=user)
-
-@app.route('/requests/<request_id>/delete/confirm')
-@login_required
-def req_delete_confirm(request_id):
-    user = g.user
-    req = Request.query.get(request_id)
-    if req and (user == req.poster or user.is_admin or user.is_director):
-        return render_template('req_delete_confirm.html', req=req, user=user)
-    return redirect(url_for('req', request_id=req.id))
-
-@app.route('/requests/<request_id>/delete', methods=['POST'])
-@login_required
-def req_delete(request_id):
-    user = g.user
-    req = Request.query.get(request_id)
-    if req and (user == req.poster or user.is_admin or user.is_director):
-        db.session.delete(req)
-        db.session.commit()
-        return redirect(url_for('requests'))
-    return redirect(url_for('req', request_id=req.id))
 
 @app.route('/requests/new', methods=['GET', 'POST'])
 @login_required
@@ -250,6 +183,54 @@ def request_new():
 
     return render_template('newRequest.html', form=form, user=user)
 
+@app.route('/requests/<request_id>', methods=['GET', 'POST'])
+@login_required
+def req(request_id):
+    '''Route to a particular request.'''
+    user = g.user
+    if request.method == 'GET':
+        req = Request.query.get(request_id)
+        if req:
+            return render_template('request.html', req=req, user=user)
+        abort(404)
+    req = Request.query.filter_by(id=request_id).first()
+    if req:
+        if not req.sub:
+            req.sub = g.user
+            db.session.commit()
+            send_req_pickup_emails(req)
+        return redirect(url_for('req', request_id=req.id))
+    abort(404)
+
+@app.route('/requests/<request_id>/delete', methods=['POST'])
+@login_required
+def req_delete(request_id):
+    user = g.user
+    req = Request.query.get(request_id)
+    if req and (user == req.poster or user.is_admin or user.is_director):
+        db.session.delete(req)
+        db.session.commit()
+        return redirect(url_for('requests'))
+    return redirect(url_for('req', request_id=req.id))
+
+@app.route('/requests/<request_id>/pickup/confirm')
+@login_required
+def req_pickup_confirm(request_id):
+    user = g.user
+    req = Request.query.get(request_id)
+    if not req or req.sub:
+        return redirect(url_for('requests'))
+    return render_template('pickup-req-confirm.html', req=req, user=user)
+
+@app.route('/requests/<request_id>/delete/confirm')
+@login_required
+def req_delete_confirm(request_id):
+    user = g.user
+    req = Request.query.get(request_id)
+    if req and (user == req.poster or user.is_admin or user.is_director):
+        return render_template('req_delete_confirm.html', req=req, user=user)
+    return redirect(url_for('req', request_id=req.id))
+
 @app.route('/events/')
 @login_required
 def events():
@@ -258,20 +239,6 @@ def events():
     if user.is_director or user.is_admin:
         events = Event.get_future_events()
         return render_template('events.html', events=events, user=user)
-    abort(404)
-
-@app.route('/events/<event_id>')
-@login_required
-def event(event_id):
-    '''Route to a particular event.'''
-    user = g.user
-    if user.is_director or user.is_admin:
-        if request.method == 'GET':
-            event = Event.query.get(event_id)
-            if event:
-                return render_template('event.html', event=event, user=user)
-            abort(404)
-        return 'POST unimplemented'
     abort(404)
 
 @app.route('/events/new', methods=['GET', 'POST'])
@@ -297,6 +264,20 @@ def event_new():
         return render_template('create_update_event.html', form=form, user=user)
     abort(404)
 
+@app.route('/events/<event_id>')
+@login_required
+def event(event_id):
+    '''Route to a particular event.'''
+    user = g.user
+    if user.is_director or user.is_admin:
+        if request.method == 'GET':
+            event = Event.query.get(event_id)
+            if event:
+                return render_template('event.html', event=event, user=user)
+            abort(404)
+        return 'POST unimplemented'
+    abort(404)
+
 @app.route('/events/<event_id>/edit', methods=['GET', 'POST'])
 @login_required
 def event_edit(event_id):
@@ -319,3 +300,22 @@ def event_edit(event_id):
             return render_template('create_update_event.html', form=form, user=user)
             
     abort(404)
+
+@app.route('/verify')
+def verify_email():
+    username = request.args.get('username')
+    key = request.args.get('k')
+    user = User.query.filter_by(username=username).first()
+    
+    if user and user.email_verify_key != None and user.email_verify_key == key:
+        user.email_verify_key = None
+        user.enabled = True
+        db.session.commit()
+        if session.get('logged_in') == True:
+            user = g.user
+            return render_template('verified.html', success=True, user=user)
+        return render_template('verified.html', success=True)
+    if session.get('logged_in') == True:
+        user = g.user
+        return render_template('verified.html', success=False, user=user)
+    return render_template('verified.html', success=False)
