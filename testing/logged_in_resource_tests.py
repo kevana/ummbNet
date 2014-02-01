@@ -102,8 +102,8 @@ class LoggedInResourceTests(unittest.TestCase):
     def test_event(self):
         self.assert_get_status_code('/events/event_id', 404)
 
-    def test_newevent(self):
-        self.assert_get_status_code('/newevent', 404)
+    def test_event_new(self):
+        self.assert_get_status_code('/events/new', 404)
 
     def test_event_edit(self):
         self.assert_get_status_code('/event//edit', 404)

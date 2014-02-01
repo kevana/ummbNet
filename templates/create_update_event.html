@@ -4,7 +4,7 @@
 <div class="container">
   <h2>{% if form.date.data %}Update{% else %}Create a new{% endif %} event</h2>
   {% if error %}<p class=error><strong>Error:</strong></p> {{ error }}{% endif %}
-  <form action="{% if form.event_id.data %}{{ url_for('event_edit', event_id=form.event_id.data) }}{% else %}{{ url_for('newevent') }}{% endif %}" method='POST'>
+  <form action="{% if form.event_id.data %}{{ url_for('event_edit', event_id=form.event_id.data) }}{% else %}{{ url_for('event_new') }}{% endif %}" method='POST'>
     {{ form.hidden_tag() }}
     <div class="form-group col-xs-7 col-sm-6 col-md-5 col-lg-4 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
       {{ form.date.label }}

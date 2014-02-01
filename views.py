@@ -244,9 +244,9 @@ def event(event_id):
         return 'POST unimplemented'
     abort(404)
 
-@app.route('/newevent', methods=['GET', 'POST'])
+@app.route('/events/new', methods=['GET', 'POST'])
 @login_required
-def newevent():
+def event_new():
     '''Add a new Event.'''
     user = g.user
     if user.is_director or user.is_admin:
