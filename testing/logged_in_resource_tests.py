@@ -91,6 +91,9 @@ class LoggedInResourceTests(unittest.TestCase):
 
     def test_request(self):
         self.assert_get_status_code('/requests/request_id', 200)
+    
+    def test_request_confirm_add(self):
+        self.assert_get_status_code('/requests/request_id/pickup/confirm', 302)
 
     def test_request_new(self):
         self.assert_get_status_code('/requests/new', 200)
@@ -108,8 +111,6 @@ class LoggedInResourceTests(unittest.TestCase):
     def test_event_edit(self):
         self.assert_get_status_code('/event//edit', 404)
 
-    def test_confirm(self):
-        self.assert_get_status_code('/confirm', 302)
 
 if __name__ == '__main__':
     try:
