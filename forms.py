@@ -6,6 +6,7 @@ from flask.ext.wtf import Form
 from wtforms import (TextField, BooleanField, PasswordField,
                     HiddenField, SelectField, SelectMultipleField)
 from wtforms.fields.html5 import DateTimeLocalField
+from wtforms_components import TimeField
 from wtforms.validators import Required, EqualTo, Email, ValidationError
 
 from app import db
@@ -49,7 +50,7 @@ class SetPasswordForm(Form):
                                     message='Passwords must match')])
     username = HiddenField('username')
 
-class NewUserForm(Form):
+class UserForm(Form):
     '''Form for new user screen.'''
     username = TextField('Username:', validators=[Required()])
     email = TextField('Email:', validators=[Required(), Email()])
@@ -81,8 +82,13 @@ class EventForm(Form):
     event_types = [(typ.id, typ.name) for typ in EventType.query.all()]
     
     event_id = HiddenField('event_id')
-    date = DateTimeLocalField('Date:', format='%Y-%m-%dT%H:%M')
+    date = DateTimeLocalField('Event Date:', format='%Y-%m-%dT%H:%M')
+    calltime = TimeField('Calltime:')
     band_id = SelectField('Band:', choices=bands, 
                         validators=[Required()], coerce=int)
     event_type_id = SelectField('Event Type:', choices=event_types, 
                         validators=[Required()], coerce=int)
+    
+    def validate_date(form, field):
+        if field.data and field.data < datetime.utcnow():
+            raise ValidationError('Event date must be in the future.')

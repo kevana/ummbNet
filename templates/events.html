@@ -7,21 +7,25 @@
   <table id="events" class="table">
     <thead>
       <tr>
-        <th>Date</th>
+        <th>Event Date</th>
+        <th>Calltime</th>
         <th>Band</th>
         <th>Event Type</th>
         <th>Details</th>
-        <th>Edit</th>
+        {% if user.is_director or user.is_admin %}<th>Edit</th>{% endif %}
       </tr>
     </thead>
     <tbody>
     {% for event in events %}
       <tr>
         <td>{{ event.date.strftime('%a %b %d, %I:%M%p') }}</td>
+        <td>{% if event.calltime %}{{ event.calltime.strftime('%I:%M%p') }}{% endif %}</td>
         <td>{{ event.band.name }}</td>
         <td>{{ event.event_type.name }}</td>
         <td><a href="{{ url_for('event', event_id=event.id) }}">Details</a></td>
-        <td><a href="{{ url_for('editevent', event_id=event.id) }}">Edit</a></td>
+        {% if user.is_director or user.is_admin %}
+          <td><a href="{{ url_for('event_edit', event_id=event.id) }}">Edit</a></td>
+        {% endif %}
       </tr>
     {% endfor %}
   </tbody>
@@ -29,7 +33,7 @@
   {% else %}
   <p><em>No events found.</p>
   {% endif %}
-  <p><a class="btn btn-primary btn-lg" role="button" href="{{ url_for('newevent') }}">Create Event</a></p>
+  <p><a class="btn btn-primary btn-lg" role="button" href="{{ url_for('event_new') }}">Create Event</a></p>
   <p><a href="{{ url_for('index') }}">home</a></p>
 </div>
 {% endblock %}

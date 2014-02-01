@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %} - Confirm Deletion{% endblock %}
+{% block content %}
+<div class="container">
+  <h1>Are you sure?</h1>
+  <p>Please review the details below and confirm that you want to delete this request</p>
+  <p>Band: {{ req.event.band.name }}<br>
+     Event: {{ req.event.event_type.name  }}<br>
+     Date: {{ req.event.date.strftime('%a %b %d, %I:%M%p') }}<br>
+     Instrument: {{ req.instrument.name }}<br>
+     Part: {{ req.part }}<br>
+     Poster: {% if req.poster.nickname %}
+              {{ req.poster.nickname }}
+              {% else %}
+              {{ req.poster.first_name }}
+              {% endif %}
+  </p
+  <p>
+  <form role="form" action="{{ url_for('req_delete', request_id=req.id) }}" method="POST">
+    <button type="button" class="btn btn-default btn-sm" onclick="location.href='{{ url_for('req', request_id=req.id) }}'">Cancel</button>
+    <button type="submit" class="btn alert-danger">Confirm Deletion</button>
+  </form>
+  </p>
+
+  <p><a href="{{ url_for('index') }}">home</a></p>
+</div>
+{% endblock %}

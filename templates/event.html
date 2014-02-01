@@ -4,6 +4,7 @@
 <div class="container">
   <h1>Event</h1>
   <p>Date: {{ event.date.strftime('%a %b %d, %I:%M%p') }}<br>
+     Calltime: {% if event.calltime %}{{ event.calltime.strftime('%I:%M%p') }}{% else %}TBD{% endif %}<br>
      Band: {{ event.band.name }}<br>
      Event Type: {{ event.event_type.name  }}<br>
   </p>
@@ -34,10 +35,10 @@
         {% endif %}
       </div>
   </div>
-  <form action="{{ url_for('editevent') }}" method="GET">
-    <input type="hidden" name="event_id" value="{{ event.id }}">
-    <button type="button" class="btn btn-default btn-sm" onclick="location.href='{{ url_for('events') }}'">Back to Events</button>
-    <button type="submit" class="btn btn-primary">Edit</button>
+  <button type="button" class="btn btn-default btn-sm" onclick="location.href='{{ url_for('events') }}'">Back to Events</button>
+  {% if user.is_director or user.is_admin %}
+    <button type="submit" class="btn btn-primary" onclick="location.href='{{ url_for('event_edit', event_id=event.id) }}'">Edit</button>
+  {% endif %}
   <p><a href="{{ url_for('index') }}">home</a></p>
 </div>
 {% endblock %}

@@ -57,8 +57,8 @@ class LoggedOutResourceTests(unittest.TestCase):
     def test_user(self):
         self.assert_get_status_code('/users/username', 302)
 
-    def test_newuser(self):
-        self.assert_get_status_code('/newuser', 200)
+    def test_user_new(self):
+        self.assert_get_status_code('/users/new', 200)
 
     def test_verify(self):
         self.assert_get_status_code('/verify', 200)
@@ -69,9 +69,12 @@ class LoggedOutResourceTests(unittest.TestCase):
 
     def test_request(self):
         self.assert_get_status_code('/requests/request_id', 302)
+    
+    def test_request_confirm_add(self):
+        self.assert_get_status_code('/requests/request_id/pickup/confirm', 302)
 
-    def test_newrequest(self):
-        self.assert_get_status_code('/newrequest', 302)
+    def test_request_new(self):
+        self.assert_get_status_code('/requests/new', 302)
 
     def test_events(self):
         self.assert_get_status_code('/events', 301)
@@ -80,14 +83,11 @@ class LoggedOutResourceTests(unittest.TestCase):
     def test_event(self):
         self.assert_get_status_code('/events/event_id', 302)
 
-    def test_newevent(self):
-        self.assert_get_status_code('/newevent', 302)
+    def test_event_new(self):
+        self.assert_get_status_code('/events/new', 302)
 
-    def test_editevent(self):
-        self.assert_get_status_code('/editevent', 302)
-
-    def test_confirm(self):
-        self.assert_get_status_code('/confirm', 302)
+    def test_event_edit(self):
+        self.assert_get_status_code('/event//edit', 404)
 
 if __name__ == '__main__':
     try:

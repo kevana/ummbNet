@@ -13,7 +13,7 @@ from emails import *
 from functions import *
 from models import *
 from forms import (LoginForm, PasswordResetForm, SetPasswordForm, 
-                    NewUserForm, NewRequestForm, EventForm)
+                    UserForm, NewRequestForm, EventForm)
 
 
 @app.before_request
@@ -107,24 +107,13 @@ def users():
         return render_template('users.html', users=users, user=user)
     abort(404)
 
-@app.route('/users/<username>', methods=['GET', 'POST'])
-@login_required
-def user(username):
-    '''Route to a particular user.'''
-    user = g.user
-    if user.is_director or user.is_admin:
-        page_user = User.query.filter_by(username=username).first()
-        if page_user:
-            return render_template('user.html', user=user, page_user=page_user)
-    abort(404)
-
-@app.route('/newuser', methods=['GET', 'POST'])
-def newuser():
+@app.route('/users/new', methods=['GET', 'POST'])
+def user_new():
     user = g.user
     if user is not None and user.is_authenticated():
             return redirect(url_for('index'))
 
-    form = NewUserForm()
+    form = UserForm()
     if form.validate_on_submit():
         username = form.username.data
         email = form.email.data
@@ -147,26 +136,45 @@ def newuser():
             form.errors['username'] = ['This username is taken.']
         if not email_avail:
             form.errors['email'] = ['This email address is taken.']
-    return render_template('newuser.html', user=None, form=form)
+    return render_template('user_create_update.html', user=None, form=form)
 
-@app.route('/verify')
-def verify_email():
-    username = request.args.get('username')
-    key = request.args.get('k')
-    user = User.query.filter_by(username=username).first()
-    
-    if user and user.email_verify_key != None and user.email_verify_key == key:
-        user.email_verify_key = None
-        user.enabled = True
-        db.session.commit()
-        if session.get('logged_in') == True:
-            user = g.user
-            return render_template('verified.html', success=True, user=user)
-        return render_template('verified.html', success=True)
-    if session.get('logged_in') == True:
-        user = g.user
-        return render_template('verified.html', success=False, user=user)
-    return render_template('verified.html', success=False)
+@app.route('/users/<username>', methods=['GET', 'POST'])
+@login_required
+def user(username):
+    '''Route to a particular user.'''
+    user = g.user
+    page_user = User.query.filter_by(username=username).first()
+    if user.is_director or user.is_admin or user == page_user:
+        if page_user:
+            return render_template('user.html', user=user, page_user=page_user)
+    abort(404)
+
+@app.route('/users/<username>/edit', methods=['GET', 'POST'])
+@login_required
+def user_edit(username):
+    user = g.user
+    edit_user = User.query.filter_by(username=username).first()
+    if user == edit_user:
+        form = UserForm()
+        del form.username
+        del form.email
+        del form.password
+        del form.confirm
+        if form.validate_on_submit():
+            edit_user.first_name = form.first_name.data
+            edit_user.last_name = form.last_name.data
+            edit_user.nickname = form.nickname.data
+            edit_user.instruments = get_form_instr(form)
+            db.session.commit()
+            return redirect(url_for('user', username=username))
+
+        form.first_name.data = user.first_name
+        form.last_name.data = user.last_name
+        form.nickname.data = user.nickname
+        form.instruments.data = user.instruments
+        return render_template('user_create_update.html', form=form, user=user)
+
+    abort(404)
 
 @app.route('/requests')
 @login_required
@@ -176,27 +184,9 @@ def requests():
     user = g.user
     return render_template('requests.html', requests=requests, user=user)
 
-@app.route('/requests/<request_id>', methods=['GET', 'POST'])
+@app.route('/requests/new', methods=['GET', 'POST'])
 @login_required
-def req(request_id):
-    '''Route to a particular request.'''
-    user = g.user
-    if request.method == 'GET':
-        req = Request.query.get(request_id)
-        if req:
-            return render_template('request.html', req=req, user=user)
-        return render_template('404.html', user=user)
-    req = Request.query.filter_by(id=request_id).first()
-    if req:
-        req.sub = g.user
-        db.session.commit()
-        send_req_pickup_emails(req)
-        return redirect(url_for('index', message='Success'))
-    return render_template('404.html', user=user)
-
-@app.route('/newrequest', methods=['GET', 'POST'])
-@login_required
-def newrequest():
+def request_new():
     '''Add a new request.'''
     user = g.user
     form = NewRequestForm()
@@ -220,6 +210,54 @@ def newrequest():
 
     return render_template('newRequest.html', form=form, user=user)
 
+@app.route('/requests/<request_id>', methods=['GET', 'POST'])
+@login_required
+def req(request_id):
+    '''Route to a particular request.'''
+    user = g.user
+    if request.method == 'GET':
+        req = Request.query.get(request_id)
+        if req:
+            return render_template('request.html', req=req, user=user)
+        abort(404)
+    req = Request.query.filter_by(id=request_id).first()
+    if req:
+        if not req.sub:
+            req.sub = g.user
+            db.session.commit()
+            send_req_pickup_emails(req)
+        return redirect(url_for('req', request_id=req.id))
+    abort(404)
+
+@app.route('/requests/<request_id>/delete', methods=['POST'])
+@login_required
+def req_delete(request_id):
+    user = g.user
+    req = Request.query.get(request_id)
+    if req and (user == req.poster or user.is_admin or user.is_director):
+        db.session.delete(req)
+        db.session.commit()
+        return redirect(url_for('requests'))
+    return redirect(url_for('req', request_id=req.id))
+
+@app.route('/requests/<request_id>/pickup/confirm')
+@login_required
+def req_pickup_confirm(request_id):
+    user = g.user
+    req = Request.query.get(request_id)
+    if not req or req.sub:
+        return redirect(url_for('requests'))
+    return render_template('pickup-req-confirm.html', req=req, user=user)
+
+@app.route('/requests/<request_id>/delete/confirm')
+@login_required
+def req_delete_confirm(request_id):
+    user = g.user
+    req = Request.query.get(request_id)
+    if req and (user == req.poster or user.is_admin or user.is_director):
+        return render_template('req_delete_confirm.html', req=req, user=user)
+    return redirect(url_for('req', request_id=req.id))
+
 @app.route('/events/')
 @login_required
 def events():
@@ -228,6 +266,29 @@ def events():
     if user.is_director or user.is_admin:
         events = Event.get_future_events()
         return render_template('events.html', events=events, user=user)
+    abort(404)
+
+@app.route('/events/new', methods=['GET', 'POST'])
+@login_required
+def event_new():
+    '''Add a new Event.'''
+    user = g.user
+    if user.is_director or user.is_admin:
+        form = EventForm()
+        if form.validate_on_submit():
+            date = form.date.data
+            time = form.calltime.data
+            calltime = datetime(year=date.year,
+                                 month=date.month, 
+                                 day=date.day, 
+                                 hour=time.hour, 
+                                 minute=time.minute)
+            band_id = form.band_id.data
+            event_type_id = form.event_type_id.data
+            event_id = add_event(date=date, calltime=calltime, band_id=band_id, event_type_id=event_type_id)
+            return redirect(url_for('event', event_id=event_id))
+        
+        return render_template('create_update_event.html', form=form, user=user)
     abort(404)
 
 @app.route('/events/<event_id>')
@@ -244,41 +305,22 @@ def event(event_id):
         return 'POST unimplemented'
     abort(404)
 
-@app.route('/newevent', methods=['GET', 'POST'])
+@app.route('/events/<event_id>/edit', methods=['GET', 'POST'])
 @login_required
-def newevent():
-    '''Add a new Event.'''
+def event_edit(event_id):
     user = g.user
     if user.is_director or user.is_admin:
         form = EventForm()
         if form.validate_on_submit():
-            date = form.date.data
-            band_id = form.band_id.data
-            event_type_id = form.event_type.data
-            event_id = add_event(date=date, band_id=band_id, event_type_id=event_type_id)
-            return redirect(url_for('event', event_id=event_id))
-        
-        return render_template('create_update_event.html', form=form, user=user)
-    abort(404)
-
-@app.route('/editevent', methods=['GET', 'POST'])
-@login_required
-def editevent():
-    user = g.user
-    if user.is_director or user.is_admin:
-        form = EventForm()
-        if form.validate_on_submit():
-            event_id = form.event_id.data
             event = Event.query.get(event_id)
             event.date = form.date.data
             event.band_id = form.band_id.data
             event.event_type_id = form.event_type_id.data
             db.session.commit()
             return redirect(url_for('event', event_id=event_id))
-        event_id = request.args.get('event_id')
+
         if event_id:
             event = Event.query.get(event_id)
-            form.event_id.data = event_id
             form.date.data = event.date
             form.band_id.data = event.band_id
             form.event_type_id.data = event.event_type_id
@@ -286,16 +328,21 @@ def editevent():
             
     abort(404)
 
-@app.route('/confirm')
-@login_required
-def confirm():
-    '''Confirm an action.'''
-    user = g.user
-    if request.args.get('action') == 'pickup':
-        req_id = request.args['request_id']
-        req = Request.query.get(req_id)
-        if not req or req.sub:
-            return redirect(url_for('requests'))
-        return render_template('pickup-req-confirm.html', req=req, user=user)
-    error = 'Nothing to confirm'
-    return redirect(url_for('index', error=error))
+@app.route('/verify')
+def verify_email():
+    username = request.args.get('username')
+    key = request.args.get('k')
+    user = User.query.filter_by(username=username).first()
+    
+    if user and user.email_verify_key != None and user.email_verify_key == key:
+        user.email_verify_key = None
+        user.enabled = True
+        db.session.commit()
+        if session.get('logged_in') == True:
+            user = g.user
+            return render_template('verified.html', success=True, user=user)
+        return render_template('verified.html', success=True)
+    if session.get('logged_in') == True:
+        user = g.user
+        return render_template('verified.html', success=False, user=user)
+    return render_template('verified.html', success=False)

@@ -74,13 +74,13 @@ class LoggedInResourceTests(unittest.TestCase):
 
     def test_users(self):
         self.assert_get_status_code('/users', 301)
-        self.assert_get_status_code('/users/', 200)
+        self.assert_get_status_code('/users/', 404)
 
     def test_user(self):
         self.assert_get_status_code('/users/user', 200)
 
-    def test_newuser(self):
-        self.assert_get_status_code('/newuser', 200)
+    def test_user_new(self):
+        self.assert_get_status_code('/users/new', 302)
 
     def test_verify(self):
         self.assert_get_status_code('/verify', 200)
@@ -90,10 +90,13 @@ class LoggedInResourceTests(unittest.TestCase):
         self.assert_get_status_code('/requests/', 200)
 
     def test_request(self):
-        self.assert_get_status_code('/requests/request_id', 200)
+        self.assert_get_status_code('/requests/request_id', 404)
+    
+    def test_request_confirm_add(self):
+        self.assert_get_status_code('/requests/request_id/pickup/confirm', 302)
 
-    def test_newrequest(self):
-        self.assert_get_status_code('/newrequest', 200)
+    def test_request_new(self):
+        self.assert_get_status_code('/requests/new', 200)
 
     def test_events(self):
         self.assert_get_status_code('/events', 301)
@@ -102,14 +105,12 @@ class LoggedInResourceTests(unittest.TestCase):
     def test_event(self):
         self.assert_get_status_code('/events/event_id', 404)
 
-    def test_newevent(self):
-        self.assert_get_status_code('/newevent', 404)
+    def test_event_new(self):
+        self.assert_get_status_code('/events/new', 404)
 
-    def test_editevent(self):
-        self.assert_get_status_code('/editevent', 404)
+    def test_event_edit(self):
+        self.assert_get_status_code('/event//edit', 404)
 
-    def test_confirm(self):
-        self.assert_get_status_code('/confirm', 302)
 
 if __name__ == '__main__':
     try:

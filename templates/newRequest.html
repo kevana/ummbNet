@@ -4,7 +4,7 @@
 <div class="container">
   <h2>Create a new request</h2>
   {% if error %}<p class=error><strong>Error:</strong></p> {{ error }}{% endif %}
-  <form role="form" action="{{ url_for('newrequest') }}" method='POST'>
+  <form role="form" action="{{ url_for('request_new') }}" method='POST'>
     {{ form.hidden_tag() }}
     <div class="form-group col-xs-7 col-sm-6 col-md-5 col-lg-4 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
       {{ form.band_id.label }}
