@@ -253,9 +253,15 @@ def newevent():
         form = EventForm()
         if form.validate_on_submit():
             date = form.date.data
+            time = form.calltime.data
+            calltime = datetime(year=date.year,
+                                 month=date.month, 
+                                 day=date.day, 
+                                 hour=time.hour, 
+                                 minute=time.minute)
             band_id = form.band_id.data
-            event_type_id = form.event_type.data
-            event_id = add_event(date=date, band_id=band_id, event_type_id=event_type_id)
+            event_type_id = form.event_type_id.data
+            event_id = add_event(date=date, calltime=calltime, band_id=band_id, event_type_id=event_type_id)
             return redirect(url_for('event', event_id=event_id))
         
         return render_template('create_update_event.html', form=form, user=user)

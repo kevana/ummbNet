@@ -74,13 +74,13 @@ class LoggedInResourceTests(unittest.TestCase):
 
     def test_users(self):
         self.assert_get_status_code('/users', 301)
-        self.assert_get_status_code('/users/', 200)
+        self.assert_get_status_code('/users/', 404)
 
     def test_user(self):
-        self.assert_get_status_code('/users/user', 200)
+        self.assert_get_status_code('/users/user', 404)
 
     def test_newuser(self):
-        self.assert_get_status_code('/newuser', 200)
+        self.assert_get_status_code('/newuser', 302)
 
     def test_verify(self):
         self.assert_get_status_code('/verify', 200)

@@ -140,22 +140,25 @@ class Event(db.Model):
     event_type_id = db.Column(
                     db.Integer, db.ForeignKey('event_type.id'))
     date = db.Column(db.DateTime)
+    calltime = db.Column(db.DateTime)
     requests = db.relationship('Request', backref='event', lazy='dynamic')
     band_id = db.Column(db.Integer, db.ForeignKey('band.id'))
 
-    def __init__(self, event_type_id, date, requests=None, band_id=None):
+    def __init__(self, event_type_id, date, calltime=None, requests=None, band_id=None):
         self.event_type_id = event_type_id
         self.date = date
         if requests:
             self.requests = requests
         if band_id:
             self.band_id = band_id
+        if calltime:
+            self.calltime = calltime
 
     def __repr__(self):
         return '<Event Type: %r Date: %r Call: %r>' % \
             (self.event_type_id, self.date, self.date.time())
     
-    @staticmethod # Event.get_current()
+    @staticmethod
     def get_future_events():
         return Event.query.filter(Event.date > datetime.utcnow()).order_by(Event.date).all()
 
