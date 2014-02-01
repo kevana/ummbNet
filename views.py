@@ -267,24 +267,22 @@ def newevent():
         return render_template('create_update_event.html', form=form, user=user)
     abort(404)
 
-@app.route('/editevent', methods=['GET', 'POST'])
+@app.route('/events/<event_id>/edit', methods=['GET', 'POST'])
 @login_required
-def editevent():
+def event_edit(event_id):
     user = g.user
     if user.is_director or user.is_admin:
         form = EventForm()
         if form.validate_on_submit():
-            event_id = form.event_id.data
             event = Event.query.get(event_id)
             event.date = form.date.data
             event.band_id = form.band_id.data
             event.event_type_id = form.event_type_id.data
             db.session.commit()
             return redirect(url_for('event', event_id=event_id))
-        event_id = request.args.get('event_id')
+
         if event_id:
             event = Event.query.get(event_id)
-            form.event_id.data = event_id
             form.date.data = event.date
             form.band_id.data = event.band_id
             form.event_type_id.data = event.event_type_id

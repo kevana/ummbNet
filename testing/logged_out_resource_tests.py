@@ -83,8 +83,8 @@ class LoggedOutResourceTests(unittest.TestCase):
     def test_newevent(self):
         self.assert_get_status_code('/newevent', 302)
 
-    def test_editevent(self):
-        self.assert_get_status_code('/editevent', 302)
+    def test_event_edit(self):
+        self.assert_get_status_code('/event//edit', 404)
 
     def test_confirm(self):
         self.assert_get_status_code('/confirm', 302)

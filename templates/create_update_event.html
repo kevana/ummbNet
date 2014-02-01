@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %} - {% if form.event_id.data %}Update{% else %}Create New{% endif %} Event{% endblock %}
+{% block title %} - {% if form.date.data %}Update{% else %}Create New{% endif %} Event{% endblock %}
 {% block content %}
 <div class="container">
-  <h2>{% if form.event_id.data %}Update an{% else %}Create a new{% endif %} event</h2>
+  <h2>{% if form.date.data %}Update{% else %}Create a new{% endif %} event</h2>
   {% if error %}<p class=error><strong>Error:</strong></p> {{ error }}{% endif %}
-  <form action="{% if form.event_id.data %}{{ url_for('editevent', event_id=form.event_id.data) }}{% else %}{{ url_for('newevent') }}{% endif %}" method='POST'>
+  <form action="{% if form.event_id.data %}{{ url_for('event_edit', event_id=form.event_id.data) }}{% else %}{{ url_for('newevent') }}{% endif %}" method='POST'>
     {{ form.hidden_tag() }}
     <div class="form-group col-xs-7 col-sm-6 col-md-5 col-lg-4 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
       {{ form.date.label }}
@@ -36,7 +36,7 @@
     </div>
     <div class="container col-xs-7 col-sm-6 col-md-5 col-lg-4 col-xs-offset-3 col-sm-offset-3 col-lg-offset-4">
       <button type="button" class="btn btn-default btn-sm" onclick="location.href='{{ url_for('events') }}'">Back to Events</button>
-      <button type="submit" class="btn btn-primary">{% if form.event_id.data %}Update{% else %}Create{% endif %} Event</button>
+      <button type="submit" class="btn btn-primary">{% if form.date.data %}Update{% else %}Create{% endif %} Event</button>
     </div>
   </form>
 </div>

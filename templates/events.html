@@ -24,7 +24,7 @@
         <td>{{ event.event_type.name }}</td>
         <td><a href="{{ url_for('event', event_id=event.id) }}">Details</a></td>
         {% if user.is_director or user.is_admin %}
-          <td><a href="{{ url_for('editevent', event_id=event.id) }}">Edit</a></td>
+          <td><a href="{{ url_for('event_edit', event_id=event.id) }}">Edit</a></td>
         {% endif %}
       </tr>
     {% endfor %}
