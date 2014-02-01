@@ -188,9 +188,10 @@ def req(request_id):
         return render_template('404.html', user=user)
     req = Request.query.filter_by(id=request_id).first()
     if req:
-        req.sub = g.user
-        db.session.commit()
-        send_req_pickup_emails(req)
+        if not req.sub:
+            req.sub = g.user
+            db.session.commit()
+            send_req_pickup_emails(req)
         return redirect(url_for('req', request_id=req.id))
     return render_template('404.html', user=user)
 
