@@ -314,6 +314,12 @@ def event_edit(event_id):
         if form.validate_on_submit():
             event = Event.query.get(event_id)
             event.date = form.date.data
+            time = form.calltime.data
+            event.calltime = datetime(year=event.date.year,
+                                 month=event.date.month, 
+                                 day=event.date.day, 
+                                 hour=time.hour, 
+                                 minute=time.minute)
             event.band_id = form.band_id.data
             event.event_type_id = form.event_type_id.data
             db.session.commit()
@@ -321,7 +327,9 @@ def event_edit(event_id):
 
         if event_id:
             event = Event.query.get(event_id)
+            form.event_id.data = event.id
             form.date.data = event.date
+            form.calltime.data = event.calltime
             form.band_id.data = event.band_id
             form.event_type_id.data = event.event_type_id
             return render_template('create_update_event.html', form=form, user=user)
