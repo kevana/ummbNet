@@ -1,8 +1,13 @@
+'''
+Script to load static database objects like
+bands, event types, and instruments
+'''
+
 from alembic.config import Config
 from alembic import command
 
 from app import app, db
-from models import *
+from models import Band, EventType, Instrument
 
 
 def db_insert_bands():
@@ -22,7 +27,7 @@ def db_insert_event_types():
     womens_hockey = EventType("Women's Hockey")
     volleyball = EventType("Volleyball")
 
-    db.session.add_all([mens_basketball, womens_basketball, \
+    db.session.add_all([mens_basketball, womens_basketball,
                         mens_hockey, womens_hockey, volleyball])
     db.session.commit()
 
@@ -40,8 +45,8 @@ def db_insert_instruments():
     tuba = Instrument('Tuba')
     drumline = Instrument('Drumline')
 
-    db.session.add_all([piccolo, flute, clarinet, alto_sax, tenor_sax, \
-                        trumpet, mellophone, trombone, baritone, tuba, \
+    db.session.add_all([piccolo, flute, clarinet, alto_sax, tenor_sax,
+                        trumpet, mellophone, trombone, baritone, tuba,
                         drumline])
     db.session.commit()
 
@@ -55,9 +60,9 @@ def db_insert_all():
 if __name__ == '__main__':
     db.drop_all()
     db.create_all()
-    
+
     with app.app_context():
         alembic_cfg = Config('migrations/alembic.ini')
         command.stamp(alembic_cfg, 'head')
-    
+
     db_insert_all()
