@@ -1,3 +1,7 @@
+'''
+Route access tests for (non-admin) logged-in users.
+'''
+
 import os
 import sys
 import unittest
@@ -24,7 +28,7 @@ class LoggedInResourceTests(unittest.TestCase):
         app.config['MAIL_SUPPRESS_SEND'] = True
         app.config['CSRF_ENABLED'] = False
         app.config['WTF_CSRF_ENABLED'] = False
-        
+
         self.app = app.test_client()
         db.create_all()
         user = User(username='user', \
@@ -57,14 +61,11 @@ class LoggedInResourceTests(unittest.TestCase):
         rv = self.app.get(route)
         self.assertEqual(rv.status_code, code)
 
-    # Test access to resources when logged in
     def test_index(self):
         self.assert_get_status_code('/', 200)
 
     def test_login(self):
         self.assert_get_status_code('/login', 302)
-
-    # Test redirects to resources that require a logged-in user
 
     def test_resetpassword(self):
         self.assert_get_status_code('/resetpassword', 200)
@@ -91,7 +92,7 @@ class LoggedInResourceTests(unittest.TestCase):
 
     def test_request(self):
         self.assert_get_status_code('/requests/request_id', 404)
-    
+
     def test_request_confirm_add(self):
         self.assert_get_status_code('/requests/request_id/pickup/confirm', 302)
 

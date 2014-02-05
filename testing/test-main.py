@@ -1,3 +1,7 @@
+'''
+Main test harness for ummbNet
+'''
+
 from coverage import coverage
 import os
 import sys
@@ -16,9 +20,9 @@ from password_reset_tests import PasswordResetTests
 
 if __name__ == '__main__':
     # Initialize coverage
-    cov = coverage(branch = True, omit = ['env/*', 'testing/*', 'migrations/*'])
+    cov = coverage(branch=True, omit=['env/*', 'testing/*', 'migrations/*'])
     cov.start()
-    
+
     try:
         unittest.main()
     except:

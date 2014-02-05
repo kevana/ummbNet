@@ -1,3 +1,7 @@
+'''
+Route access tests for logged-out users.
+'''
+
 import os
 import sys
 import unittest
@@ -30,17 +34,18 @@ class LoggedOutResourceTests(unittest.TestCase):
         db.drop_all()
 
     def assert_get_status_code(self, route, code):
+        '''Get the specified route and check the status code.'''
         rv = self.app.get(route)
         self.assertEqual(rv.status_code, code)
 
-    # Test access to resources when not logged in
+    # Resources that should be available to everyone
     def test_index(self):
         self.assert_get_status_code('/', 200)
 
     def test_login(self):
         self.assert_get_status_code('/login', 200)
 
-    # Test redirects to resources that require a logged-in user
+    # Resources that require a logged-in user
     def test_logout(self):
         self.assert_get_status_code('/logout', 200)
 
@@ -69,7 +74,7 @@ class LoggedOutResourceTests(unittest.TestCase):
 
     def test_request(self):
         self.assert_get_status_code('/requests/request_id', 302)
-    
+
     def test_request_confirm_add(self):
         self.assert_get_status_code('/requests/request_id/pickup/confirm', 302)
 

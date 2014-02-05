@@ -1,3 +1,7 @@
+'''
+New user tests.
+'''
+
 import os
 import sys
 import unittest
