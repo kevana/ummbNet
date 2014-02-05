@@ -266,7 +266,9 @@ def req_delete_confirm(request_id):
     req = Request.query.get(request_id)
     if req and (user == req.poster or user.is_admin or user.is_director):
         return render_template('request/delete_confirm.html', req=req, user=user)
-    return redirect(url_for('req', request_id=req.id))
+    if req:
+        return redirect(url_for('req', request_id=req.id))
+    return redirect(url_for('requests'))
 
 @app.route('/events/')
 @login_required

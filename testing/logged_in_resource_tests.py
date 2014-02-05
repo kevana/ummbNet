@@ -31,9 +31,9 @@ class LoggedInResourceTests(unittest.TestCase):
 
         self.app = app.test_client()
         db.create_all()
-        user = User(username='user', \
-                    email='admin@example.com', \
-                    password='password', \
+        user = User(username='user',
+                    email='admin@example.com',
+                    password='password',
                     enabled=True)
         db.session.add(user)
         db.session.commit()
@@ -77,41 +77,49 @@ class LoggedInResourceTests(unittest.TestCase):
         self.assert_get_status_code('/users', 301)
         self.assert_get_status_code('/users/', 404)
 
-    def test_user(self):
-        self.assert_get_status_code('/users/user', 200)
-
     def test_user_new(self):
         self.assert_get_status_code('/users/new', 302)
 
-    def test_verify(self):
-        self.assert_get_status_code('/verify', 200)
+    def test_user(self):
+        self.assert_get_status_code('/users/user', 200)
+
+    def test_user_edit(self):
+        self.assert_get_status_code('/users/user/edit', 200)
 
     def test_requests(self):
         self.assert_get_status_code('/requests', 301)
         self.assert_get_status_code('/requests/', 200)
 
+    def test_request_new(self):
+        self.assert_get_status_code('/requests/new', 200)
+
     def test_request(self):
         self.assert_get_status_code('/requests/request_id', 404)
+
+    def test_request_delete(self):
+        self.assert_get_status_code('/requests/request_id/delete', 405)
 
     def test_request_confirm_add(self):
         self.assert_get_status_code('/requests/request_id/pickup/confirm', 302)
 
-    def test_request_new(self):
-        self.assert_get_status_code('/requests/new', 200)
+    def test_request_delete_confirm(self):
+        self.assert_get_status_code('/requests/request_id/delete/confirm', 302)
 
     def test_events(self):
         self.assert_get_status_code('/events', 301)
         self.assert_get_status_code('/events/', 404)
 
-    def test_event(self):
-        self.assert_get_status_code('/events/event_id', 404)
-
     def test_event_new(self):
         self.assert_get_status_code('/events/new', 404)
 
-    def test_event_edit(self):
-        self.assert_get_status_code('/event//edit', 404)
+    def test_event(self):
+        self.assert_get_status_code('/events/event_id', 404)
 
+    def test_event_edit(self):
+        self.assert_get_status_code('/event/event_id/edit', 404)
+
+    def test_verify(self):
+        self.assert_get_status_code('/verify', 200)
 
 if __name__ == '__main__':
     try:
