@@ -7,10 +7,6 @@ import os
 import config
 from config import basedir
 from app import app
-from async import *
-from email import *
-from functions import *
-from models import *
 from views import *
 
 if __name__ == '__main__':
@@ -19,7 +15,7 @@ if __name__ == '__main__':
         import logging
         from logging import Formatter
         from logging.handlers import SMTPHandler, RotatingFileHandler
-        mail_handler = SMTPHandler(mailhost=config.MAIL_SERVER, 
+        mail_handler = SMTPHandler(mailhost=config.MAIL_SERVER,
                                 fromaddr=config.LOGGING_SENDER,
                                 toaddrs=config.ADMINS,
                                 subject='ummbNet Server Error',
@@ -48,5 +44,5 @@ if __name__ == '__main__':
         ))
         app.logger.addHandler(mail_handler)
         app.logger.addHandler(file_handler)
-    
+
     app.run()

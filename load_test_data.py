@@ -1,5 +1,11 @@
+'''
+A set of sample users, events, and requests for ummbNet.
+'''
+
 from datetime import timedelta
-from main import *
+
+from main import (Band, datetime, db, Event, EventType,
+                    Instrument, Request, User)
 
 
 # Get event_types

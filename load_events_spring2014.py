@@ -2,7 +2,7 @@
 Event data for Spring 2014, TBD and playoffs excluded.
 '''
 
-from main import *
+from main import Band, datetime, db, Event, EventType
 
 
 # Get event_types
