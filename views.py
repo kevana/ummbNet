@@ -130,8 +130,8 @@ def user_new():
 
         username_avail = [] == User.query.filter_by(username=username).all()
         email_avail = [] == User.query.filter_by(email=email).all()
-        user = User(username=username, email=email, password=password, \
-                    first_name=first_name, last_name=last_name, \
+        user = User(username=username, email=email, password=password,
+                    first_name=first_name, last_name=last_name,
                     nickname=nickname, instruments=instruments)
         if username_avail and email_avail and add_user(user):
             verify_email_start(user)

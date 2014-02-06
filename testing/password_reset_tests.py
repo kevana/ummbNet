@@ -27,7 +27,6 @@ class PasswordResetTests(unittest.TestCase):
         '''Pre-test setup.'''
         app.config['TESTING'] = True
         app.config['MAIL_SUPPRESS_SEND'] = True
-        app.config['CSRF_ENABLED'] = False
         app.config['WTF_CSRF_ENABLED'] = False
 
         self.app = app.test_client()
