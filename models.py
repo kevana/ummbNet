@@ -97,9 +97,10 @@ class Request(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
     instrument_id = db.Column(db.Integer, db.ForeignKey('instrument.id'))
     part = db.Column(db.Text)
+    info = db.Column(db.Text)
 
     def __init__(self, poster, sub=None, band_id=None,
-                 event_id=None, instrument_id=None, part=''):
+                 event_id=None, instrument_id=None, part='', info=''):
         self.poster = poster
         if sub:
             self.sub = sub
@@ -109,6 +110,8 @@ class Request(db.Model):
             self.event_id = event_id
         if instrument_id:
             self.instrument_id = instrument_id
+        if info:
+            self.info = info
         self.part = part
 
     def __repr__(self):
@@ -149,9 +152,10 @@ class Event(db.Model):
     calltime = db.Column(db.DateTime)
     requests = db.relationship('Request', backref='event', lazy='dynamic')
     band_id = db.Column(db.Integer, db.ForeignKey('band.id'))
+    opponent = db.Column(db.Text)
 
     def __init__(self, event_type_id, date, calltime=None,
-                requests=None, band_id=None):
+                requests=None, band_id=None, opponent=None):
         self.event_type_id = event_type_id
         self.date = date
         if requests:
@@ -160,6 +164,8 @@ class Event(db.Model):
             self.band_id = band_id
         if calltime:
             self.calltime = calltime
+        if opponent:
+            self.opponent = opponent
 
     def __repr__(self):
         return '<Event Type: %r Date: %r Call: %r>' % \

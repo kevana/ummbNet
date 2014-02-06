@@ -32,16 +32,15 @@ def add_user(user):
         return False
     return True
 
-def add_request(band_id, event_id, instrument_id, part):
+def add_request(band_id, event_id, instrument_id, part='', info=''):
     '''Add a new request to the database.'''
     user = g.user
-    part = '' if part == None else part
     # Check if user has already created a request for this event
     if [] != user.posted_requests.filter(Request.event_id == event_id).all():
         return None
 
-    req = Request(poster=user, band_id=band_id, event_id=event_id, \
-                  instrument_id=instrument_id, part=part)
+    req = Request(poster=user, band_id=band_id, event_id=event_id,
+                  instrument_id=instrument_id, part=part, info=info)
     try:
         db.session.add(req)
         db.session.commit()

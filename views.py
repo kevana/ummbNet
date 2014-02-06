@@ -209,8 +209,9 @@ def request_new():
         event_id = form.event_id.data
         instrument_id = form.instrument.data
         part = form.part.data if form.part.data else ''
+        info = form.info.data if form.info.data else ''
         req_id = add_request(band_id=band_id, event_id=event_id,
-                            instrument_id=instrument_id, part=part)
+                            instrument_id=instrument_id, part=part, info=info)
         if req_id:
             return redirect(url_for('req', request_id=req_id))
         form.errors['event_id'] = \
@@ -298,8 +299,9 @@ def event_new():
                                  minute=time.minute)
             band_id = form.band_id.data
             event_type_id = form.event_type_id.data
+            opponent = form.opponent.data
             event_id = add_event(date=date, calltime=calltime, band_id=band_id,
-                                    event_type_id=event_type_id)
+                                    event_type_id=event_type_id, opponent=opponent)
             return redirect(url_for('event', event_id=event_id))
 
         return render_template('event/create_update.html', form=form, user=user)
@@ -337,6 +339,7 @@ def event_edit(event_id):
                                  minute=time.minute)
             event.band_id = form.band_id.data
             event.event_type_id = form.event_type_id.data
+            event.opponent = form.opponent.data
             db.session.commit()
             return redirect(url_for('event', event_id=event_id))
 
@@ -347,6 +350,7 @@ def event_edit(event_id):
             form.calltime.data = event.calltime
             form.band_id.data = event.band_id
             form.event_type_id.data = event.event_type_id
+            form.opponent.data = event.opponent
             return render_template('event/create_update.html', form=form, user=user)
 
     abort(404)

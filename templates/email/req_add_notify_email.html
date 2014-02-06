@@ -1,10 +1,6 @@
 <h1>A new request has been posted</h1>
 
-<strong>Band:</strong> {{ req.band.name }}<br>
-<strong>Event Type:</strong> {{ req.event.event_type.name }}<br>
-<strong>Date:</strong> {{ req.event.date.strftime('%a %b %d, %I:%M%p') }}<br>
-<strong>Instrument:</strong> {{ req.instrument.name }}<br>
-<strong>Part:</strong> {{ req.part }}
+{% include "/request/base_info.html" %}
 
 <p>To view this request on ummbNet, please click <a href="{{ url_for('req', request_id=req.id, _external=True) }}">here</a>.</p>
 

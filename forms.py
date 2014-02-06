@@ -4,7 +4,7 @@ Form classes for ummbNet
 
 from datetime import datetime
 from flask.ext.wtf import Form
-from wtforms import (TextField, PasswordField, HiddenField,
+from wtforms import (TextField, TextAreaField, PasswordField, HiddenField,
                         SelectField, SelectMultipleField)
 from wtforms.fields.html5 import DateTimeLocalField
 from wtforms_components import TimeField
@@ -77,6 +77,7 @@ class NewRequestForm(Form):
     event_id = SelectField('Event:', validators=[Required()], coerce=int)
     instrument = SelectField('Instrument:', validators=[Required()], coerce=int)
     part = TextField('Part:')
+    info = TextAreaField('Extra info:')
 
 class EventForm(Form):
     '''Form for event creation and update.'''
@@ -90,6 +91,7 @@ class EventForm(Form):
                         validators=[Required()], coerce=int)
     event_type_id = SelectField('Event Type:', choices=event_types,
                         validators=[Required()], coerce=int)
+    opponent = TextField('Opponent:')
 
     def validate_date(form, field):
         '''Validate a date, ensure it is in the future.'''

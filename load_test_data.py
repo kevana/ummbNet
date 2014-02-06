@@ -100,39 +100,39 @@ db.session.commit()
 
 
 # Create Events
-event_1 = Event(event_type_id=mens_basketball.id, date=tomorrow, \
-                band_id=gold_band.id)
-event_2 = Event(event_type_id=mens_basketball.id, date=next_week, \
-                band_id=maroon_band.id)
-event_3 = Event(event_type_id=mens_basketball.id, date=next_month, \
-                band_id=gopher_band.id)
-event_4 = Event(event_type_id=womens_basketball.id, date=tomorrow, \
-                band_id=gold_band.id)
-event_5 = Event(event_type_id=womens_basketball.id, date=next_week, \
-                band_id=maroon_band.id)
-event_6 = Event(event_type_id=womens_basketball.id, date=next_month, \
-                band_id=gopher_band.id)
-event_7 = Event(event_type_id=mens_hockey.id, date=tomorrow, \
-                band_id=gold_band.id)
-event_8 = Event(event_type_id=mens_hockey.id, date=next_week, \
-                band_id=maroon_band.id)
-event_9 = Event(event_type_id=mens_hockey.id, date=next_month, \
-                band_id=gopher_band.id)
-event_10 = Event(event_type_id=womens_hockey.id, date=tomorrow, \
-                band_id=gold_band.id)
-event_11 = Event(event_type_id=womens_hockey.id, date=next_week, \
-                band_id=maroon_band.id)
-event_12 = Event(event_type_id=womens_hockey.id, date=next_month, \
-                band_id=gopher_band.id)
-event_13 = Event(event_type_id=volleyball.id, date=tomorrow, \
-                band_id=gold_band.id)
-event_14 = Event(event_type_id=volleyball.id, date=next_week, \
-                band_id=maroon_band.id)
-event_15 = Event(event_type_id=volleyball.id, date=next_month, \
-                band_id=gopher_band.id)
+event_1 = Event(event_type_id=mens_basketball.id, date=tomorrow,
+                band_id=gold_band.id, opponent='Purdue')
+event_2 = Event(event_type_id=mens_basketball.id, date=next_week,
+                band_id=maroon_band.id, opponent='Illinois')
+event_3 = Event(event_type_id=mens_basketball.id, date=next_month,
+                band_id=gopher_band.id, opponent='Indiana')
+event_4 = Event(event_type_id=womens_basketball.id, date=tomorrow,
+                band_id=gold_band.id, opponent='Wisconsin')
+event_5 = Event(event_type_id=womens_basketball.id, date=next_week,
+                band_id=maroon_band.id, opponent='Nebraska')
+event_6 = Event(event_type_id=womens_basketball.id, date=next_month,
+                band_id=gopher_band.id, opponent='Iowa')
+event_7 = Event(event_type_id=mens_hockey.id, date=tomorrow,
+                band_id=gold_band.id, opponent='Penn State')
+event_8 = Event(event_type_id=mens_hockey.id, date=next_week,
+                band_id=maroon_band.id, opponent='Michigan')
+event_9 = Event(event_type_id=mens_hockey.id, date=next_month,
+                band_id=gopher_band.id, opponent='Michigan State')
+event_10 = Event(event_type_id=womens_hockey.id, date=tomorrow,
+                band_id=gold_band.id, opponent='Rutgers')
+event_11 = Event(event_type_id=womens_hockey.id, date=next_week,
+                band_id=maroon_band.id, opponent='Maryland')
+event_12 = Event(event_type_id=womens_hockey.id, date=next_month,
+                band_id=gopher_band.id, opponent='Northwestern')
+event_13 = Event(event_type_id=volleyball.id, date=tomorrow,
+                band_id=gold_band.id, opponent='Purdue')
+event_14 = Event(event_type_id=volleyball.id, date=next_week,
+                band_id=maroon_band.id, opponent='Illinois')
+event_15 = Event(event_type_id=volleyball.id, date=next_month,
+                band_id=gopher_band.id, opponent='Indiana')
 
-db.session.add_all([event_1, event_2, event_3, event_4, event_5, \
-                    event_6, event_7, event_8, event_9, event_10, \
+db.session.add_all([event_1, event_2, event_3, event_4, event_5,
+                    event_6, event_7, event_8, event_9, event_10,
                     event_11, event_12, event_13, event_14, event_15])
 db.session.commit()
 
