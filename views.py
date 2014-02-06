@@ -132,7 +132,8 @@ def user_new():
         email_avail = [] == User.query.filter_by(email=email).all()
         user = User(username=username, email=email, password=password,
                     first_name=first_name, last_name=last_name,
-                    nickname=nickname, instruments=instruments)
+                    nickname=nickname, instruments=instruments, 
+                    req_add_notify_instrs=instruments)
         if username_avail and email_avail and add_user(user):
             verify_email_start(user)
             return render_template('user/reg_complete.html', user=None)

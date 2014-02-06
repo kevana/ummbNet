@@ -32,7 +32,7 @@ def send_email(subject, recipients, text_body, html_body, sender=None):
 
 def send_pw_reset_email(user, key):
     '''Send a password reset email to a user.'''
-    subject = 'Password reset for %r on ummbNet' % user.username
+    subject = 'Password reset for %s on ummbNet' % user.username
     msg_to = [user.email]
     txt_body = render_template('email/pw_reset_email.txt', user=user, key=key)
     html_body = render_template('email/pw_reset_email.html', user=user, key=key)
@@ -41,7 +41,7 @@ def send_pw_reset_email(user, key):
 
 def send_verify_email(user, key):
     '''Send an email verification message to a user.'''
-    subject = 'Verify email address for %r on ummbNet' % user.username
+    subject = 'Verify email address for %s on ummbNet' % user.username
     msg_to = [user.email]
     txt_body = render_template('email/verify_email.txt', user=user, key=key)
     html_body = render_template('email/verify_email.html', user=user, key=key)

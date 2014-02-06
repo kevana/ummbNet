@@ -2,10 +2,10 @@
 A set of sample users, events, and requests for ummbNet.
 '''
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
-from main import (Band, datetime, db, Event, EventType,
-                    Instrument, Request, User)
+from app import db
+from models import Band, Event, EventType, Instrument, Request, User
 
 
 # Get event_types
@@ -56,40 +56,43 @@ next_month = now + one_month
 
 
 # Create Users
-admin = User(username='admin', email='kevan@ummb.net', password='password', \
-            first_name='Kevan', last_name='Ahlquist', nickname='Krevan', \
-            instruments=[trumpet], is_admin=True, is_director=True, \
+admin = User(username='admin', email='kevan@ummb.net', password='password',
+            first_name='Kevan', last_name='Ahlquist', nickname='Krevan',
+            instruments=[trumpet], req_add_notify_instrs=[trumpet], 
+            is_admin=True, is_director=True, enabled=True)
+director = User(username='director', email='kevan+skeeter@ummb.net', password='password',
+            first_name='Skeeter', last_name='Boroughs', nickname='Skeeter',
+            instruments=[], req_add_notify_instrs=[], is_director=True, enabled=True)
+user_1 = User(username='user_1', email='kevan+user_1@ummb.net', password='password',
+            first_name='Mitch', last_name='Gulbransen', nickname='Gulbie',
+            instruments=[piccolo, flute], req_add_notify_instrs=[piccolo, flute],
             enabled=True)
-director = User(username='director', email='user_1@example.com', password='password', \
-            first_name='Skeeter', last_name='Boroughs', nickname='Skeeter', \
-            instruments=[], is_director=True, enabled=True)
-user_1 = User(username='user_1', email='user_1@example.com', password='password', \
-            first_name='Mitch', last_name='Gulbransen', nickname='Gulbie', \
-            instruments=[piccolo, flute], enabled=True)
-user_2 = User(username='user_2', email='user_2@example.com', password='password', \
-            first_name='Phillip', last_name='Homen', nickname='Phil', \
-            instruments=[clarinet], enabled=True)
-user_3 = User(username='user_3', email='user_3@example.com', password='password', \
-            first_name='Raoul', last_name='Shah', nickname='Batman', \
-            instruments=[alto_sax], enabled=True)
-user_4 = User(username='user_4', email='user_4@example.com', password='password', \
-            first_name='Joe', last_name='Walsh', nickname='', \
-            instruments=[mellophone, drumline], enabled=True)
-user_5 = User(username='user_5', email='user_5@example.com', password='password', \
-            first_name='Colin', last_name='Campbell', nickname='', \
-            instruments=[trombone], enabled=True)
-user_6 = User(username='user_6', email='user_6@example.com', password='password', \
-            first_name='Jeff', last_name='Korum', nickname='Twitch', \
-            instruments=[baritone], enabled=True)
-user_7 = User(username='user_7', email='user_7@example.com', password='password', \
-            first_name='Tyler', last_name='Hoffman', nickname='Ty', \
-            instruments=[tuba], enabled=True)
-user_8 = User(username='user_8', email='user_8@example.com', password='password', \
-            first_name='Brad', last_name='Billstein', nickname='Colin2', \
-            instruments=[drumline, flute], enabled=True)
-user_9 = User(username='user_9', email='user_9@example.com', password='password', \
-            first_name='Tomas', last_name='Icenogle', nickname='Iceman', \
-            instruments=[trumpet], enabled=True)
+user_2 = User(username='user_2', email='kevan+user_2@ummb.net', password='password',
+            first_name='Phillip', last_name='Homen', nickname='Phil',
+            instruments=[clarinet], req_add_notify_instrs=[clarinet], enabled=True)
+user_3 = User(username='user_3', email='kevan+user_3@ummb.net', password='password',
+            first_name='Raoul', last_name='Shah', nickname='Batman',
+            instruments=[alto_sax], req_add_notify_instrs=[alto_sax], enabled=True)
+user_4 = User(username='user_4', email='kevan+user_4@ummb.net', password='password',
+            first_name='Joe', last_name='Walsh', nickname='',
+            instruments=[mellophone, drumline], 
+            req_add_notify_instrs=[mellophone, drumline], enabled=True)
+user_5 = User(username='user_5', email='kevan+user_5@ummb.net', password='password',
+            first_name='Colin', last_name='Campbell', nickname='',
+            instruments=[trombone], req_add_notify_instrs=[trombone], enabled=True)
+user_6 = User(username='user_6', email='kevan+user_6@ummb.net', password='password',
+            first_name='Jeff', last_name='Korum', nickname='Twitch',
+            instruments=[baritone], req_add_notify_instrs=[baritone], enabled=True)
+user_7 = User(username='user_7', email='kevan+user_7@ummb.net', password='password',
+            first_name='Tyler', last_name='Hoffman', nickname='Ty',
+            instruments=[tuba], req_add_notify_instrs=[tuba], enabled=True)
+user_8 = User(username='user_8', email='kevan+user_8@ummb.net', password='password',
+            first_name='Brad', last_name='Billstein', nickname='Colin2',
+            instruments=[drumline, flute], req_add_notify_instrs=[drumline, flute],
+            enabled=True)
+user_9 = User(username='user_9', email='kevan+user_9@ummb.net', password='password',
+            first_name='Tomas', last_name='Icenogle', nickname='Iceman',
+            instruments=[trumpet], req_add_notify_instrs=[trumpet], enabled=True)
 
 db.session.add_all([admin, user_1, user_2, user_3, user_4, \
                     user_5, user_6, user_7, user_8, user_9])
