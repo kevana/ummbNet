@@ -130,8 +130,8 @@ def user_new():
 
         username_avail = [] == User.query.filter_by(username=username).all()
         email_avail = [] == User.query.filter_by(email=email).all()
-        user = User(username=username, email=email, password=password, \
-                    first_name=first_name, last_name=last_name, \
+        user = User(username=username, email=email, password=password,
+                    first_name=first_name, last_name=last_name,
                     nickname=nickname, instruments=instruments)
         if username_avail and email_avail and add_user(user):
             verify_email_start(user)
@@ -266,7 +266,9 @@ def req_delete_confirm(request_id):
     req = Request.query.get(request_id)
     if req and (user == req.poster or user.is_admin or user.is_director):
         return render_template('request/delete_confirm.html', req=req, user=user)
-    return redirect(url_for('req', request_id=req.id))
+    if req:
+        return redirect(url_for('req', request_id=req.id))
+    return redirect(url_for('requests'))
 
 @app.route('/events/')
 @login_required
