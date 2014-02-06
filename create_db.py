@@ -6,11 +6,10 @@ bands, event types, and instruments
 from alembic.config import Config
 from alembic import command
 
-from app import app, db
 from models import Band, EventType, Instrument
 
 
-def db_insert_bands():
+def db_insert_bands(db):
     '''Create Bands and insert into the database.'''
     gold_band = Band('Gold Band')
     maroon_band = Band('Maroon Band')
@@ -18,8 +17,9 @@ def db_insert_bands():
 
     db.session.add_all([gold_band, maroon_band, gopher_band])
     db.session.commit()
+    print('Added bands')
 
-def db_insert_event_types():
+def db_insert_event_types(db):
     '''Create EventTypes and insert into the database.'''
     mens_basketball = EventType("Men's Basketball")
     womens_basketball = EventType("Women's Basketball")
@@ -30,8 +30,9 @@ def db_insert_event_types():
     db.session.add_all([mens_basketball, womens_basketball,
                         mens_hockey, womens_hockey, volleyball])
     db.session.commit()
+    print('Added event types')
 
-def db_insert_instruments():
+def db_insert_instruments(db):
     '''Create Instruments and insert into the database.'''
     piccolo = Instrument('Piccolo')
     flute = Instrument('Flute')
@@ -49,15 +50,17 @@ def db_insert_instruments():
                         trumpet, mellophone, trombone, baritone, tuba,
                         drumline])
     db.session.commit()
+    print('Added instruments')
 
-def db_insert_all():
+def db_insert_all(db):
     '''Create Bands, EventTypes, Instruments.'''
-    db_insert_bands()
-    db_insert_event_types()
-    db_insert_instruments()
+    db_insert_bands(db)
+    db_insert_event_types(db)
+    db_insert_instruments(db)
 
 
 if __name__ == '__main__':
+    from app import app, db
     db.drop_all()
     db.create_all()
 
@@ -65,4 +68,4 @@ if __name__ == '__main__':
         alembic_cfg = Config('migrations/alembic.ini')
         command.stamp(alembic_cfg, 'head')
 
-    db_insert_all()
+    db_insert_all(db)

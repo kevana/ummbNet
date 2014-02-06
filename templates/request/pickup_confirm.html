@@ -15,7 +15,7 @@
               {{ req.poster.first_name }}
               {% endif %}
     Info: {{ req.info }}
-  </p
+  </p>
   <p>
   <form role="form" action="{{ url_for('req', request_id=req.id) }}" method="POST">
     <button type="button" class="btn btn-default btn-sm" onclick="location.href='{{ url_for('req', request_id=req.id) }}'">Cancel</button>

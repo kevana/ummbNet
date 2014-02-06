@@ -4,11 +4,11 @@ Form classes for ummbNet
 
 from datetime import datetime
 from flask.ext.wtf import Form
-from wtforms import (TextField, TextAreaField, PasswordField, HiddenField,
-                        SelectField, SelectMultipleField)
+from wtforms import (HiddenField, PasswordField, SelectField,
+                    SelectMultipleField, TextField, TextAreaField)
 from wtforms.fields.html5 import DateTimeLocalField
 from wtforms_components import TimeField
-from wtforms.validators import Required, EqualTo, Email, ValidationError
+from wtforms.validators import Email, EqualTo, Required, ValidationError
 
 from models import Band, EventType, Instrument, User
 

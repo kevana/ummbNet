@@ -1,6 +1,11 @@
 <h1>You have picked up a request</h1>
 
 {% include "/request/base_info.html" %}
+<strong>Sub:</strong> {% if req.sub.nickname %}
+                        {{ req.sub.nickname}}
+                      {% else %}
+                        {{ req.sub.first_name }}
+                      {% endif %}
 
 <p>To view this request on ummbNet click <a href="{{ url_for('req', request_id=req.id, _external=True) }}">here</a>.</p>
 ummbNet

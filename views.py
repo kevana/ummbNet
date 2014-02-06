@@ -343,8 +343,8 @@ def event_edit(event_id):
             db.session.commit()
             return redirect(url_for('event', event_id=event_id))
 
-        if event_id:
-            event = Event.query.get(event_id)
+        event = Event.query.get(event_id)
+        if event:
             form.event_id.data = event.id
             form.date.data = event.date
             form.calltime.data = event.calltime
