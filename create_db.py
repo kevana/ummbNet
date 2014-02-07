@@ -17,7 +17,8 @@ def db_insert_bands(db):
 
     db.session.add_all([gold_band, maroon_band, gopher_band])
     db.session.commit()
-    print('Added bands')
+    #print('Added bands:')
+    #print(Band.query.all())
 
 def db_insert_event_types(db):
     '''Create EventTypes and insert into the database.'''
@@ -30,7 +31,8 @@ def db_insert_event_types(db):
     db.session.add_all([mens_basketball, womens_basketball,
                         mens_hockey, womens_hockey, volleyball])
     db.session.commit()
-    print('Added event types')
+    #print('Added event types:')
+    #print(EventType.query.all())
 
 def db_insert_instruments(db):
     '''Create Instruments and insert into the database.'''
@@ -50,7 +52,8 @@ def db_insert_instruments(db):
                         trumpet, mellophone, trombone, baritone, tuba,
                         drumline])
     db.session.commit()
-    print('Added instruments')
+    #print('Added instruments:')
+    #print(Instrument.query.all())
 
 def db_insert_all(db):
     '''Create Bands, EventTypes, Instruments.'''

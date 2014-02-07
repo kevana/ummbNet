@@ -29,13 +29,13 @@ class NewUserTests(unittest.TestCase):
         app.config['WTF_CSRF_ENABLED'] = False
         self.app = app.test_client()
         db.create_all()
-        db_insert_all()
+        db_insert_all(db)
 
     def tearDown(self):
         '''Post-test teardown.'''
         db.session.remove()
         db.drop_all()
-    #Broken test, instruments not adding to list
+    @unittest.skip('Broken, instruments not adding to list')
     def user_new_all_instrs(self):
         rv = self.app.post('/users/new', data=dict({
                         'username'    : 'user',
