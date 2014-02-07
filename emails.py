@@ -27,8 +27,7 @@ def send_email(subject, recipients, text_body, html_body, sender=None):
     if app.config.get('TESTING'):
         mail.send(msg)
     else:
-        thr = Thread(target=send_async_email, args=[app, msg])
-        thr.start()
+        send_async_email(app, msg)
 
 def send_pw_reset_email(user, key):
     '''Send a password reset email to a user.'''
