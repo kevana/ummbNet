@@ -1,10 +1,6 @@
 <h1>Your request has been picked up</h1>
 
-<strong>Band:</strong> {{ req.band.name }}<br>
-<strong>Event Type:</strong> {{ req.event.event_type.name }}<br>
-<strong>Date:</strong> {{ req.event.date.strftime('%a %b %d, %I:%M%p') }}<br>
-<strong>Instrument:</strong> {{ req.instrument.name }}<br>
-<strong>Part:</strong> {{ req.part }}<br>
+{% include "/request/base_info.html" %}
 <strong>Sub:</strong> {% if req.sub.nickname %}
                         {{ req.sub.nickname}}
                       {% else %}

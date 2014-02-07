@@ -1,5 +1,11 @@
-from datetime import timedelta
-from main import *
+'''
+A set of sample users, events, and requests for ummbNet.
+'''
+
+from datetime import datetime, timedelta
+
+from app import db
+from models import Band, Event, EventType, Instrument, Request, User
 
 
 # Get event_types
@@ -50,40 +56,43 @@ next_month = now + one_month
 
 
 # Create Users
-admin = User(username='admin', email='kevan@ummb.net', password='password', \
-            first_name='Kevan', last_name='Ahlquist', nickname='Krevan', \
-            instruments=[trumpet], is_admin=True, is_director=True, \
+admin = User(username='admin', email='kevan@ummb.net', password='password',
+            first_name='Kevan', last_name='Ahlquist', nickname='Krevan',
+            instruments=[trumpet], req_add_notify_instrs=[trumpet], 
+            is_admin=True, is_director=True, enabled=True)
+director = User(username='director', email='kevan+skeeter@ummb.net', password='password',
+            first_name='Skeeter', last_name='Boroughs', nickname='Skeeter',
+            instruments=[], req_add_notify_instrs=[], is_director=True, enabled=True)
+user_1 = User(username='user_1', email='kevan+user_1@ummb.net', password='password',
+            first_name='Mitch', last_name='Gulbransen', nickname='Gulbie',
+            instruments=[piccolo, flute], req_add_notify_instrs=[piccolo, flute],
             enabled=True)
-director = User(username='director', email='user_1@example.com', password='password', \
-            first_name='Skeeter', last_name='Boroughs', nickname='Skeeter', \
-            instruments=[], is_director=True, enabled=True)
-user_1 = User(username='user_1', email='user_1@example.com', password='password', \
-            first_name='Mitch', last_name='Gulbransen', nickname='Gulbie', \
-            instruments=[piccolo, flute], enabled=True)
-user_2 = User(username='user_2', email='user_2@example.com', password='password', \
-            first_name='Phillip', last_name='Homen', nickname='Phil', \
-            instruments=[clarinet], enabled=True)
-user_3 = User(username='user_3', email='user_3@example.com', password='password', \
-            first_name='Raoul', last_name='Shah', nickname='Batman', \
-            instruments=[alto_sax], enabled=True)
-user_4 = User(username='user_4', email='user_4@example.com', password='password', \
-            first_name='Joe', last_name='Walsh', nickname='', \
-            instruments=[mellophone, drumline], enabled=True)
-user_5 = User(username='user_5', email='user_5@example.com', password='password', \
-            first_name='Colin', last_name='Campbell', nickname='', \
-            instruments=[trombone], enabled=True)
-user_6 = User(username='user_6', email='user_6@example.com', password='password', \
-            first_name='Jeff', last_name='Korum', nickname='Twitch', \
-            instruments=[baritone], enabled=True)
-user_7 = User(username='user_7', email='user_7@example.com', password='password', \
-            first_name='Tyler', last_name='Hoffman', nickname='Ty', \
-            instruments=[tuba], enabled=True)
-user_8 = User(username='user_8', email='user_8@example.com', password='password', \
-            first_name='Brad', last_name='Billstein', nickname='Colin2', \
-            instruments=[drumline, flute], enabled=True)
-user_9 = User(username='user_9', email='user_9@example.com', password='password', \
-            first_name='Tomas', last_name='Icenogle', nickname='Iceman', \
-            instruments=[trumpet], enabled=True)
+user_2 = User(username='user_2', email='kevan+user_2@ummb.net', password='password',
+            first_name='Phillip', last_name='Homen', nickname='Phil',
+            instruments=[clarinet], req_add_notify_instrs=[clarinet], enabled=True)
+user_3 = User(username='user_3', email='kevan+user_3@ummb.net', password='password',
+            first_name='Raoul', last_name='Shah', nickname='Batman',
+            instruments=[alto_sax], req_add_notify_instrs=[alto_sax], enabled=True)
+user_4 = User(username='user_4', email='kevan+user_4@ummb.net', password='password',
+            first_name='Joe', last_name='Walsh', nickname='',
+            instruments=[mellophone, drumline], 
+            req_add_notify_instrs=[mellophone, drumline], enabled=True)
+user_5 = User(username='user_5', email='kevan+user_5@ummb.net', password='password',
+            first_name='Colin', last_name='Campbell', nickname='',
+            instruments=[trombone], req_add_notify_instrs=[trombone], enabled=True)
+user_6 = User(username='user_6', email='kevan+user_6@ummb.net', password='password',
+            first_name='Jeff', last_name='Korum', nickname='Twitch',
+            instruments=[baritone], req_add_notify_instrs=[baritone], enabled=True)
+user_7 = User(username='user_7', email='kevan+user_7@ummb.net', password='password',
+            first_name='Tyler', last_name='Hoffman', nickname='Ty',
+            instruments=[tuba], req_add_notify_instrs=[tuba], enabled=True)
+user_8 = User(username='user_8', email='kevan+user_8@ummb.net', password='password',
+            first_name='Brad', last_name='Billstein', nickname='Colin2',
+            instruments=[drumline, flute], req_add_notify_instrs=[drumline, flute],
+            enabled=True)
+user_9 = User(username='user_9', email='kevan+user_9@ummb.net', password='password',
+            first_name='Tomas', last_name='Icenogle', nickname='Iceman',
+            instruments=[trumpet], req_add_notify_instrs=[trumpet], enabled=True)
 
 db.session.add_all([admin, user_1, user_2, user_3, user_4, \
                     user_5, user_6, user_7, user_8, user_9])
@@ -91,39 +100,39 @@ db.session.commit()
 
 
 # Create Events
-event_1 = Event(event_type_id=mens_basketball.id, date=tomorrow, \
-                band_id=gold_band.id)
-event_2 = Event(event_type_id=mens_basketball.id, date=next_week, \
-                band_id=maroon_band.id)
-event_3 = Event(event_type_id=mens_basketball.id, date=next_month, \
-                band_id=gopher_band.id)
-event_4 = Event(event_type_id=womens_basketball.id, date=tomorrow, \
-                band_id=gold_band.id)
-event_5 = Event(event_type_id=womens_basketball.id, date=next_week, \
-                band_id=maroon_band.id)
-event_6 = Event(event_type_id=womens_basketball.id, date=next_month, \
-                band_id=gopher_band.id)
-event_7 = Event(event_type_id=mens_hockey.id, date=tomorrow, \
-                band_id=gold_band.id)
-event_8 = Event(event_type_id=mens_hockey.id, date=next_week, \
-                band_id=maroon_band.id)
-event_9 = Event(event_type_id=mens_hockey.id, date=next_month, \
-                band_id=gopher_band.id)
-event_10 = Event(event_type_id=womens_hockey.id, date=tomorrow, \
-                band_id=gold_band.id)
-event_11 = Event(event_type_id=womens_hockey.id, date=next_week, \
-                band_id=maroon_band.id)
-event_12 = Event(event_type_id=womens_hockey.id, date=next_month, \
-                band_id=gopher_band.id)
-event_13 = Event(event_type_id=volleyball.id, date=tomorrow, \
-                band_id=gold_band.id)
-event_14 = Event(event_type_id=volleyball.id, date=next_week, \
-                band_id=maroon_band.id)
-event_15 = Event(event_type_id=volleyball.id, date=next_month, \
-                band_id=gopher_band.id)
+event_1 = Event(event_type_id=mens_basketball.id, date=tomorrow,
+                band_id=gold_band.id, opponent='Purdue')
+event_2 = Event(event_type_id=mens_basketball.id, date=next_week,
+                band_id=maroon_band.id, opponent='Illinois')
+event_3 = Event(event_type_id=mens_basketball.id, date=next_month,
+                band_id=gopher_band.id, opponent='Indiana')
+event_4 = Event(event_type_id=womens_basketball.id, date=tomorrow,
+                band_id=gold_band.id, opponent='Wisconsin')
+event_5 = Event(event_type_id=womens_basketball.id, date=next_week,
+                band_id=maroon_band.id, opponent='Nebraska')
+event_6 = Event(event_type_id=womens_basketball.id, date=next_month,
+                band_id=gopher_band.id, opponent='Iowa')
+event_7 = Event(event_type_id=mens_hockey.id, date=tomorrow,
+                band_id=gold_band.id, opponent='Penn State')
+event_8 = Event(event_type_id=mens_hockey.id, date=next_week,
+                band_id=maroon_band.id, opponent='Michigan')
+event_9 = Event(event_type_id=mens_hockey.id, date=next_month,
+                band_id=gopher_band.id, opponent='Michigan State')
+event_10 = Event(event_type_id=womens_hockey.id, date=tomorrow,
+                band_id=gold_band.id, opponent='Rutgers')
+event_11 = Event(event_type_id=womens_hockey.id, date=next_week,
+                band_id=maroon_band.id, opponent='Maryland')
+event_12 = Event(event_type_id=womens_hockey.id, date=next_month,
+                band_id=gopher_band.id, opponent='Northwestern')
+event_13 = Event(event_type_id=volleyball.id, date=tomorrow,
+                band_id=gold_band.id, opponent='Purdue')
+event_14 = Event(event_type_id=volleyball.id, date=next_week,
+                band_id=maroon_band.id, opponent='Illinois')
+event_15 = Event(event_type_id=volleyball.id, date=next_month,
+                band_id=gopher_band.id, opponent='Indiana')
 
-db.session.add_all([event_1, event_2, event_3, event_4, event_5, \
-                    event_6, event_7, event_8, event_9, event_10, \
+db.session.add_all([event_1, event_2, event_3, event_4, event_5,
+                    event_6, event_7, event_8, event_9, event_10,
                     event_11, event_12, event_13, event_14, event_15])
 db.session.commit()
 

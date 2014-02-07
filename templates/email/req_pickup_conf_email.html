@@ -1,11 +1,11 @@
 <h1>You have picked up a request</h1>
 
-<strong>Band:</strong> {{ req.band.name }}<br>
-<strong>Event Type:</strong> {{ req.event.event_type.name }}<br>
-<strong>Date:</strong> {{ req.event.date.strftime('%a %b %d, %I:%M%p') }}<br>
-<strong>Instrument:</strong> {{ req.instrument.name }}<br>
-<strong>Part:</strong> {{ req.part }}<br>
-<strong>Sub:</strong> {% if req.sub.nickname %}{{ req.sub.nickname}}{% else %}{{ req.sub.first_name }}{% endif %}
+{% include "/request/base_info.html" %}
+<strong>Sub:</strong> {% if req.sub.nickname %}
+                        {{ req.sub.nickname}}
+                      {% else %}
+                        {{ req.sub.first_name }}
+                      {% endif %}
 
 <p>To view this request on ummbNet click <a href="{{ url_for('req', request_id=req.id, _external=True) }}">here</a>.</p>
 ummbNet

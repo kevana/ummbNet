@@ -1,10 +1,6 @@
 You have picked up a request
 
-Band: {{ req.band.name }}
-Event Type: {{ req.event.event_type.name }}
-Date: {{ req.event.date.strftime('%a %b %d, %I:%M%p') }}
-Instrument: {{ req.instrument.name }}
-Part: {{ req.part }}
+{% include "/request/base_info.txt" %}
 Sub: {% if req.sub.nickname %}{{ req.sub.nickname}}{% else %}{{ req.sub.first_name }}{% endif %}
 
 To view this request on ummbNet click the following link:

@@ -11,6 +11,7 @@
         <!--<th>Poster</th>-->
         <!--<th>Band</th>-->
         <th>Event</th>
+        <th>Opponent</th>
         <th>Instrument</th>
         <th>Part</th>
         <th>Details</th>
@@ -29,6 +30,7 @@
         </td>-->
         <!--<td>{{ req.band.name }}</td>-->
         <td>{{ req.event.event_type.name }}</td>
+        <td>{{ req.event.opponent }}</td>
         <td>{{ req.instrument.name }}</td>
         <td>{{ req.part }}</td>
         <td><a href="{{ url_for('req', request_id=req.id) }}">Details</a></td>

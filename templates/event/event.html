@@ -6,7 +6,8 @@
   <p>Date: {{ event.date.strftime('%a %b %d, %I:%M%p') }}<br>
      Calltime: {% if event.calltime %}{{ event.calltime.strftime('%I:%M%p') }}{% else %}TBD{% endif %}<br>
      Band: {{ event.band.name }}<br>
-     Event Type: {{ event.event_type.name  }}<br>
+     Event Type: {{ event.event_type.name }}<br>
+     Opponent: {{ event.opponent }}<br>
   </p>
   <div class="panel panel-primary">
     <div class="panel-heading">Requests</div>

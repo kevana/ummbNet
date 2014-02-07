@@ -1,3 +1,7 @@
+'''
+Tests for password reset functionality.
+'''
+
 import os
 import sys
 import unittest
@@ -23,9 +27,8 @@ class PasswordResetTests(unittest.TestCase):
         '''Pre-test setup.'''
         app.config['TESTING'] = True
         app.config['MAIL_SUPPRESS_SEND'] = True
-        app.config['CSRF_ENABLED'] = False
         app.config['WTF_CSRF_ENABLED'] = False
-        
+
         self.app = app.test_client()
         db.create_all()
         user = User(username='user', \
@@ -43,7 +46,7 @@ class PasswordResetTests(unittest.TestCase):
         self.assertIn('You have logged out', rv.data)
         db.session.remove()
         db.drop_all()
-    
+
     def login(self, username, password):
         '''Login a user by posting to /login.'''
         return self.app.post('/login', data=dict(
@@ -52,16 +55,19 @@ class PasswordResetTests(unittest.TestCase):
             ), follow_redirects=True)
 
     def logout(self):
+        '''Logout the logged in user.'''
         return self.app.get('/logout', follow_redirects=True)
 
     def test_reset_password(self):
+        '''Test a successful password reset.'''
         rv = self.app.post('/resetpassword', data=dict(
                 username='user',
                 email='admin@example.com'
             ), follow_redirects=True)
         self.assertIn('Reset successful', rv.data)
-    
+
     def test_fail_reset_password(self):
+        '''Test a failed password reset.'''
         rv = self.app.post('/resetpassword', data=dict(
                 username='user',
                 email='fakeuser@example.com'
@@ -69,11 +75,12 @@ class PasswordResetTests(unittest.TestCase):
         self.assertIn('Invalid username email combination', rv.data)
 
     def test_resetpassword_fail_pw_mismatch(self):
+        '''Test a mismatched passwords failure.'''
         rv = self.app.get('/resetpassword', data=dict(username='user',
                                                     password1='pw1',
                                                     password2='pw2'))
         self.assertIn('Password Reset', rv.data)
-        
+
 
 if __name__ == '__main__':
     try:

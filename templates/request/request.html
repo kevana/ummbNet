@@ -5,6 +5,7 @@
   <h1>Request</h1>
   <p>Band: {{ req.event.band.name }}<br>
      Event: {{ req.event.event_type.name  }}<br>
+     Opponent: {{ req.event.opponent }}<br>
      Date: {{ req.event.date.strftime('%a %b %d, %I:%M%p') }}<br>
      Instrument: {{ req.instrument.name }}<br>
      Part: {{ req.part }}<br>
@@ -14,12 +15,9 @@
               {{ req.poster.first_name }}
               {% endif %}<br>
     {% if req.sub %}
-      Sub: {% if req.sub.nickname %}
-            {{ req.sub.nickname }}
-            {% else %}
-            {{ req.sub.first_name }}
-            {% endif %}
+      Sub: {{ req.sub.first_name}} {{ req.sub.last_name }}
     {% endif %}
+    Info: {{ req.info }}
   </p>
   <button type="button" class="btn btn-default btn-sm" onclick="location.href='{{ url_for('requests') }}'">Back to Requests</button>
   {% if req.poster != user and not req.sub %}

@@ -11,6 +11,7 @@
         <th>Calltime</th>
         <th>Band</th>
         <th>Event Type</th>
+        <th>Opponent</th>
         <th>Details</th>
         {% if user.is_director or user.is_admin %}<th>Edit</th>{% endif %}
       </tr>
@@ -22,6 +23,7 @@
         <td>{% if event.calltime %}{{ event.calltime.strftime('%I:%M%p') }}{% endif %}</td>
         <td>{{ event.band.name }}</td>
         <td>{{ event.event_type.name }}</td>
+        <td>{{ event.opponent }}</td>
         <td><a href="{{ url_for('event', event_id=event.id) }}">Details</a></td>
         {% if user.is_director or user.is_admin %}
           <td><a href="{{ url_for('event_edit', event_id=event.id) }}">Edit</a></td>

@@ -8,16 +8,18 @@ from flask_login import (login_required, login_user,
                          logout_user, current_user)
 from datetime import datetime
 
-from app import app
-from emails import *
-from functions import *
-from models import *
-from forms import (LoginForm, PasswordResetForm, SetPasswordForm, 
+from app import app, db
+from emails import send_req_pickup_emails
+from functions import (add_event, add_request, add_user, authenticate_user, 
+                    get_form_instr, reset_password_start, verify_email_start)
+from forms import (LoginForm, PasswordResetForm, SetPasswordForm,
                     UserForm, NewRequestForm, EventForm)
+from models import Event, Request, User
 
 
 @app.before_request
 def before_request():
+    '''Load the current user into g before every request.'''
     g.user = current_user
 
 @app.route('/')
@@ -35,7 +37,7 @@ def login():
     user = g.user
     error = None
     if user is not None and user.is_authenticated():
-            return redirect(next or url_for('index'))
+        return redirect(next or url_for('index'))
 
     form = LoginForm()
     username = form.username.data
@@ -60,16 +62,18 @@ def logout():
 
 @app.route('/resetpassword', methods=['GET', 'POST'])
 def reset_pw():
+    '''Route to reset a user's password.'''
     form = PasswordResetForm()
-    if form.validate_on_submit(): # Checks for post
+    if form.validate_on_submit():
         username = form.username.data
         user = User.query.filter_by(username=username).first()
         reset_password_start(user=user)
-        return render_template('resetpassword.html', sent=True, user=None)
-    return render_template('resetpassword.html', form=form, user=None)
+        return render_template('user/reset_password.html', sent=True, user=None)
+    return render_template('user/reset_password.html', form=form, user=None)
 
 @app.route('/setpassword', methods=['GET', 'POST'])
 def set_pw():
+    '''Route to set a user's password'''
     error = None
     form = SetPasswordForm()
     if form.validate_on_submit():
@@ -80,7 +84,7 @@ def set_pw():
             user.set_pw(password)
             return redirect(url_for('user', username=user.username))
         error = 'Unable to reset password.'
-        return render_template('setpassword.html',
+        return render_template('user/set_password.html',
                             form=form, user=None, error=error)
 
     username = request.args.get('username')
@@ -89,12 +93,12 @@ def set_pw():
     if user and user.pw_reset_key != None and user.pw_reset_key == key:
         form = SetPasswordForm(username=user.username)
         form.validate()
-        return render_template('setpassword.html',
+        return render_template('user/set_password.html',
                             form=form, user=None, error=error)
-    
+
     form = PasswordResetForm()
     error = 'Invalid link, please complete this form to receive a new link'
-    return render_template('resetpassword.html', form=form, 
+    return render_template('user/reset_password.html', form=form,
                             user=None, error=error)
 
 @app.route('/users')
@@ -104,14 +108,15 @@ def users():
     user = g.user
     if user.is_director or user.is_admin:
         users = User.query.all()
-        return render_template('users.html', users=users, user=user)
+        return render_template('user/users.html', users=users, user=user)
     abort(404)
 
 @app.route('/users/new', methods=['GET', 'POST'])
 def user_new():
+    '''Route to add a new user.'''
     user = g.user
     if user is not None and user.is_authenticated():
-            return redirect(url_for('index'))
+        return redirect(url_for('index'))
 
     form = UserForm()
     if form.validate_on_submit():
@@ -122,21 +127,22 @@ def user_new():
         last_name = form.last_name.data
         nickname = form.nickname.data
         instruments = get_form_instr(form)
-        
+
         username_avail = [] == User.query.filter_by(username=username).all()
         email_avail = [] == User.query.filter_by(email=email).all()
-        user = User(username=username, email=email, password=password, \
-                    first_name=first_name, last_name=last_name, \
-                    nickname=nickname, instruments=instruments)
+        user = User(username=username, email=email, password=password,
+                    first_name=first_name, last_name=last_name,
+                    nickname=nickname, instruments=instruments, 
+                    req_add_notify_instrs=instruments)
         if username_avail and email_avail and add_user(user):
             verify_email_start(user)
-            return render_template('postreg.html', user=None)
+            return render_template('user/reg_complete.html', user=None)
 
         if not username_avail:
             form.errors['username'] = ['This username is taken.']
         if not email_avail:
             form.errors['email'] = ['This email address is taken.']
-    return render_template('user_create_update.html', user=None, form=form)
+    return render_template('user/create_update.html', user=None, form=form)
 
 @app.route('/users/<username>', methods=['GET', 'POST'])
 @login_required
@@ -146,12 +152,13 @@ def user(username):
     page_user = User.query.filter_by(username=username).first()
     if user.is_director or user.is_admin or user == page_user:
         if page_user:
-            return render_template('user.html', user=user, page_user=page_user)
+            return render_template('user/user.html', user=user, page_user=page_user)
     abort(404)
 
 @app.route('/users/<username>/edit', methods=['GET', 'POST'])
 @login_required
 def user_edit(username):
+    '''Route to edit a user's account information.'''
     user = g.user
     edit_user = User.query.filter_by(username=username).first()
     if user == edit_user:
@@ -172,7 +179,7 @@ def user_edit(username):
         form.last_name.data = user.last_name
         form.nickname.data = user.nickname
         form.instruments.data = user.instruments
-        return render_template('user_create_update.html', form=form, user=user)
+        return render_template('user/create_update.html', form=form, user=user)
 
     abort(404)
 
@@ -182,7 +189,7 @@ def requests():
     '''Route to Requests Collection.'''
     requests = Request.get_open_reqs()
     user = g.user
-    return render_template('requests.html', requests=requests, user=user)
+    return render_template('request/requests.html', requests=requests, user=user)
 
 @app.route('/requests/new', methods=['GET', 'POST'])
 @login_required
@@ -190,10 +197,10 @@ def request_new():
     '''Add a new request.'''
     user = g.user
     form = NewRequestForm()
-    form.instrument.choices = [(instr.id, instr.name) 
+    form.instrument.choices = [(instr.id, instr.name)
                                 for instr in user.instruments]
-    events = Event.get_future_events()
-    choices = [(event.id, event.event_type.name + ' ' + event.date.strftime('%a %b %d, %I:%M%p')) 
+    choices = [(event.id, event.event_type.name + ' ' + \
+                event.date.strftime('%a %b %d, %I:%M%p'))
         for event in Event.get_future_events()]
     form.event_id.choices = choices
 
@@ -202,13 +209,15 @@ def request_new():
         event_id = form.event_id.data
         instrument_id = form.instrument.data
         part = form.part.data if form.part.data else ''
+        info = form.info.data if form.info.data else ''
         req_id = add_request(band_id=band_id, event_id=event_id,
-                            instrument_id=instrument_id, part=part)
+                            instrument_id=instrument_id, part=part, info=info)
         if req_id:
             return redirect(url_for('req', request_id=req_id))
-        form.errors['event_id'] = ['You have already created a request for this event.']
+        form.errors['event_id'] = \
+                    ['You have already created a request for this event.']
 
-    return render_template('newRequest.html', form=form, user=user)
+    return render_template('request/new.html', form=form, user=user)
 
 @app.route('/requests/<request_id>', methods=['GET', 'POST'])
 @login_required
@@ -218,7 +227,7 @@ def req(request_id):
     if request.method == 'GET':
         req = Request.query.get(request_id)
         if req:
-            return render_template('request.html', req=req, user=user)
+            return render_template('request/request.html', req=req, user=user)
         abort(404)
     req = Request.query.filter_by(id=request_id).first()
     if req:
@@ -232,6 +241,7 @@ def req(request_id):
 @app.route('/requests/<request_id>/delete', methods=['POST'])
 @login_required
 def req_delete(request_id):
+    '''Route to delete a request.'''
     user = g.user
     req = Request.query.get(request_id)
     if req and (user == req.poster or user.is_admin or user.is_director):
@@ -243,20 +253,24 @@ def req_delete(request_id):
 @app.route('/requests/<request_id>/pickup/confirm')
 @login_required
 def req_pickup_confirm(request_id):
+    '''Route to confirm pickup of a request.'''
     user = g.user
     req = Request.query.get(request_id)
     if not req or req.sub:
         return redirect(url_for('requests'))
-    return render_template('pickup-req-confirm.html', req=req, user=user)
+    return render_template('request/pickup_confirm.html', req=req, user=user)
 
 @app.route('/requests/<request_id>/delete/confirm')
 @login_required
 def req_delete_confirm(request_id):
+    '''Route to confirm deletion of a request.'''
     user = g.user
     req = Request.query.get(request_id)
     if req and (user == req.poster or user.is_admin or user.is_director):
-        return render_template('req_delete_confirm.html', req=req, user=user)
-    return redirect(url_for('req', request_id=req.id))
+        return render_template('request/delete_confirm.html', req=req, user=user)
+    if req:
+        return redirect(url_for('req', request_id=req.id))
+    return redirect(url_for('requests'))
 
 @app.route('/events/')
 @login_required
@@ -265,7 +279,7 @@ def events():
     user = g.user
     if user.is_director or user.is_admin:
         events = Event.get_future_events()
-        return render_template('events.html', events=events, user=user)
+        return render_template('event/events.html', events=events, user=user)
     abort(404)
 
 @app.route('/events/new', methods=['GET', 'POST'])
@@ -279,16 +293,18 @@ def event_new():
             date = form.date.data
             time = form.calltime.data
             calltime = datetime(year=date.year,
-                                 month=date.month, 
-                                 day=date.day, 
-                                 hour=time.hour, 
+                                 month=date.month,
+                                 day=date.day,
+                                 hour=time.hour,
                                  minute=time.minute)
             band_id = form.band_id.data
             event_type_id = form.event_type_id.data
-            event_id = add_event(date=date, calltime=calltime, band_id=band_id, event_type_id=event_type_id)
+            opponent = form.opponent.data
+            event_id = add_event(date=date, calltime=calltime, band_id=band_id,
+                                    event_type_id=event_type_id, opponent=opponent)
             return redirect(url_for('event', event_id=event_id))
-        
-        return render_template('create_update_event.html', form=form, user=user)
+
+        return render_template('event/create_update.html', form=form, user=user)
     abort(404)
 
 @app.route('/events/<event_id>')
@@ -300,7 +316,7 @@ def event(event_id):
         if request.method == 'GET':
             event = Event.query.get(event_id)
             if event:
-                return render_template('event.html', event=event, user=user)
+                return render_template('event/event.html', event=event, user=user)
             abort(404)
         return 'POST unimplemented'
     abort(404)
@@ -308,6 +324,7 @@ def event(event_id):
 @app.route('/events/<event_id>/edit', methods=['GET', 'POST'])
 @login_required
 def event_edit(event_id):
+    '''Route to edit an event.'''
     user = g.user
     if user.is_director or user.is_admin:
         form = EventForm()
@@ -316,41 +333,44 @@ def event_edit(event_id):
             event.date = form.date.data
             time = form.calltime.data
             event.calltime = datetime(year=event.date.year,
-                                 month=event.date.month, 
-                                 day=event.date.day, 
-                                 hour=time.hour, 
+                                 month=event.date.month,
+                                 day=event.date.day,
+                                 hour=time.hour,
                                  minute=time.minute)
             event.band_id = form.band_id.data
             event.event_type_id = form.event_type_id.data
+            event.opponent = form.opponent.data
             db.session.commit()
             return redirect(url_for('event', event_id=event_id))
 
-        if event_id:
-            event = Event.query.get(event_id)
+        event = Event.query.get(event_id)
+        if event:
             form.event_id.data = event.id
             form.date.data = event.date
             form.calltime.data = event.calltime
             form.band_id.data = event.band_id
             form.event_type_id.data = event.event_type_id
-            return render_template('create_update_event.html', form=form, user=user)
-            
+            form.opponent.data = event.opponent
+            return render_template('event/create_update.html', form=form, user=user)
+
     abort(404)
 
 @app.route('/verify')
 def verify_email():
+    '''Route to verify a user's email address.'''
     username = request.args.get('username')
     key = request.args.get('k')
     user = User.query.filter_by(username=username).first()
-    
+
     if user and user.email_verify_key != None and user.email_verify_key == key:
         user.email_verify_key = None
         user.enabled = True
         db.session.commit()
         if session.get('logged_in') == True:
             user = g.user
-            return render_template('verified.html', success=True, user=user)
-        return render_template('verified.html', success=True)
+            return render_template('user/verify.html', success=True, user=user)
+        return render_template('user/verify.html', success=True)
     if session.get('logged_in') == True:
         user = g.user
-        return render_template('verified.html', success=False, user=user)
-    return render_template('verified.html', success=False)
+        return render_template('user/verify.html', success=False, user=user)
+    return render_template('user/verify.html', success=False)
