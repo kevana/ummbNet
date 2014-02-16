@@ -65,7 +65,7 @@ director = User(username='director', email='kevan+skeeter@ummb.net', password='p
             instruments=[], req_add_notify_instrs=[], is_director=True, enabled=True)
 user_1 = User(username='user_1', email='kevan+user_1@ummb.net', password='password',
             first_name='Mitch', last_name='Gulbransen', nickname='Gulbie',
-            instruments=[piccolo, flute], req_add_notify_instrs=[piccolo, flute],
+            instruments=[piccolo, flute], req_add_notify_instrs=[piccolo, flute, trumpet],
             enabled=True)
 user_2 = User(username='user_2', email='kevan+user_2@ummb.net', password='password',
             first_name='Phillip', last_name='Homen', nickname='Phil',
@@ -82,13 +82,13 @@ user_5 = User(username='user_5', email='kevan+user_5@ummb.net', password='passwo
             instruments=[trombone], req_add_notify_instrs=[trombone], enabled=True)
 user_6 = User(username='user_6', email='kevan+user_6@ummb.net', password='password',
             first_name='Jeff', last_name='Korum', nickname='Twitch',
-            instruments=[baritone], req_add_notify_instrs=[baritone], enabled=True)
+            instruments=[baritone, trumpet], req_add_notify_instrs=[baritone, trumpet], enabled=True)
 user_7 = User(username='user_7', email='kevan+user_7@ummb.net', password='password',
             first_name='Tyler', last_name='Hoffman', nickname='Ty',
             instruments=[tuba], req_add_notify_instrs=[tuba], enabled=True)
 user_8 = User(username='user_8', email='kevan+user_8@ummb.net', password='password',
             first_name='Brad', last_name='Billstein', nickname='Colin2',
-            instruments=[drumline, flute], req_add_notify_instrs=[drumline, flute],
+            instruments=[drumline, flute, trumpet], req_add_notify_instrs=[drumline, flute, trumpet],
             enabled=True)
 user_9 = User(username='user_9', email='kevan+user_9@ummb.net', password='password',
             first_name='Tomas', last_name='Icenogle', nickname='Iceman',
