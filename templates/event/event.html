@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container">
   <h1>Event</h1>
-  <p>Date: {{ event.date.strftime('%a %b %d, %I:%M%p') }}<br>
+  <p>Date: {{ event.date.strftime('%a %b %d') }}<br>
      Calltime: {% if event.calltime %}{{ event.calltime.strftime('%I:%M%p') }}{% else %}TBD{% endif %}<br>
      Band: {{ event.band.name }}<br>
      Event Type: {{ event.event_type.name }}<br>
