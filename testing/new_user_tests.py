@@ -5,7 +5,7 @@ New user tests.
 import os
 import sys
 import unittest
-
+from werkzeug.datastructures import MultiDict
 # Add parent directory to import path
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
@@ -30,33 +30,36 @@ class NewUserTests(unittest.TestCase):
         self.app = app.test_client()
         db.create_all()
         db_insert_all(db)
+        db.session.remove()
 
     def tearDown(self):
         '''Post-test teardown.'''
         db.session.remove()
         db.drop_all()
-    @unittest.skip('Broken, instruments not adding to list')
-    def user_new_all_instrs(self):
-        rv = self.app.post('/users/new', data=dict({
-                        'username'    : 'user',
-                        'email'       : 'user@example.com',
-                        'password'    : 'password',
-                        'confirm'     : 'password',
-                        'first_name'  : 'User',
-                        'last_name'   : 'Name',
-                        'nickname'    : 'nickname',
-                        'instruments' : 'Piccolo',
-                        'instruments' : 'Flute',
-                        'instruments' : 'Clarinet',
-                        'instruments' : 'Alto Sax',
-                        'instruments' : 'Tenor Sax',
-                        'instruments' : 'Trumpet',
-                        'instruments' : 'Mellophone',
-                        'instruments' : 'Trombone',
-                        'instruments' : 'Baritone',
-                        'instruments' : 'Tuba',
-                        'instruments' : 'Drumline'
-                    }), query_string='instruments=Piccolo&instruments=Flute&instruments=Clarinet&instruments=Alto+Sax&instruments=Tenor+Sax&instruments=Trumpet&instruments=Mellophone&instruments=Trombone&instruments=Baritone&instruments=Tuba&instruments=Drumline',
+
+    def test_user_new_all_instrs(self):
+        rv = self.app.get('/users/new')
+        self.assertIn('option', rv.data)
+        rv = self.app.post('/users/new', data=MultiDict([
+                        ('username'    , 'user'),
+                        ('email'       , 'user@example.com'),
+                        ('password'    , 'password'),
+                        ('confirm'     , 'password'),
+                        ('first_name'  , 'User'),
+                        ('last_name'   , 'Name'),
+                        ('nickname'    , 'nickname'),
+                        ('instruments' , 'Piccolo'),
+                        ('instruments' , 'Flute'),
+                        ('instruments' , 'Clarinet'),
+                        ('instruments' , 'Alto Sax'),
+                        ('instruments' , 'Tenor Sax'),
+                        ('instruments' , 'Trumpet'),
+                        ('instruments' , 'Mellophone'),
+                        ('instruments' , 'Trombone'),
+                        ('instruments' , 'Baritone'),
+                        ('instruments' , 'Tuba'),
+                        ('instruments' , 'Drumline'),
+                    ]),
                     follow_redirects=True)
         self.assertIn('Registration Complete', rv.data)
 

@@ -64,10 +64,8 @@ class UserForm(Form):
     first_name = TextField('First Name:', validators=[Required()])
     last_name = TextField('Last Name:')
     nickname = TextField('Nickname:')
-    instrs = [(instr.name, instr.name) for instr in Instrument.query.all()]
     instruments = SelectMultipleField(
-                'Instruments: (ctrl+click or cmd+click to select multiple)',
-                choices=instrs)
+                'Instruments: (ctrl+click or cmd+click to select multiple)')
 
 class NewRequestForm(Form):
     '''Form for request creation.'''

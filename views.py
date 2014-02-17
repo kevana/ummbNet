@@ -14,7 +14,7 @@ from functions import (add_event, add_request, add_user, authenticate_user,
                     get_form_instr, reset_password_start, verify_email_start)
 from forms import (LoginForm, PasswordResetForm, SetPasswordForm,
                     UserForm, NewRequestForm, EventForm)
-from models import Event, Request, User
+from models import Event, Instrument, Request, User
 
 
 @app.before_request
@@ -119,6 +119,9 @@ def user_new():
         return redirect(url_for('index'))
 
     form = UserForm()
+    instrs = [(instr.name, instr.name) for instr in Instrument.query.all()]
+    form.instruments.choices = instrs
+
     if form.validate_on_submit():
         username = form.username.data
         email = form.email.data
