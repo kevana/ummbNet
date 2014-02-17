@@ -3,22 +3,7 @@
 {% block content %}
 <div class="container">
   <h1>Request</h1>
-  <p>Band: {{ req.event.band.name }}<br>
-     Event: {{ req.event.event_type.name  }}<br>
-     Opponent: {{ req.event.opponent }}<br>
-     Date: {{ req.event.date.strftime('%a %b %d, %I:%M%p') }}<br>
-     Instrument: {{ req.instrument.name }}<br>
-     Part: {{ req.part }}<br>
-     Poster: {% if req.poster.nickname %}
-              {{ req.poster.nickname }}
-              {% else %}
-              {{ req.poster.first_name }}
-              {% endif %}<br>
-    {% if req.sub %}
-      Sub: {{ req.sub.first_name}} {{ req.sub.last_name }}
-    {% endif %}
-    Info: {{ req.info }}
-  </p>
+  <p>{% include 'request/base_info.html' %}</p>
   <button type="button" class="btn btn-default btn-sm" onclick="location.href='{{ url_for('requests') }}'">Back to Requests</button>
   {% if req.poster != user and not req.sub %}
     <button type="button" class="btn btn-default btn-primary" onclick="location.href='{{ url_for('req_pickup_confirm', request_id=req.id) }}'">Pick up</button>

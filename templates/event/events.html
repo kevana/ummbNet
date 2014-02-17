@@ -19,7 +19,7 @@
     <tbody>
     {% for event in events %}
       <tr>
-        <td>{{ event.date.strftime('%a %b %d, %I:%M%p') }}</td>
+        <td>{{ event.date.strftime('%a %b %d') }}</td>
         <td>{% if event.calltime %}{{ event.calltime.strftime('%I:%M%p') }}{% endif %}</td>
         <td>{{ event.band.name }}</td>
         <td>{{ event.event_type.name }}</td>

@@ -3,6 +3,7 @@ Event tests for a logged in user.
 '''
 
 import os
+import re
 import sys
 import unittest
 from datetime import datetime, timedelta
@@ -80,7 +81,6 @@ class EventTests(unittest.TestCase):
         self.assertNotIn('Create a new event', rv.data)
         self.assertIn(calltime.strftime('%H:%M'), rv.data)
 
-    @unittest.skip('Incomplete')
     def test_edit_event(self):
         # Create a new event
         one_hour = timedelta(hours=1)
@@ -96,9 +96,11 @@ class EventTests(unittest.TestCase):
         ), follow_redirects=True)
         self.assertNotIn('Create a new event', rv.data)
         self.assertIn(calltime.strftime('%H:%M'), rv.data)
-        #print(rv.data)
+        p = re.compile(ur'.*/events/([0-9]+)/edit.*', re.DOTALL)
+        m = p.match(rv.data)
+        event_id = int(m.group(1))
         # Edit the event
-        rv = self.app.get('/events/1/edit')
+        rv = self.app.get('/events/' + str(event_id) + '/edit')
         self.assertIn('Update event', rv.data)
         date = datetime.utcnow() + one_week + one_week
         calltime = date - one_hour - one_hour

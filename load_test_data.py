@@ -43,17 +43,23 @@ day = now.day
 hour = now.hour
 minute = now.minute
 
+one_hour = timedelta(minutes=60)
 one_day = timedelta(days=1)
 one_week = timedelta(days=7)
 one_month = timedelta(days=30)
 
 yesterday = now - one_day
+yesterday_call = now - one_day - one_hour
 tomorrow = now + one_day
+tomorrow_call = now + one_day - one_hour
 last_week = now - one_week
+last_week_call = now - one_week - one_hour
 next_week = now + one_week
+next_week_call = now + one_week - one_hour
 last_month = now - one_month
+last_month_call = now - one_month - one_hour
 next_month = now + one_month
-
+next_month_call = now + one_month - one_hour
 
 # Create Users
 admin = User(username='admin', email='kevan@ummb.net', password='password',
@@ -101,35 +107,50 @@ db.session.commit()
 
 # Create Events
 event_1 = Event(event_type_id=mens_basketball.id, date=tomorrow,
-                band_id=gold_band.id, opponent='Purdue')
+                calltime=tomorrow_call, band_id=gold_band.id,
+                opponent='Purdue')
 event_2 = Event(event_type_id=mens_basketball.id, date=next_week,
-                band_id=maroon_band.id, opponent='Illinois')
+                calltime=next_week_call, band_id=maroon_band.id,
+                opponent='Illinois')
 event_3 = Event(event_type_id=mens_basketball.id, date=next_month,
-                band_id=gopher_band.id, opponent='Indiana')
+                calltime=next_month_call, band_id=gopher_band.id,
+                opponent='Indiana')
 event_4 = Event(event_type_id=womens_basketball.id, date=tomorrow,
-                band_id=gold_band.id, opponent='Wisconsin')
+                calltime=tomorrow_call, band_id=gold_band.id, 
+                opponent='Wisconsin')
 event_5 = Event(event_type_id=womens_basketball.id, date=next_week,
-                band_id=maroon_band.id, opponent='Nebraska')
+                calltime=next_week_call, band_id=maroon_band.id, 
+                opponent='Nebraska')
 event_6 = Event(event_type_id=womens_basketball.id, date=next_month,
-                band_id=gopher_band.id, opponent='Iowa')
+                calltime=next_month_call, band_id=gopher_band.id,
+                opponent='Iowa')
 event_7 = Event(event_type_id=mens_hockey.id, date=tomorrow,
-                band_id=gold_band.id, opponent='Penn State')
+                calltime=tomorrow_call, band_id=gold_band.id,
+                opponent='Penn State')
 event_8 = Event(event_type_id=mens_hockey.id, date=next_week,
-                band_id=maroon_band.id, opponent='Michigan')
+                calltime=next_week_call, band_id=maroon_band.id,
+                opponent='Michigan')
 event_9 = Event(event_type_id=mens_hockey.id, date=next_month,
-                band_id=gopher_band.id, opponent='Michigan State')
+                calltime=next_month_call, band_id=gopher_band.id,
+                opponent='Michigan State')
 event_10 = Event(event_type_id=womens_hockey.id, date=tomorrow,
-                band_id=gold_band.id, opponent='Rutgers')
+                calltime=tomorrow_call, band_id=gold_band.id,
+                opponent='Rutgers')
 event_11 = Event(event_type_id=womens_hockey.id, date=next_week,
-                band_id=maroon_band.id, opponent='Maryland')
+                calltime=next_week_call, band_id=maroon_band.id,
+                opponent='Maryland')
 event_12 = Event(event_type_id=womens_hockey.id, date=next_month,
-                band_id=gopher_band.id, opponent='Northwestern')
+                calltime=next_month_call, band_id=gopher_band.id,
+                opponent='Northwestern')
 event_13 = Event(event_type_id=volleyball.id, date=tomorrow,
-                band_id=gold_band.id, opponent='Purdue')
+                calltime=tomorrow_call, band_id=gold_band.id, 
+                opponent='Purdue')
 event_14 = Event(event_type_id=volleyball.id, date=next_week,
-                band_id=maroon_band.id, opponent='Illinois')
+                calltime=next_week_call, band_id=maroon_band.id,
+                opponent='Illinois')
 event_15 = Event(event_type_id=volleyball.id, date=next_month,
-                band_id=gopher_band.id, opponent='Indiana')
+                calltime=next_month_call, band_id=gopher_band.id,
+                opponent='Indiana')
 
 db.session.add_all([event_1, event_2, event_3, event_4, event_5,
                     event_6, event_7, event_8, event_9, event_10,

@@ -8,12 +8,13 @@
     <thead>
       <tr>
         <th>Date</th>
+        <th>Calltime</th>
+        <th>Instrument</th>
+        <th>Part</th>
         <!--<th>Poster</th>-->
         <!--<th>Band</th>-->
         <th>Event</th>
         <th>Opponent</th>
-        <th>Instrument</th>
-        <th>Part</th>
         <th>Details</th>
         <th>Pickup</th>
       </tr>
@@ -21,7 +22,10 @@
     <tbody>
     {% for req in requests %}
       <tr>
-        <td>{{ req.event.date.strftime('%a %b %d, %I:%M%p') }}</td>
+        <td>{{ req.event.date.strftime('%a %b %d') }}</td>
+        <td>{{ req.event.calltime.strftime('%I:%M%p') }}
+        <td>{{ req.instrument.name }}</td>
+        <td>{{ req.part }}</td>
         <!--<td>{% if req.poster.nickname %}
             {{ req.poster.nickname }}
             {% else %}
@@ -31,8 +35,6 @@
         <!--<td>{{ req.band.name }}</td>-->
         <td>{{ req.event.event_type.name }}</td>
         <td>{{ req.event.opponent }}</td>
-        <td>{{ req.instrument.name }}</td>
-        <td>{{ req.part }}</td>
         <td><a href="{{ url_for('req', request_id=req.id) }}">Details</a></td>
         <td>
           {% if req.poster != user %}

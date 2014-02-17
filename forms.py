@@ -64,10 +64,8 @@ class UserForm(Form):
     first_name = TextField('First Name:', validators=[Required()])
     last_name = TextField('Last Name:')
     nickname = TextField('Nickname:')
-    instrs = [(instr.name, instr.name) for instr in Instrument.query.all()]
     instruments = SelectMultipleField(
-                'Instruments: (ctrl+click or cmd+click to select multiple)',
-                choices=instrs)
+                'Instruments: (ctrl+click or cmd+click to select multiple)')
 
 class NewRequestForm(Form):
     '''Form for request creation.'''
@@ -81,16 +79,12 @@ class NewRequestForm(Form):
 
 class EventForm(Form):
     '''Form for event creation and update.'''
-    bands = [(band.id, band.name) for band in Band.query.all()]
-    event_types = [(typ.id, typ.name) for typ in EventType.query.all()]
-
     event_id = HiddenField('event_id')
     date = DateTimeLocalField('Event Date:', format='%Y-%m-%dT%H:%M')
     calltime = TimeField('Calltime:')
-    band_id = SelectField('Band:', choices=bands,
-                        validators=[Required()], coerce=int)
-    event_type_id = SelectField('Event Type:', choices=event_types,
-                        validators=[Required()], coerce=int)
+    band_id = SelectField('Band:', validators=[Required()], coerce=int)
+    event_type_id = SelectField('Event Type:', validators=[Required()],
+                                coerce=int)
     opponent = TextField('Opponent:')
 
     def validate_date(form, field):

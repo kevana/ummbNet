@@ -4,18 +4,7 @@
 <div class="container">
   <h1>Are you sure?</h1>
   <p>Please review the details below and confirm that you want to pick up this event</p>
-  <p>Band: {{ req.event.band.name }}<br>
-     Event: {{ req.event.event_type.name  }}<br>
-     Date: {{ req.event.date.strftime('%a %b %d, %I:%M%p') }}<br>
-     Instrument: {{ req.instrument.name }}<br>
-     Part: {{ req.part }}<br>
-     Poster: {% if req.poster.nickname %}
-              {{ req.poster.nickname }}
-              {% else %}
-              {{ req.poster.first_name }}
-              {% endif %}
-    Info: {{ req.info }}
-  </p>
+  <p>{% include 'request/base_info.html' %}</p>
   <p>
   <form role="form" action="{{ url_for('req', request_id=req.id) }}" method="POST">
     <button type="button" class="btn btn-default btn-sm" onclick="location.href='{{ url_for('req', request_id=req.id) }}'">Cancel</button>
