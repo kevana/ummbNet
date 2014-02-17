@@ -14,7 +14,7 @@ from functions import (add_event, add_request, add_user, authenticate_user,
                     get_form_instr, reset_password_start, verify_email_start)
 from forms import (LoginForm, PasswordResetForm, SetPasswordForm,
                     UserForm, NewRequestForm, EventForm)
-from models import Event, Instrument, Request, User
+from models import Band, Event, EventType, Instrument, Request, User
 
 
 @app.before_request
@@ -101,7 +101,7 @@ def set_pw():
     return render_template('user/reset_password.html', form=form,
                             user=None, error=error)
 
-@app.route('/users')
+@app.route('/users/')
 @login_required
 def users():
     '''Route to users collection.'''
@@ -172,7 +172,7 @@ def user_edit(username):
         del form.confirm
         instrs = [(instr.name, instr.name) for instr in Instrument.query.all()]
         form.instruments.choices = instrs
-        
+
         if form.validate_on_submit():
             edit_user.first_name = form.first_name.data
             edit_user.last_name = form.last_name.data
@@ -189,7 +189,7 @@ def user_edit(username):
 
     abort(404)
 
-@app.route('/requests')
+@app.route('/requests/')
 @login_required
 def requests():
     '''Route to Requests Collection.'''
@@ -295,6 +295,11 @@ def event_new():
     user = g.user
     if user.is_director or user.is_admin:
         form = EventForm()
+        bands = [(band.id, band.name) for band in Band.query.all()]
+        event_types = [(typ.id, typ.name) for typ in EventType.query.all()]
+        form.band_id.choices = bands
+        form.event_type_id.choices = event_types
+
         if form.validate_on_submit():
             date = form.date.data
             time = form.calltime.data
@@ -334,6 +339,11 @@ def event_edit(event_id):
     user = g.user
     if user.is_director or user.is_admin:
         form = EventForm()
+        bands = [(band.id, band.name) for band in Band.query.all()]
+        event_types = [(typ.id, typ.name) for typ in EventType.query.all()]
+        form.band_id.choices = bands
+        form.event_type_id.choices = event_types
+
         if form.validate_on_submit():
             event = Event.query.get(event_id)
             event.date = form.date.data

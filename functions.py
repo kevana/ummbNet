@@ -50,9 +50,9 @@ def add_request(band_id, event_id, instrument_id, part='', info=''):
     send_new_req_emails(req)
     return req.id
 
-def add_event(date, band_id, event_type_id, calltime=None):
+def add_event(date, band_id, event_type_id, calltime=None, opponent=None):
     '''Add a new event to the database.'''
-    event = Event(date=date, calltime=calltime,
+    event = Event(date=date, calltime=calltime, opponent=opponent,
                 band_id=band_id, event_type_id=event_type_id)
     if event:
         try:
