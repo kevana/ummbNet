@@ -170,6 +170,9 @@ def user_edit(username):
         del form.email
         del form.password
         del form.confirm
+        instrs = [(instr.name, instr.name) for instr in Instrument.query.all()]
+        form.instruments.choices = instrs
+        
         if form.validate_on_submit():
             edit_user.first_name = form.first_name.data
             edit_user.last_name = form.last_name.data
