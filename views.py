@@ -194,7 +194,10 @@ def user_edit(username):
 @login_required
 def requests():
     '''Route to Requests Collection.'''
-    requests = Request.get_open_reqs()
+    if ('past' == request.args.get('date')):
+        requests = Request.get_past_reqs()
+    else:
+        requests = Request.get_open_reqs()
     user = g.user
     return render_template('request/requests.html', requests=requests, user=user)
 
