@@ -89,5 +89,5 @@ class EventForm(Form):
 
     def validate_date(form, field):
         '''Validate a date, ensure it is in the future.'''
-        if field.data and field.data < datetime.utcnow():
+        if field.data and field.data < datetime.now():
             raise ValidationError('Event date must be in the future.')

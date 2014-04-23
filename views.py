@@ -164,7 +164,7 @@ def user_edit(username):
     '''Route to edit a user's account information.'''
     user = g.user
     edit_user = User.query.filter_by(username=username).first()
-    if user == edit_user:
+    if user == edit_user or user.is_director or user.is_admin:
         form = UserForm()
         del form.username
         del form.email
@@ -181,11 +181,12 @@ def user_edit(username):
             db.session.commit()
             return redirect(url_for('user', username=username))
 
-        form.first_name.data = user.first_name
-        form.last_name.data = user.last_name
-        form.nickname.data = user.nickname
+        form.first_name.data = edit_user.first_name
+        form.last_name.data = edit_user.last_name
+        form.nickname.data = edit_user.nickname
         form.instruments.data = user.instruments
-        return render_template('user/create_update.html', form=form, user=user)
+        return render_template('user/create_update.html', form=form, user=user,
+                                edit_user=edit_user)
 
     abort(404)
 
@@ -193,7 +194,10 @@ def user_edit(username):
 @login_required
 def requests():
     '''Route to Requests Collection.'''
-    requests = Request.get_open_reqs()
+    if ('past' == request.args.get('date')):
+        requests = Request.get_past_reqs()
+    else:
+        requests = Request.get_open_reqs()
     user = g.user
     return render_template('request/requests.html', requests=requests, user=user)
 

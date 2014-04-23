@@ -68,7 +68,7 @@ class EventTests(unittest.TestCase):
         # Creata a new event
         one_hour = timedelta(hours=1)
         one_week = timedelta(days=7)
-        date = datetime.utcnow() + one_week
+        date = datetime.now() + one_week
         calltime = date - one_hour
         #print(rv.data)
         # Post event
@@ -85,7 +85,7 @@ class EventTests(unittest.TestCase):
         # Create a new event
         one_hour = timedelta(hours=1)
         one_week = timedelta(days=7)
-        date = datetime.utcnow() + one_week
+        date = datetime.now() + one_week
         calltime = date - one_hour
         # Post event
         rv = self.app.post('/events/new', data=dict(
@@ -102,7 +102,7 @@ class EventTests(unittest.TestCase):
         # Edit the event
         rv = self.app.get('/events/' + str(event_id) + '/edit')
         self.assertIn('Update event', rv.data)
-        date = datetime.utcnow() + one_week + one_week
+        date = datetime.now() + one_week + one_week
         calltime = date - one_hour - one_hour
         # Post edits
         rv = self.app.post('/events/1/edit', data=dict(

@@ -6,5 +6,5 @@ Calltime: {{ req.event.calltime.strftime('%I:%M%p') }}
 Instrument: {{ req.instrument.name }}
 Part: {{ req.part }}
 Poster: {{ req.poster.first_name }} {{ req.poster.last_name }}
-Sub: {% if req.sub.nickname %}{{ req.sub.nickname}}{% else %}{{ req.sub.first_name }}{% endif %}
+{% if req.sub %}Sub: {{ req.sub.first_name}} {{ req.sub.last_name }}{% endif %}
 Info: {{ req.info }}

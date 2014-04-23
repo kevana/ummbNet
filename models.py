@@ -123,7 +123,13 @@ class Request(db.Model):
         '''Get a list of all open requests for future events.'''
         return Request.query.filter(Request.sub == None).\
                 join(Request.event).\
-                filter(Event.date > datetime.utcnow()).\
+                filter(Event.date > datetime.now()).\
+                order_by(Event.date).all()
+    @staticmethod
+    def get_past_reqs():
+        '''Get a list of all requests for past events.'''
+        return Request.query.join(Request.event).\
+                filter(Event.date < datetime.now()).\
                 order_by(Event.date).all()
 
 class Band(db.Model):
@@ -174,7 +180,7 @@ class Event(db.Model):
     @staticmethod
     def get_future_events():
         '''Get a list of all future events.'''
-        return Event.query.filter(Event.date > datetime.utcnow()).\
+        return Event.query.filter(Event.date > datetime.now()).\
                                                 order_by(Event.date).all()
 
 class EventType(db.Model):

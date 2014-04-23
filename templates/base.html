@@ -46,8 +46,11 @@
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Requests<b class="caret"></b></a>
               <ul class="dropdown-menu">
-                <li><a href="{{ url_for('requests') }}">View Requests</a></li>
+                <li><a href="{{ url_for('requests') }}">View Open Requests</a></li>
                 <li><a href="{{ url_for('request_new') }}">Add a New Request</a></li>
+                {% if user.is_admin or user.is_director %}
+                <li><a href="{{ url_for('requests', date='past') }}">View Past Requests</a></li>
+                {% endif %}
               </ul>
             </li>
             {% if user.is_admin or user.is_director %}
@@ -56,6 +59,12 @@
               <ul class="dropdown-menu">
                 <li><a href="{{ url_for('events') }}">View Events</a></li>
                 <li><a href="{{ url_for('event_new') }}">Add a New Event</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Users<b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ url_for('users') }}">View Users</a>
               </ul>
             </li>
             {% endif %}

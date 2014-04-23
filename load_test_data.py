@@ -36,7 +36,7 @@ maroon_band = Band.query.filter_by(name='Maroon Band').first()
 gopher_band = Band.query.filter_by(name='Gopher Band').first()
 
 # Create Dates
-now = datetime.utcnow()
+now = datetime.now()
 year = now.year
 month = now.month
 day = now.day
