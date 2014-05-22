@@ -170,6 +170,9 @@ class Event(db.Model):
             self.band_id = band_id
         if calltime:
             self.calltime = calltime
+        else:
+            self.calltime = date
+
         if opponent:
             self.opponent = opponent
 
