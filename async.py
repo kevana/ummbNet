@@ -4,6 +4,7 @@ Async functions for ummbNet
 
 from threading import Thread
 
+
 def async(f):
     '''Decorator that executes in a new thread.'''
     def wrapper(*args, **kwargs):

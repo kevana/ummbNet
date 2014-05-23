@@ -19,7 +19,7 @@
   Matthew Lewis
 
 /*SITE*/
-  Last update: 2014/01/25
+  Last update: 2014/05/23
   Doctype: HTML5
   IDE: TextMate
   Components: JQuery, Bootstrap

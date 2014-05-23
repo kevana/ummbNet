@@ -60,9 +60,11 @@ class EventTests(unittest.TestCase):
             ), follow_redirects=True)
 
     def logout(self):
+        '''Logout a user by getting /logout.'''
         return self.app.get('/logout', follow_redirects=True)
 
     def test_create_event(self):
+        '''Test the event creation process.'''
         rv = self.app.get('/events/new')
         self.assertIn('Create a new event', rv.data)
         # Creata a new event
@@ -79,9 +81,10 @@ class EventTests(unittest.TestCase):
             event_type_id=1
         ), follow_redirects=True)
         self.assertNotIn('Create a new event', rv.data)
-        self.assertIn(calltime.strftime('%H:%M'), rv.data)
+        self.assertIn(calltime.strftime('%I:%M'), rv.data)
 
     def test_edit_event(self):
+        '''Test the event edit process.'''
         # Create a new event
         one_hour = timedelta(hours=1)
         one_week = timedelta(days=7)
@@ -95,7 +98,7 @@ class EventTests(unittest.TestCase):
             event_type_id=1
         ), follow_redirects=True)
         self.assertNotIn('Create a new event', rv.data)
-        self.assertIn(calltime.strftime('%H:%M'), rv.data)
+        self.assertIn(calltime.strftime('%I:%M'), rv.data)
         p = re.compile(ur'.*/events/([0-9]+)/edit.*', re.DOTALL)
         m = p.match(rv.data)
         event_id = int(m.group(1))
@@ -112,13 +115,13 @@ class EventTests(unittest.TestCase):
             band_id=1,
             event_type_id=1
         ), follow_redirects=True)
-        self.assertIn(calltime.strftime('%H:%M'), rv.data)
-    
+        self.assertIn(calltime.strftime('%I:%M'), rv.data)
+
     @unittest.skip('Unimplemented feature')
     def test_delete_event(self):
         '''Unimplemented feature.'''
-        #self.test_create_event()
-        
+        pass
+
 
 if __name__ == '__main__':
     try:

@@ -55,6 +55,7 @@ class LoggedInResourceTests(unittest.TestCase):
             ), follow_redirects=True)
 
     def logout(self):
+        '''Logout the logged in user.'''
         return self.app.get('/logout', follow_redirects=True)
 
     def assert_get_status_code(self, route, code):

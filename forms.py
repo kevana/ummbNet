@@ -5,12 +5,13 @@ Form classes for ummbNet
 from datetime import datetime
 from flask.ext.wtf import Form
 from wtforms import (HiddenField, PasswordField, SelectField,
-                    SelectMultipleField, TextField, TextAreaField)
+                     SelectMultipleField, TextField, TextAreaField)
 from wtforms.fields.html5 import DateTimeLocalField
 from wtforms_components import TimeField
 from wtforms.validators import Email, EqualTo, Required, ValidationError
 
 from models import Band, EventType, Instrument, User
+
 
 # Validators
 def Password(length=8):
@@ -25,11 +26,13 @@ def Password(length=8):
 
     return _password
 
+
 # Forms
 class LoginForm(Form):
     '''Form for main login.'''
     username = TextField('username', validators=[Required()])
     password = PasswordField('password', validators=[Required()])
+
 
 class PasswordResetForm(Form):
     '''Form for resetting passwords.'''
@@ -43,14 +46,16 @@ class PasswordResetForm(Form):
         if not user or form.email.data != user.email:
             raise ValidationError('Invalid username email combination.')
 
+
 class SetPasswordForm(Form):
     '''Form for changing passwords.'''
     password = PasswordField('Select a new password:',
-                            validators=[Password(8)])
+                             validators=[Password(8)])
     confirm = PasswordField('Please re-enter your new password:',
-                             validators=[EqualTo('password',
-                                    message='Passwords must match')])
+                            validators=[EqualTo('password',
+                                                message='Passwords must match')])
     username = HiddenField('username')
+
 
 class UserForm(Form):
     '''Form for user creation and update.'''
@@ -59,23 +64,25 @@ class UserForm(Form):
     password = PasswordField('Password:',
                              validators=[Required()])
     confirm = PasswordField('Please re-enter your password:',
-                             validators=[EqualTo('password',
-                                    message='Passwords must match')])
+                            validators=[EqualTo('password',
+                                                message='Passwords must match')])
     first_name = TextField('First Name:', validators=[Required()])
     last_name = TextField('Last Name:')
     nickname = TextField('Nickname:')
     instruments = SelectMultipleField(
                 'Instruments: (ctrl+click or cmd+click to select multiple)')
 
+
 class NewRequestForm(Form):
     '''Form for request creation.'''
     bands = [(band.id, band.name) for band in Band.query.all()]
     band_id = SelectField('Band:', choices=bands,
-                        validators=[Required()], coerce=int)
+                          validators=[Required()], coerce=int)
     event_id = SelectField('Event:', validators=[Required()], coerce=int)
     instrument = SelectField('Instrument:', validators=[Required()], coerce=int)
     part = TextField('Part:')
     info = TextAreaField('Extra info:')
+
 
 class EventForm(Form):
     '''Form for event creation and update.'''
