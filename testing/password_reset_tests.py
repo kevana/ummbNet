@@ -21,6 +21,7 @@ db.create_all()
 from views import *
 from create_db import *
 
+
 class PasswordResetTests(unittest.TestCase):
     '''Reset user passwords.'''
     def setUp(self):
@@ -31,9 +32,9 @@ class PasswordResetTests(unittest.TestCase):
 
         self.app = app.test_client()
         db.create_all()
-        user = User(username='user', \
-                    email='admin@example.com', \
-                    password='password', \
+        user = User(username='user',
+                    email='admin@example.com',
+                    password='password',
                     enabled=True)
         db.session.add(user)
         db.session.commit()
@@ -77,8 +78,8 @@ class PasswordResetTests(unittest.TestCase):
     def test_resetpassword_fail_pw_mismatch(self):
         '''Test a mismatched passwords failure.'''
         rv = self.app.get('/resetpassword', data=dict(username='user',
-                                                    password1='pw1',
-                                                    password2='pw2'))
+                                                      password1='pw1',
+                                                      password2='pw2'))
         self.assertIn('Password Reset', rv.data)
 
 

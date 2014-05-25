@@ -21,6 +21,7 @@ db.create_all()
 from views import *
 from create_db import *
 
+
 class NewUserTests(unittest.TestCase):
     '''Create new users.'''
     def setUp(self):

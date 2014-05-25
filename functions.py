@@ -11,10 +11,12 @@ from app import bcrypt, db, login_manager
 from models import Event, Instrument, Request, User
 from emails import send_new_req_emails, send_pw_reset_email, send_verify_email
 
+
 @login_manager.user_loader
 def load_user(user_id):
     '''login_manager callback, Return user for a given user_id.'''
     return User.query.get(int(user_id))
+
 
 def authenticate_user(username, password):
     '''Authenticate a user. Return True if username and password are valid.'''
@@ -22,6 +24,7 @@ def authenticate_user(username, password):
     if user:
         return bcrypt.check_password_hash(user.pw_hash, password)
     return False
+
 
 def add_user(user):
     '''Add a new user to the database.'''
@@ -31,6 +34,7 @@ def add_user(user):
     except IntegrityError:
         return False
     return True
+
 
 def add_request(band_id, event_id, instrument_id, part='', info=''):
     '''Add a new request to the database.'''
@@ -50,10 +54,11 @@ def add_request(band_id, event_id, instrument_id, part='', info=''):
     send_new_req_emails(req)
     return req.id
 
+
 def add_event(date, band_id, event_type_id, calltime=None, opponent=None):
     '''Add a new event to the database.'''
     event = Event(date=date, calltime=calltime, opponent=opponent,
-                band_id=band_id, event_type_id=event_type_id)
+                  band_id=band_id, event_type_id=event_type_id)
     if event:
         try:
             db.session.add(event)
@@ -63,6 +68,7 @@ def add_event(date, band_id, event_type_id, calltime=None, opponent=None):
         return event.id
     return None
 
+
 def get_form_instr(form):
     '''Retrieve chosen instruments from form. Return a list containing them.'''
     instrs = []
@@ -71,11 +77,13 @@ def get_form_instr(form):
             instrs.append(Instrument.get_by_name(instr._value()))
     return instrs
 
+
 def get_hash_key():
     '''Get a pseudorandom hex key for password reset and email verification.'''
     m = sha1()
     m.update(urandom(10))
     return m.hexdigest()
+
 
 def reset_password_start(user):
     '''Generate a password reset key and send it via email to a user.'''
@@ -83,6 +91,7 @@ def reset_password_start(user):
     user.pw_reset_key = key
     db.session.commit()
     send_pw_reset_email(user=user, key=key)
+
 
 def verify_email_start(user):
     '''Generate a verification key and send it via email to a user.'''

@@ -10,10 +10,10 @@ from datetime import datetime
 
 from app import app, db
 from emails import send_req_pickup_emails
-from functions import (add_event, add_request, add_user, authenticate_user, 
-                    get_form_instr, reset_password_start, verify_email_start)
+from functions import (add_event, add_request, add_user, authenticate_user,
+                       get_form_instr, reset_password_start, verify_email_start)
 from forms import (LoginForm, PasswordResetForm, SetPasswordForm,
-                    UserForm, NewRequestForm, EventForm)
+                   UserForm, NewRequestForm, EventForm)
 from models import Band, Event, EventType, Instrument, Request, User
 
 
@@ -22,13 +22,15 @@ def before_request():
     '''Load the current user into g before every request.'''
     g.user = current_user
 
+
 @app.route('/')
 def index():
     '''Return the ummbNet homepage.'''
-    if session.get('logged_in') == True:
+    if session.get('logged_in'):
         user = g.user
         return render_template('index.html', user=user)
     return render_template('index.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -52,6 +54,7 @@ def login():
 
     return render_template('login.html', form=form, user=user, error=error)
 
+
 @app.route('/logout')
 def logout():
     '''Log out the currently logged-in user.'''
@@ -59,6 +62,7 @@ def logout():
     flash('You have logged out')
     session.pop('logged_in', None)
     return render_template('logout.html')
+
 
 @app.route('/resetpassword', methods=['GET', 'POST'])
 def reset_pw():
@@ -70,6 +74,7 @@ def reset_pw():
         reset_password_start(user=user)
         return render_template('user/reset_password.html', sent=True, user=None)
     return render_template('user/reset_password.html', form=form, user=None)
+
 
 @app.route('/setpassword', methods=['GET', 'POST'])
 def set_pw():
@@ -85,21 +90,22 @@ def set_pw():
             return redirect(url_for('user', username=user.username))
         error = 'Unable to reset password.'
         return render_template('user/set_password.html',
-                            form=form, user=None, error=error)
+                               form=form, user=None, error=error)
 
     username = request.args.get('username')
     user = User.query.filter_by(username=username).first()
     key = request.args.get('k')
-    if user and user.pw_reset_key != None and user.pw_reset_key == key:
+    if user and user.pw_reset_key is not None and user.pw_reset_key == key:
         form = SetPasswordForm(username=user.username)
         form.validate()
         return render_template('user/set_password.html',
-                            form=form, user=None, error=error)
+                               form=form, user=None, error=error)
 
     form = PasswordResetForm()
     error = 'Invalid link, please complete this form to receive a new link'
     return render_template('user/reset_password.html', form=form,
-                            user=None, error=error)
+                           user=None, error=error)
+
 
 @app.route('/users/')
 @login_required
@@ -110,6 +116,7 @@ def users():
         users = User.query.all()
         return render_template('user/users.html', users=users, user=user)
     abort(404)
+
 
 @app.route('/users/new', methods=['GET', 'POST'])
 def user_new():
@@ -135,7 +142,7 @@ def user_new():
         email_avail = [] == User.query.filter_by(email=email).all()
         user = User(username=username, email=email, password=password,
                     first_name=first_name, last_name=last_name,
-                    nickname=nickname, instruments=instruments, 
+                    nickname=nickname, instruments=instruments,
                     req_add_notify_instrs=instruments)
         if username_avail and email_avail and add_user(user):
             verify_email_start(user)
@@ -147,6 +154,7 @@ def user_new():
             form.errors['email'] = ['This email address is taken.']
     return render_template('user/create_update.html', user=None, form=form)
 
+
 @app.route('/users/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
@@ -155,8 +163,10 @@ def user(username):
     page_user = User.query.filter_by(username=username).first()
     if user.is_director or user.is_admin or user == page_user:
         if page_user:
-            return render_template('user/user.html', user=user, page_user=page_user)
+            return render_template('user/user.html', user=user,
+                                   page_user=page_user)
     abort(404)
+
 
 @app.route('/users/<username>/edit', methods=['GET', 'POST'])
 @login_required
@@ -186,9 +196,10 @@ def user_edit(username):
         form.nickname.data = edit_user.nickname
         form.instruments.data = user.instruments
         return render_template('user/create_update.html', form=form, user=user,
-                                edit_user=edit_user)
+                               edit_user=edit_user)
 
     abort(404)
+
 
 @app.route('/requests/')
 @login_required
@@ -201,6 +212,7 @@ def requests():
     user = g.user
     return render_template('request/requests.html', requests=requests, user=user)
 
+
 @app.route('/requests/new', methods=['GET', 'POST'])
 @login_required
 def request_new():
@@ -208,10 +220,10 @@ def request_new():
     user = g.user
     form = NewRequestForm()
     form.instrument.choices = [(instr.id, instr.name)
-                                for instr in user.instruments]
-    choices = [(event.id, event.event_type.name + ' ' + \
-                event.date.strftime('%a %b %d, %I:%M%p'))
-        for event in Event.get_future_events()]
+                               for instr in user.instruments]
+    choices = [(event.id, event.event_type.name + ' ' +
+               event.date.strftime('%a %b %d, %I:%M%p'))
+               for event in Event.get_future_events()]
     form.event_id.choices = choices
 
     if form.validate_on_submit():
@@ -221,13 +233,14 @@ def request_new():
         part = form.part.data if form.part.data else ''
         info = form.info.data if form.info.data else ''
         req_id = add_request(band_id=band_id, event_id=event_id,
-                            instrument_id=instrument_id, part=part, info=info)
+                             instrument_id=instrument_id, part=part, info=info)
         if req_id:
             return redirect(url_for('req', request_id=req_id))
         form.errors['event_id'] = \
-                    ['You have already created a request for this event.']
+                   ['You have already created a request for this event.']
 
     return render_template('request/new.html', form=form, user=user)
+
 
 @app.route('/requests/<request_id>', methods=['GET', 'POST'])
 @login_required
@@ -248,6 +261,7 @@ def req(request_id):
         return redirect(url_for('req', request_id=req.id))
     abort(404)
 
+
 @app.route('/requests/<request_id>/delete', methods=['POST'])
 @login_required
 def req_delete(request_id):
@@ -260,6 +274,7 @@ def req_delete(request_id):
         return redirect(url_for('requests'))
     return redirect(url_for('req', request_id=req.id))
 
+
 @app.route('/requests/<request_id>/pickup/confirm')
 @login_required
 def req_pickup_confirm(request_id):
@@ -269,6 +284,7 @@ def req_pickup_confirm(request_id):
     if not req or req.sub:
         return redirect(url_for('requests'))
     return render_template('request/pickup_confirm.html', req=req, user=user)
+
 
 @app.route('/requests/<request_id>/delete/confirm')
 @login_required
@@ -282,6 +298,7 @@ def req_delete_confirm(request_id):
         return redirect(url_for('req', request_id=req.id))
     return redirect(url_for('requests'))
 
+
 @app.route('/events/')
 @login_required
 def events():
@@ -291,6 +308,7 @@ def events():
         events = Event.get_future_events()
         return render_template('event/events.html', events=events, user=user)
     abort(404)
+
 
 @app.route('/events/new', methods=['GET', 'POST'])
 @login_required
@@ -308,19 +326,20 @@ def event_new():
             date = form.date.data
             time = form.calltime.data
             calltime = datetime(year=date.year,
-                                 month=date.month,
-                                 day=date.day,
-                                 hour=time.hour,
-                                 minute=time.minute)
+                                month=date.month,
+                                day=date.day,
+                                hour=time.hour,
+                                minute=time.minute)
             band_id = form.band_id.data
             event_type_id = form.event_type_id.data
             opponent = form.opponent.data
             event_id = add_event(date=date, calltime=calltime, band_id=band_id,
-                                    event_type_id=event_type_id, opponent=opponent)
+                                 event_type_id=event_type_id, opponent=opponent)
             return redirect(url_for('event', event_id=event_id))
 
         return render_template('event/create_update.html', form=form, user=user)
     abort(404)
+
 
 @app.route('/events/<event_id>')
 @login_required
@@ -335,6 +354,7 @@ def event(event_id):
             abort(404)
         return 'POST unimplemented'
     abort(404)
+
 
 @app.route('/events/<event_id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -353,10 +373,10 @@ def event_edit(event_id):
             event.date = form.date.data
             time = form.calltime.data
             event.calltime = datetime(year=event.date.year,
-                                 month=event.date.month,
-                                 day=event.date.day,
-                                 hour=time.hour,
-                                 minute=time.minute)
+                                      month=event.date.month,
+                                      day=event.date.day,
+                                      hour=time.hour,
+                                      minute=time.minute)
             event.band_id = form.band_id.data
             event.event_type_id = form.event_type_id.data
             event.opponent = form.opponent.data
@@ -375,6 +395,7 @@ def event_edit(event_id):
 
     abort(404)
 
+
 @app.route('/verify')
 def verify_email():
     '''Route to verify a user's email address.'''
@@ -382,15 +403,15 @@ def verify_email():
     key = request.args.get('k')
     user = User.query.filter_by(username=username).first()
 
-    if user and user.email_verify_key != None and user.email_verify_key == key:
+    if user and user.email_verify_key is not None and user.email_verify_key == key:
         user.email_verify_key = None
         user.enabled = True
         db.session.commit()
-        if session.get('logged_in') == True:
+        if session.get('logged_in'):
             user = g.user
             return render_template('user/verify.html', success=True, user=user)
         return render_template('user/verify.html', success=True)
-    if session.get('logged_in') == True:
+    if session.get('logged_in'):
         user = g.user
         return render_template('user/verify.html', success=False, user=user)
     return render_template('user/verify.html', success=False)

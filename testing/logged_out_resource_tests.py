@@ -20,6 +20,7 @@ db.drop_all()
 db.create_all()
 from views import *
 
+
 class LoggedOutResourceTests(unittest.TestCase):
     '''Test route access for users that are not logged in.'''
     def setUp(self):

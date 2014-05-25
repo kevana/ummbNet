@@ -65,38 +65,38 @@ event_9 = Event(event_type_id=mens_basketball.id,
 # 2/9/14	2:00pm	WBB Gopher
 dt = datetime(2014, 2, 9, 13, 30)
 event_10 = Event(event_type_id=womens_basketball.id,
-                date=dt,
-                band_id=gopher_band.id)
+                 date=dt,
+                 band_id=gopher_band.id)
 # 2/19/14	8:00pm	MBB Gold
 dt = datetime(2014, 2, 19, 19, 15)
 event_11 = Event(event_type_id=mens_basketball.id,
-                date=dt,
-                band_id=gold_band.id)
+                 date=dt,
+                 band_id=gold_band.id)
 # 2/20/14	7:00pm	WBB Gopher
 dt = datetime(2014, 2, 20, 18, 30)
 event_12 = Event(event_type_id=womens_basketball.id,
-                date=dt,
-                band_id=gopher_band.id)
+                 date=dt,
+                 band_id=gopher_band.id)
 # 2/21/14	7:07pm	WH  Maroon
 dt = datetime(2014, 2, 21, 18, 30)
 event_13 = Event(event_type_id=womens_hockey.id,
-                date=dt,
-                band_id=maroon_band.id)
+                 date=dt,
+                 band_id=maroon_band.id)
 # 2/22/14	4:07pm	WH  Maroon
 dt = datetime(2014, 2, 22, 15, 30)
 event_14 = Event(event_type_id=womens_hockey.id,
-                date=dt,
-                band_id=maroon_band.id)
+                 date=dt,
+                 band_id=maroon_band.id)
 # 2/25/14	6:00pm	MBB Gold
 dt = datetime(2014, 2, 25, 17, 15)
 event_15 = Event(event_type_id=mens_basketball.id,
-                date=dt,
-                band_id=gold_band.id)
+                 date=dt,
+                 band_id=gold_band.id)
 # 2/27/14	7:00 or 9:00pm	WBB Gopher
 dt = datetime(2014, 2, 27, 18, 30)
 event_16 = Event(event_type_id=womens_basketball.id,
-                date=dt,
-                band_id=gopher_band.id)
+                 date=dt,
+                 band_id=gopher_band.id)
 
 db.session.add_all([event_1, event_2, event_3, event_4, event_5, event_6,
                     event_7, event_8, event_9, event_10, event_11, event_12,

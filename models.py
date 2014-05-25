@@ -14,6 +14,7 @@ users_instrs_notify = db.Table('users_instrs_notify', db.Model.metadata,
     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('instrument_id', db.Integer, db.ForeignKey('instrument.id')))
 
+
 class User(db.Model):
     '''Represent a user that can log into ummbNet.'''
     id = db.Column(db.Integer, primary_key=True)
@@ -28,9 +29,9 @@ class User(db.Model):
     last_name = db.Column(db.Text)
     nickname = db.Column(db.Text)
     instruments = db.relationship('Instrument',
-                                secondary=users_instrs_play, backref='users')
+                                  secondary=users_instrs_play, backref='users')
     req_add_notify_instrs = db.relationship('Instrument',
-                secondary=users_instrs_notify, backref='notify_users_add')
+                    secondary=users_instrs_notify, backref='notify_users_add')
     enabled = db.Column(db.Boolean)
 
     def set_pw(self, password):
@@ -40,9 +41,9 @@ class User(db.Model):
         db.session.commit()
 
     def __init__(self, username, email, password, first_name=None,
-                last_name=None, nickname=None, requests=None, enabled=False,
-                instruments=None, is_admin=False, is_director=False,
-                req_add_notify_instrs=None):
+                 last_name=None, nickname=None, requests=None, enabled=False,
+                 instruments=None, is_admin=False, is_director=False,
+                 req_add_notify_instrs=None):
         self.username = username
         self.email = email
         self.pw_hash = bcrypt.generate_password_hash(password)
@@ -82,6 +83,7 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
+
 class Request(db.Model):
     '''Represent a user's request for a substitute for an event.'''
     id = db.Column(db.Integer, primary_key=True)
@@ -116,21 +118,23 @@ class Request(db.Model):
 
     def __repr__(self):
         return '<Request Event: %r Posted by: %r>' % \
-                (self.event_id, self.poster)
+               (self.event_id, self.poster)
 
     @staticmethod
     def get_open_reqs():
         '''Get a list of all open requests for future events.'''
-        return Request.query.filter(Request.sub == None).\
-                join(Request.event).\
-                filter(Event.date > datetime.now()).\
-                order_by(Event.date).all()
+        return Request.query.filter(Request.sub is None).\
+                             join(Request.event).\
+                             filter(Event.date > datetime.now()).\
+                             order_by(Event.date).all()
+
     @staticmethod
     def get_past_reqs():
         '''Get a list of all requests for past events.'''
         return Request.query.join(Request.event).\
-                filter(Event.date < datetime.now()).\
-                order_by(Event.date).all()
+                             filter(Event.date < datetime.now()).\
+                             order_by(Event.date).all()
+
 
 class Band(db.Model):
     '''Represent which band the request is for.'''
@@ -149,6 +153,7 @@ class Band(db.Model):
     def __repr__(self):
         return '<Band Name: %r>' % self.name
 
+
 class Event(db.Model):
     '''Represent a specific band event.'''
     id = db.Column(db.Integer, primary_key=True)
@@ -161,7 +166,7 @@ class Event(db.Model):
     opponent = db.Column(db.Text)
 
     def __init__(self, event_type_id, date, calltime=None,
-                requests=None, band_id=None, opponent=None):
+                 requests=None, band_id=None, opponent=None):
         self.event_type_id = event_type_id
         self.date = date
         if requests:
@@ -170,18 +175,22 @@ class Event(db.Model):
             self.band_id = band_id
         if calltime:
             self.calltime = calltime
+        else:
+            self.calltime = date
+
         if opponent:
             self.opponent = opponent
 
     def __repr__(self):
         return '<Event Type: %r Date: %r Call: %r>' % \
-                (self.event_type_id, self.date, self.date.time())
+               (self.event_type_id, self.date, self.date.time())
 
     @staticmethod
     def get_future_events():
         '''Get a list of all future events.'''
         return Event.query.filter(Event.date > datetime.now()).\
-                                                order_by(Event.date).all()
+                           order_by(Event.date).all()
+
 
 class EventType(db.Model):
     '''Represent the type of band event.'''
@@ -197,6 +206,7 @@ class EventType(db.Model):
 
     def __repr__(self):
         return '<Event_Type Name: %r>' % self.name
+
 
 class Instrument(db.Model):
     '''Represent the instrument the requester plays and needs a sub for.'''
