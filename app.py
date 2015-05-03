@@ -8,6 +8,7 @@ from flask.ext.mail import Mail
 from flask.ext.migrate import Migrate
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from raven.contrib.flask import Sentry
 
 
 app = Flask(__name__)
@@ -22,3 +23,5 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 bcrypt = Bcrypt(app)
+
+sentry = Sentry(app, dsn=app.config.get('SENTRY_DSN', None))
