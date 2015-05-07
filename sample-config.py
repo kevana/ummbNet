@@ -24,6 +24,7 @@ MAIL_DEFAULT_SENDER = 'noreply@example.com'
 # administrator list
 ADMINS = ['admin@example.com']
 LOGGING_SENDER = 'server-error@example.com'
+SENTRY_DSN = 'https://public:private@app.getsentry.com/team'
 
 # Development
 MAIL_SUPPRESS_SEND = True
